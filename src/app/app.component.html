@@ -1,3 +1,84 @@
-<h1>
-  {{title}}
-</h1>
+<div class="main-title">
+  Pathtracer WebGL
+</div>
+<div id="main-content">
+  <table>
+    <tr>
+      <td width="194px">
+        <md-list style="height:512px;">
+            <div class="list-header" style="">
+              Bloom
+            </div>
+            <md-list-item>
+                <md-slide-toggle enabled checked="true"></md-slide-toggle>
+                <md-slider min="1" max="5"></md-slider>
+            </md-list-item>
+
+            <div class="list-header" style="">
+              Max samples
+            </div>
+            <md-list-item style="margin-top: 10px;">
+              <md-input style="width: 100%;" dividerColor="accent"  color="accent" value="5000"></md-input>
+            </md-list-item>
+
+            <div class="list-header" style="">
+              Resolution
+            </div>
+            <md-list-item style="margin-top: 10px;">
+              <table style="width: 100%" cellspacing="0" style="padding-top: 20px;">
+                <tr>
+                  <td><md-input placeholder="Width" style="width: 100%" dividerColor="accent" color="accent" value="512"></md-input></td>
+                  <td><md-input placeholder="Height" value style="width: 100%" dividerColor="accent"  color="accent" value="512"></md-input></td>
+                </tr>
+              </table>
+            </md-list-item>
+        </md-list>
+
+      </td>
+
+      <td width="512px">
+        <md-card class="render-card">
+          <canvas id="render-canvas"></canvas>
+        </md-card>
+      </td>
+
+      <td width="194px">
+      </td>
+    </tr>
+  </table>
+  <table>
+    <tr>
+      <td width="194px"></td>
+
+      <td width="256px">
+        <div class="play-buttons">
+          <button md-icon-button  (click)="renderService.start()">
+            <md-icon class="md-24" style="color:#666;">play_arrow</md-icon>
+          </button>
+          <button md-icon-button (click)="renderService.pause()">
+            <md-icon class="md-24" style="color:#666;">pause</md-icon>
+          </button>
+          <button md-icon-button (click)="renderService.restart()">
+            <md-icon class="md-24" style="color:#666;">replay</md-icon>
+          </button>
+        </div>
+      </td>
+
+      <td width="256px">
+        <div class="status-row">
+          <div style="width: 70px">
+            <div id="render-progress-container"></div>
+          </div>
+          <div class="render-info-text">
+            <!--<span id="fps-count">{{renderService.samplesPerSecond}}</span> samples/second.-->
+            <span id="total-samples">{{renderService.renderSamples}} / 5000 </span> samples.
+          </div>
+        </div>
+      </td>
+
+      <td width="194px"></td>
+    </tr>
+  </table>
+</div>
+
+

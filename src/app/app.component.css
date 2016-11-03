@@ -1,0 +1,87 @@
+.app-root {
+}
+
+#main-content {
+  width: 900px;
+  margin: auto;
+}
+
+#right-pane {
+  position: absolute;
+  width: calc(1200px - 512px);
+  height: 100%;
+}
+#left-pane {
+  position: absolute;
+  width: calc(1200px - 512px);
+  height: 100%;
+}
+#render-pane {
+  width: 512px;
+}
+
+#render-canvas {
+  padding-left: 0;
+  padding-right: 0;
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+  width: 512px;
+  border-radius: 3px;
+}
+
+.render-card {
+  padding: 0px !important;
+}
+
+.main-title {
+  font-size: 35pt;
+  margin: auto;
+  text-align: center;
+  font-family: 'Permanent Marker', cursive;
+  color: #222;
+}
+
+.list-header {
+  font-weight: 200;
+  height: 20px;
+  margin-top: 15px;
+  margin-left: 10px;
+  margin-bottom: 5px;
+  font-size: 14pt;
+  color: #555;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+#render-progress-container {
+  margin: auto;
+  width: 50px;
+  height: 50px;
+  position: relative;
+}
+
+.bottom-bar {
+  width: 450px;
+  margin: auto;
+}
+
+.play-buttons {
+  margin: auto;
+  width: 150px;
+}
+
+.status-row {
+  margin: auto;
+  width: 240px;
+  display: flex;
+}
+
+.render-info-text {
+  font-size: 11pt;
+  font-weight: 200;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  color: #444;
+  flex: 1;
+  line-height: 50px;
+}
+

@@ -1,1 +1,17 @@
 /* You can add global styles to this file, and also import other style files */
+@import '~@angular/material/core/theming/prebuilt/indigo-pink.css';
+
+app-root {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+}
+
+md-divider {
+  color: #ddd;
+}
+
+.md-input-element {
+  color: #555555 !important;
+  font-weight: 200 !important;
+}
