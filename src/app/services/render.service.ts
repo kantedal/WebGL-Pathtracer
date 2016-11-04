@@ -45,9 +45,16 @@ export class RenderService {
     this.renderer.resetBufferTextures();
   }
 
+  public bloom(enabled: boolean) {
+    this.renderer.bloomEnabled = enabled;
+  }
+
+
   private update() {
     this.renderSamples = this.renderer.samples;
     this.renderCompletion = this.renderer.samples / 5000;
     this.samplesPerSecond = this.renderer.fps;
   }
+
+  get bloomEnabled() { return this.renderer.bloomEnabled; }
 }

@@ -18,6 +18,7 @@ export class Renderer implements TracerProgramInterface {
   private _frameBuffer: WebGLBuffer;
   private _textures: Array<WebGLTexture>;
   private _bloomTextures: Array<WebGLTexture>;
+  private _renderTexture: WebGLTexture;
 
   private _tracerProgram: TracerProgram;
   private _thresholdProgram: ThresholdProgram;
@@ -28,7 +29,8 @@ export class Renderer implements TracerProgramInterface {
   private _time: number;
   private _samples: number;
   private _maxSamples: number = 5000;
-  private _shouldRender: boolean = true;
+  private _shouldRender: boolean = false;
+  private _bloomEnabled: boolean = true;
 
   constructor(camera: Camera) {
     this._camera = camera;
@@ -58,7 +60,7 @@ export class Renderer implements TracerProgramInterface {
         this._bloomTextures = [];
 
         // Initialise WebGL
-        this._gl = this._canvas.getContext('webgl');
+        this._gl = this._canvas.getContext('experimental-webgl');
         this._gl.getExtension('OES_texture_float');
         this._gl.viewport( 0, 0, this._canvas.width, this._canvas.height );
 
@@ -69,13 +71,14 @@ export class Renderer implements TracerProgramInterface {
         this._buffer = this._gl.createBuffer();
         this._gl.bindBuffer( this._gl.ARRAY_BUFFER, this._buffer );
         this._gl.bufferData( this._gl.ARRAY_BUFFER, new Float32Array( [ -1.0, -1.0, -1.0, 1.0, 1.0, -1.0, 1.0, - 1.0, 1.0, 1.0, - 1.0, 1.0 ] ), this._gl.STATIC_DRAW );
+        this.resetBufferTextures();
 
         // Create Program
         this._thresholdProgram = new ThresholdProgram(this._gl, this._vertexBuffer, this._frameBuffer);
         this._bloomProgram = new BloomProgram(this._gl, this._vertexBuffer, this._frameBuffer);
         this._tracerProgram = new TracerProgram(this._gl, kernelData, this._vertexBuffer, this._frameBuffer, this);
         this._renderProgram = new RenderProgram(this._gl, this._vertexBuffer, this._frameBuffer);
-        this.resetBufferTextures();
+
 
         this.animate();
       },
@@ -84,6 +87,8 @@ export class Renderer implements TracerProgramInterface {
 
   public addSceneTextures(textureData) {
     this._tracerProgram.addSceneTextures(textureData);
+
+    this._shouldRender = true;
   }
 
   private animate = () => {
@@ -92,14 +97,15 @@ export class Renderer implements TracerProgramInterface {
       this._tracerProgram.update(this._time, this._canvas.width, this._canvas.height, this._textures, this._camera);
       this._textures.reverse();
 
-      // Run threshold and bloom shader
-      this._thresholdProgram.update(this._textures[0], this._bloomTextures[0], this._samples);
-      for (let bloomIteration = 0; bloomIteration < 10; bloomIteration++)
-        this._bloomProgram.update(this._bloomTextures[0], this._bloomTextures[1]);
+      // Run threshold and bloom shader if enabled
+      if (this._bloomEnabled) {
+        this._thresholdProgram.update(this._textures[0], this._bloomTextures[0], this._samples);
+        for (let bloomIteration = 0; bloomIteration < 10; bloomIteration++)
+          this._bloomProgram.update(this._bloomTextures[0], this._bloomTextures[1]);
+      }
 
       //this._bloomTextures.reverse();
-
-      this._renderProgram.update(this._textures[0], this._bloomTextures[0], this._samples);
+      this._renderProgram.update(this._textures[0], this._bloomTextures[0], this._samples, this._bloomEnabled);
 
       this._time = (new Date().getTime() - this._startTime) / 10000;
       this._samples += 1;
@@ -128,7 +134,6 @@ export class Renderer implements TracerProgramInterface {
   }
 
   public resetBufferTextures() {
-    //this.textures = [];
     for(var i = 0; i < 2; i++) {
       this._textures[i] = this._gl.createTexture();
       this._gl.bindTexture(this._gl.TEXTURE_2D, this._textures[i]);
@@ -136,12 +141,25 @@ export class Renderer implements TracerProgramInterface {
       this._gl.texParameteri(this._gl.TEXTURE_2D, this._gl.TEXTURE_MIN_FILTER, this._gl.NEAREST);
       this._gl.texImage2D(this._gl.TEXTURE_2D, 0, this._gl.RGB, 512, 512, 0, this._gl.RGB, this._gl.FLOAT, null);
 
+      let data = new Float32Array(512 * 512 * 3);
+      for (let i = 0; i < 512 * 512 * 3; i++) {
+        data[i] = 1.0;
+      }
+
       this._bloomTextures[i] = this._gl.createTexture();
       this._gl.bindTexture(this._gl.TEXTURE_2D, this._bloomTextures[i]);
-      this._gl.texParameteri(this._gl.TEXTURE_2D, this._gl.TEXTURE_MAG_FILTER, this._gl.NEAREST);
       this._gl.texParameteri(this._gl.TEXTURE_2D, this._gl.TEXTURE_MIN_FILTER, this._gl.NEAREST);
-      this._gl.texImage2D(this._gl.TEXTURE_2D, 0, this._gl.RGB, 512, 512, 0, this._gl.RGB, this._gl.FLOAT, null);
+      this._gl.texParameteri(this._gl.TEXTURE_2D, this._gl.TEXTURE_MAG_FILTER, this._gl.NEAREST);
+      this._gl.texParameteri(this._gl.TEXTURE_2D, this._gl.TEXTURE_WRAP_S, this._gl.CLAMP_TO_EDGE);
+      this._gl.texParameteri(this._gl.TEXTURE_2D, this._gl.TEXTURE_WRAP_T, this._gl.CLAMP_TO_EDGE);
+      this._gl.texImage2D(this._gl.TEXTURE_2D, 0, this._gl.RGB, 512, 512, 0, this._gl.RGB, this._gl.FLOAT, data);
     }
+
+    this._renderTexture = this._gl.createTexture();
+    this._gl.bindTexture(this._gl.TEXTURE_2D, this._renderTexture);
+    this._gl.texParameteri(this._gl.TEXTURE_2D, this._gl.TEXTURE_MAG_FILTER, this._gl.NEAREST);
+    this._gl.texParameteri(this._gl.TEXTURE_2D, this._gl.TEXTURE_MIN_FILTER, this._gl.NEAREST);
+    this._gl.texImage2D(this._gl.TEXTURE_2D, 0, this._gl.RGB, 512, 512, 0, this._gl.RGB, this._gl.FLOAT, null);
 
     this._gl.bindTexture(this._gl.TEXTURE_2D, null);
     this._samples = 1;
@@ -157,5 +175,13 @@ export class Renderer implements TracerProgramInterface {
 
   set shouldRender(value: boolean) {
     this._shouldRender = value;
+  }
+
+  get bloomEnabled(): boolean {
+    return this._bloomEnabled;
+  }
+
+  set bloomEnabled(value: boolean) {
+    this._bloomEnabled = value;
   }
 }

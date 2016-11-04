@@ -9,10 +9,10 @@ export class TracerProgram {
   private _frameBuffer;
   private _callback: TracerProgramInterface;
 
-  private triangleTexture: DataTexture;
-  private lightTexture: DataTexture;
-  private sphereTexture: DataTexture;
-  private materialTexture: DataTexture;
+  private _triangleTexture: DataTexture;
+  private _lightTexture: DataTexture;
+  private _sphereTexture: DataTexture;
+  private _materialTexture: DataTexture;
   private _vertexAttribute;
 
   private timeLocation: WebGLUniformLocation;
@@ -39,21 +39,29 @@ export class TracerProgram {
   public update(time, width, height, bufferTextures: Array<any>, camera: Camera) {
     this._gl.useProgram(this._program);
 
-    this._gl.activeTexture(this._gl.TEXTURE0);
-    this._gl.bindTexture(this._gl.TEXTURE_2D, bufferTextures[0]);
-
-    this._gl.activeTexture(this._gl.TEXTURE1);
-    this._gl.bindTexture(this._gl.TEXTURE_2D, this.triangleTexture);
-
     this.updateCamera(camera);
     this._gl.bindBuffer(this._gl.ARRAY_BUFFER, this._vertexBuffer);
     this._gl.vertexAttribPointer(this._vertexAttribute, 2, this._gl.FLOAT, false, 0, 0);
     this._gl.bindFramebuffer(this._gl.FRAMEBUFFER, this._frameBuffer);
     this._gl.framebufferTexture2D(this._gl.FRAMEBUFFER, this._gl.COLOR_ATTACHMENT0, this._gl.TEXTURE_2D, bufferTextures[1], 0);
+
+    this._gl.activeTexture(this._gl.TEXTURE0);
+    this._gl.bindTexture(this._gl.TEXTURE_2D, bufferTextures[0]);
+
+    this._gl.activeTexture(this._gl.TEXTURE1);
+    this._gl.bindTexture(this._gl.TEXTURE_2D, this._triangleTexture.texture);
+
+    this._gl.activeTexture(this._gl.TEXTURE2);
+    this._gl.bindTexture(this._gl.TEXTURE_2D, this._lightTexture.texture);
+
+    this._gl.activeTexture(this._gl.TEXTURE3);
+    this._gl.bindTexture(this._gl.TEXTURE_2D, this._sphereTexture.texture);
+
+    this._gl.activeTexture(this._gl.TEXTURE4);
+    this._gl.bindTexture(this._gl.TEXTURE_2D, this._materialTexture.texture);
+
     this._gl.drawArrays(this._gl.TRIANGLE_STRIP, 0, 4);
     this._gl.bindFramebuffer(this._gl.FRAMEBUFFER, null);
-
-
 
     this._gl.uniform1f( this.timeLocation, time );
     this._gl.uniform2f( this.resolutionLocation, width, height );
@@ -74,17 +82,17 @@ export class TracerProgram {
   }
 
   public addSceneTextures(textureData) {
-    this.triangleTexture = new DataTexture(this._gl, 1024, 1024, textureData.triangles, "u_triangle_texture", this._program, 1);
-    this.lightTexture = new DataTexture(this._gl, 128, 128, textureData.light_triangles, "u_light_texture", this._program, 2);
-    this.sphereTexture = new DataTexture(this._gl, 512, 512, textureData.spheres, "u_sphere_texture", this._program, 3);
-    this.materialTexture = new DataTexture(this._gl, 512, 512, textureData.materials, "u_material_texture", this._program, 4);
+    this._triangleTexture = new DataTexture(this._gl, 1024, 1024, textureData.triangles, "u_triangle_texture", this._program, 1);
+    this._lightTexture = new DataTexture(this._gl, 128, 128, textureData.light_triangles, "u_light_texture", this._program, 2);
+    this._sphereTexture = new DataTexture(this._gl, 512, 512, textureData.spheres, "u_sphere_texture", this._program, 3);
+    this._materialTexture = new DataTexture(this._gl, 512, 512, textureData.materials, "u_material_texture", this._program, 4);
 
     this._gl.useProgram(this._program);
     this._gl.uniform1i(this.accumulatedBufferLocation, 0);
-    this._gl.uniform1i(this.triangleTexture.location, 1);
-    this._gl.uniform1i(this.lightTexture.location, 2);
-    this._gl.uniform1i(this.sphereTexture.location, 3);
-    this._gl.uniform1i(this.materialTexture.location, 4);
+    this._gl.uniform1i(this._triangleTexture.location, 1);
+    this._gl.uniform1i(this._lightTexture.location, 2);
+    this._gl.uniform1i(this._sphereTexture.location, 3);
+    this._gl.uniform1i(this._materialTexture.location, 4);
 
     this._gl.uniform1i(this._gl.getUniformLocation( this._program, 'triangle_count'), textureData.triangle_count );
     this._gl.uniform1i(this._gl.getUniformLocation( this._program, 'sphere_count'), textureData.sphere_count );

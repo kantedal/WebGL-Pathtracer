@@ -52,5 +52,9 @@ export class AppComponent implements AfterViewInit {
     }, 100);
   }
 
+  public onBloomSwitch($event) {
+    this.renderService.bloom($event.checked);
+  }
+
   title = 'app works!';
 }

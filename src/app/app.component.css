@@ -85,3 +85,11 @@
   line-height: 50px;
 }
 
+.small-subheader {
+  color: gray;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  font-size: 12px;
+  margin-top: 10px;
+  font-weight: 100;
+  letter-spacing: 1px;
+}
