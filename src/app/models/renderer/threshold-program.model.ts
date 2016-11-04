@@ -26,8 +26,10 @@ export class ThresholdProgram {
 
   public update(inputTexture: WebGLTexture, outputTexture: WebGLTexture, samples: number) {
     this._gl.useProgram(this._thresholdProgram);
+
     this._gl.activeTexture(this._gl.TEXTURE0);
     this._gl.bindTexture(this._gl.TEXTURE_2D, inputTexture);
+    
     this._gl.bindBuffer(this._gl.ARRAY_BUFFER, this._vertexBuffer);
     this._gl.bindFramebuffer(this._gl.FRAMEBUFFER, this._frameBuffer);
     this._gl.framebufferTexture2D(this._gl.FRAMEBUFFER, this._gl.COLOR_ATTACHMENT0, this._gl.TEXTURE_2D, outputTexture, 0);

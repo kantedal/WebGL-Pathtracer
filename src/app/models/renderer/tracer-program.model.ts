@@ -38,8 +38,13 @@ export class TracerProgram {
 
   public update(time, width, height, bufferTextures: Array<any>, camera: Camera) {
     this._gl.useProgram(this._program);
+
     this._gl.activeTexture(this._gl.TEXTURE0);
     this._gl.bindTexture(this._gl.TEXTURE_2D, bufferTextures[0]);
+
+    this._gl.activeTexture(this._gl.TEXTURE1);
+    this._gl.bindTexture(this._gl.TEXTURE_2D, this.triangleTexture);
+
     this.updateCamera(camera);
     this._gl.bindBuffer(this._gl.ARRAY_BUFFER, this._vertexBuffer);
     this._gl.vertexAttribPointer(this._vertexAttribute, 2, this._gl.FLOAT, false, 0, 0);

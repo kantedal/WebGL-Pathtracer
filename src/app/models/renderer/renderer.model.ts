@@ -7,7 +7,7 @@ import { LoadShaders } from "../loader";
 import { TracerProgram, TracerProgramInterface } from "./tracer-program.model";
 import { RenderProgram } from "./render-program.model";
 import { BloomProgram } from "./bloom-program.model";
-import {ThresholdProgram} from "./threshold-program.model";
+import { ThresholdProgram } from "./threshold-program.model";
 
 export class Renderer implements TracerProgramInterface {
   private _camera: Camera;
@@ -53,6 +53,7 @@ export class Renderer implements TracerProgramInterface {
         this._canvas = document.querySelector('canvas');
         this._canvas.width = 512;
         this._canvas.height = 512;
+
         this._textures = [];
         this._bloomTextures = [];
 
@@ -63,8 +64,6 @@ export class Renderer implements TracerProgramInterface {
 
         this._vertexBuffer = this._gl.createBuffer();
         this._frameBuffer = this._gl.createFramebuffer();
-        this._renderProgram = new RenderProgram(this._gl, this._vertexBuffer, this._frameBuffer);
-        this.resetBufferTextures();
 
         // Create Vertex buffer (2 triangles)
         this._buffer = this._gl.createBuffer();
@@ -75,6 +74,9 @@ export class Renderer implements TracerProgramInterface {
         this._thresholdProgram = new ThresholdProgram(this._gl, this._vertexBuffer, this._frameBuffer);
         this._bloomProgram = new BloomProgram(this._gl, this._vertexBuffer, this._frameBuffer);
         this._tracerProgram = new TracerProgram(this._gl, kernelData, this._vertexBuffer, this._frameBuffer, this);
+        this._renderProgram = new RenderProgram(this._gl, this._vertexBuffer, this._frameBuffer);
+        this.resetBufferTextures();
+
         this.animate();
       },
       () => {});
@@ -92,8 +94,10 @@ export class Renderer implements TracerProgramInterface {
 
       // Run threshold and bloom shader
       this._thresholdProgram.update(this._textures[0], this._bloomTextures[0], this._samples);
-      // for (let bloomIteration = 0; bloomIteration < 10; bloomIteration++)
-      //   this._bloomProgram.update(this._bloomTextures[0], this._bloomTextures[1]);
+      for (let bloomIteration = 0; bloomIteration < 10; bloomIteration++)
+        this._bloomProgram.update(this._bloomTextures[0], this._bloomTextures[1]);
+
+      //this._bloomTextures.reverse();
 
       this._renderProgram.update(this._textures[0], this._bloomTextures[0], this._samples);
 
