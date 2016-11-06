@@ -1,6 +1,5 @@
 import 'hammerjs';
 import {Component, ViewChild, ElementRef, AfterViewInit} from '@angular/core';
-import {PathTracer} from "./models/pathtracer.model";
 import {RenderService} from "./services/render.service";
 
 declare var ProgressBar: any;

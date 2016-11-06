@@ -1,8 +1,10 @@
 import {Camera} from "./camera.model";
+import {Scene} from "./scene.model";
 
 
 export class Navigator {
   private render_canvas;
+  private scene: Scene;
   private camera: Camera;
 
   // Interaction data
@@ -14,13 +16,16 @@ export class Navigator {
   private left_mouse_down: boolean;
 
 
-  constructor(camera) {
+  constructor(camera: Camera, scene: Scene) {
     this.render_canvas = $('#render-canvas');
+
+    this.scene = scene;
     this.camera = camera;
 
     this.setupCameraMove();
     this.setupCameraZoom();
     this.setupCameraRotation();
+    this.setupClickListeners();
   }
 
   setupCameraMove() {
@@ -48,7 +53,7 @@ export class Navigator {
     });
 
     $('#render-canvas').mousedown((event) => {
-      if (event.which == 2) {
+      if (event.which === 2) {
         this.start_mouse_position.x = -5 * (event.pageX / 512 - 0.5);
         this.start_mouse_position.y = 5 * (event.pageY / 512 - 0.5);
         this.start_camera_position = vec3.fromValues(this.camera.position[0], this.camera.position[1], this.camera.position[2]);
@@ -85,10 +90,9 @@ export class Navigator {
     // Mouse move
     this.render_canvas.mousemove((event) => {
       if (this.left_mouse_down) {
-        console.log("camera has changed 2");
-        let uv = vec3.fromValues(0,0,0);
-        let u = vec3.fromValues(0,0,0);
-        let v = vec3.fromValues(0,0,0);
+        let uv = vec3.fromValues(0, 0, 0);
+        let u = vec3.fromValues(0, 0, 0);
+        let v = vec3.fromValues(0, 0, 0);
 
         vec3.scale(u, this.camera.camera_right, -8 * (event.pageX / 512 - 0.5) - this.start_mouse_position.x);
         vec3.scale(v, this.camera.camera_up, 8 * (event.pageY / 512 - 0.5) - this.start_mouse_position.y);
@@ -102,7 +106,7 @@ export class Navigator {
     });
 
     this.render_canvas.mousedown((event) => {
-      if (event.which == 1) {
+      if (event.which === 1) {
         this.start_mouse_position.x = -8 * (event.pageX / 512 - 0.5);
         this.start_mouse_position.y = 8 * (event.pageY / 512 - 0.5);
         this.start_camera_position = vec3.fromValues(this.camera.position[0], this.camera.position[1], this.camera.position[2]);
@@ -112,5 +116,12 @@ export class Navigator {
 
     this.render_canvas.mouseup((event) => this.left_mouse_down = false );
     this.render_canvas.mouseout((event) => this.left_mouse_down = false );
+  }
+
+  setupClickListeners() {
+    this.render_canvas.click((event) => {
+      let ray = this.camera.createRayFromPixel(vec2.fromValues(event.offsetX, event.offsetY));
+      this.scene.sceneIntersection(ray);
+    });
   }
 }

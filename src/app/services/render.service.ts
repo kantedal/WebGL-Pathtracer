@@ -26,7 +26,7 @@ export class RenderService {
     this.scene = new Scene();
     this.camera = new Camera(vec3.fromValues(-1,0,0), vec3.fromValues(1,0,0));
     this.renderer = new Renderer(this.camera);
-    this.navigator = new Navigator(this.camera);
+    this.navigator = new Navigator(this.camera, this.scene);
 
     setTimeout(() => this.renderer.addSceneTextures(this.scene.BuildSceneTextures()), 100);
 

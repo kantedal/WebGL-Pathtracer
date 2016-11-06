@@ -1,4 +1,6 @@
+declare var Vector;
 
+import {Ray} from "./ray.model";
 import {MATERIAL_TYPES, Material} from "./material.model";
 import {LoadObjects} from "./loader";
 import {Sphere} from "./sphere.model";
@@ -15,6 +17,15 @@ export class Scene {
     this.materials = [];
 
     this.CreateDefaultScene();
+  }
+
+  public sceneIntersection(ray: Ray) {
+    for (let object of this.objects) {
+      let collision_pos: GLM.IArray = vec3.fromValues(0,0,0);
+      if (object.rayIntersection(ray, collision_pos)) {
+        console.log("objet collision");
+      }
+    }
   }
 
   CreateDefaultScene() {

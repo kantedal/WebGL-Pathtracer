@@ -88,7 +88,7 @@ export class Renderer implements TracerProgramInterface {
   public addSceneTextures(textureData) {
     this._tracerProgram.addSceneTextures(textureData);
 
-    this._shouldRender = true;
+    //this._shouldRender = true;
   }
 
   private animate = () => {

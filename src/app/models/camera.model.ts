@@ -1,3 +1,4 @@
+import {Ray} from "./ray.model";
 /**
  * Created by fille on 02/11/16.
  */
@@ -18,7 +19,37 @@ export class Camera {
     this.update();
   }
 
-  update() {
+  public createRayFromPixel(pixel_position: GLM.IArray) {
+    let width = 512.0;
+    let height = 512.0;
+
+    let i = (pixel_position[0] / width) - 0.5;
+    let j = (pixel_position[1] / height) - 0.5;
+
+    let camera_right = vec3.fromValues(0,0,0);
+    let camera_up = vec3.fromValues(0,0,0);
+    let right_up = vec3.fromValues(0,0,0);
+    let dir_pos = vec3.fromValues(0,0,0);
+    let image_point = vec3.fromValues(0,0,0);
+
+    vec3.scale(camera_right, this._camera_right, i * 1.5);
+    vec3.scale(camera_up, this._camera_up, j * 1.5);
+    vec3.add(right_up, camera_right, camera_up);
+    vec3.add(dir_pos, this._position, this._direction);
+    vec3.add(image_point, right_up, dir_pos);
+
+    let direction = vec3.fromValues(0,0,0);
+    let normalized_direction = vec3.fromValues(0,0,0);
+    let camera_position = vec3.fromValues(0,0,0);
+
+    vec3.subtract(direction, image_point, this._position);
+    vec3.normalize(normalized_direction, direction);
+    vec3.copy(camera_position, this._position);
+
+    return new Ray(camera_position, normalized_direction);
+  }
+
+  public update() {
     let distance = vec3.distance(this._look_at, this._position);
 
     vec3.subtract(this._direction, this._look_at, this._position);
