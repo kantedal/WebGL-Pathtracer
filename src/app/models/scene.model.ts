@@ -19,21 +19,37 @@ export class Scene {
     this.CreateDefaultScene();
   }
 
-  public sceneIntersection(ray: Ray) {
+  public sceneIntersection(ray: Ray): Object3d {
+    let colliding_objects = [];
+    let collision_positions = [];
+
     for (let object of this.objects) {
       let collision_pos: GLM.IArray = vec3.fromValues(0,0,0);
       if (object.rayIntersection(ray, collision_pos)) {
-        console.log("objet collision");
+        colliding_objects.push(object);
+        collision_positions.push(collision_pos);
       }
     }
+
+    let closestIndex = 0;
+    let closestDistance = 1000;
+    for (let i = 0; i < collision_positions.length; i++) {
+      let distance = vec3.squaredDistance(ray.startPosition, collision_positions[i]);
+      if (distance < closestDistance) {
+        closestIndex = i;
+        closestDistance = distance;
+      }
+    }
+
+    return colliding_objects[closestIndex];
   }
 
   CreateDefaultScene() {
     let red_material = new Material(vec3.fromValues(1,0,0), MATERIAL_TYPES.oren_nayar);
     let green_material = new Material(vec3.fromValues(0,1,0), MATERIAL_TYPES.oren_nayar);
     let blue_material = new Material(vec3.fromValues(0,0,1), MATERIAL_TYPES.oren_nayar);
-    let white_material = new Material(vec3.fromValues(1,1,1), MATERIAL_TYPES.oren_nayar);
-    let green_glass = new Material(vec3.fromValues(0.5,1,0.5), MATERIAL_TYPES.transmission);
+    let white_material = new Material(vec3.fromValues(1.0, 0.5, 1.0), MATERIAL_TYPES.oren_nayar);
+    let green_glass = new Material(vec3.fromValues(0.5, 1.0, 0.5), MATERIAL_TYPES.transmission);
     let specular_red_material = new Material(vec3.fromValues(1,0.5,0.5), MATERIAL_TYPES.specular);
 
     let emission_material = new Material(vec3.fromValues(1,1,1), MATERIAL_TYPES.emission);
@@ -83,7 +99,12 @@ export class Scene {
 
     // Build material data
     let materialData = [];
-    for (let material of this.materials) {
+    for (let mat_idx = 0; mat_idx < this.materials.length; mat_idx++) {
+      let material = this.materials[mat_idx];
+
+      // Set material index
+      material.material_index = mat_idx;
+
       // Color
       materialData.push(material.color[0]);
       materialData.push(material.color[1]);

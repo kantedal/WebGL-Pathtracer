@@ -14,6 +14,7 @@ export class Material {
   private _material_type: number;
   private _color: GLM.IArray;
   private _emission_rate: number;
+  private _material_index: number;
 
   constructor(color, material_type) {
     this._material_type = material_type;
@@ -25,4 +26,12 @@ export class Material {
   get color() { return this._color; }
   get emission_rate() { return this._emission_rate; }
   set emission_rate(rate) { this._emission_rate = rate; }
+
+  get material_index(): number {
+    return this._material_index;
+  }
+
+  set material_index(value: number) {
+    this._material_index = value;
+  }
 }

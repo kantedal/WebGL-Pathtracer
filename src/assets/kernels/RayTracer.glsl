@@ -93,9 +93,9 @@ vec3 PathTrace(Ray ray) {
     vec3 next_dir = PDF(ray, collision_material, collision.normal, iteration, distribution);
     mask *= BRDF(ray, collision_material, collision.normal, next_dir) * distribution;
 
-    if (collision_material.material_type == 2) {
+    if (collision_material.emission_rate != 0.0) {
       accumulated_color += (mask * collision_material.color * collision_material.emission_rate);
-      break;
+      //break;
     }
     // else {
     //   vec3 light_intensity = ShadowRay(collision.position, collision.normal);

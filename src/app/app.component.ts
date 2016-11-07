@@ -1,6 +1,8 @@
 import 'hammerjs';
 import {Component, ViewChild, ElementRef, AfterViewInit} from '@angular/core';
 import {RenderService} from "./services/render.service";
+import {NavigatorService} from "./services/navigator.service";
+import {Object3d} from "./models/object3d.model";
 
 declare var ProgressBar: any;
 
@@ -11,9 +13,14 @@ declare var ProgressBar: any;
 })
 export class AppComponent implements AfterViewInit {
 
+  private selectedObject: Object3d = null;
   private progressBar: any;
 
-  constructor(private renderService: RenderService) {
+  constructor(
+    private renderService: RenderService,
+    private navigatorService: NavigatorService
+  ) {
+
   }
 
   ngAfterViewInit() {
@@ -49,6 +56,14 @@ export class AppComponent implements AfterViewInit {
     setInterval(() => {
       this.progressBar.animate(this.renderService.renderCompletion)
     }, 100);
+
+    this.setupListeners();
+  }
+
+  private setupListeners() {
+    this.navigatorService.on(NavigatorService.OBJECT_SELECTED).subscribe(message => {
+      this.selectedObject = message;
+    });
   }
 
   public onBloomSwitch($event) {

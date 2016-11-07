@@ -1,6 +1,7 @@
 import {Camera} from "../camera.model";
 import {createProgram} from "./gl-helper";
 import {DataTexture} from "./data-texture.model";
+import {Material} from "../material.model";
 
 export class TracerProgram {
   private _gl: WebGLRenderingContext;
@@ -79,6 +80,22 @@ export class TracerProgram {
         camera.hasChanged = false;
       }
     }
+  }
+
+  public updateMaterialTexture(material: Material) {
+    let material_index = material.material_index;
+
+    this._materialTexture.textureData[material_index * 6 + 0] = material.color[0];
+    this._materialTexture.textureData[material_index * 6 + 1] = material.color[1];
+    this._materialTexture.textureData[material_index * 6 + 2] = material.color[2];
+    this._materialTexture.textureData[material_index * 6 + 3] = material.material_type;
+    this._materialTexture.textureData[material_index * 6 + 4] = material.emission_rate;
+    this._materialTexture.textureData[material_index * 6 + 5] = 0;
+
+    this._gl.bindTexture(this._gl.TEXTURE_2D, this._materialTexture.texture);
+    this._gl.texImage2D(this._gl.TEXTURE_2D, 0, this._gl.RGB, this._materialTexture.width, this._materialTexture.height, 0, this._gl.RGB, this._gl.FLOAT, this._materialTexture.textureData);
+
+    console.log(this._materialTexture.texture);
   }
 
   public addSceneTextures(textureData) {

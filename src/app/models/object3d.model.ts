@@ -62,10 +62,18 @@ class Triangle {
 }
 
 export class Object3d {
+  private _position: GLM.IArray;
+  private _rotation: GLM.IArray;
+  private _scale: GLM.IArray;
+
   private _triangles: Array<Triangle>;
   private _material: Material;
 
   constructor(triangles, material) {
+    this._position = vec3.fromValues(1, 0, 0);
+    this._rotation = vec3.fromValues(0, 0, 0);
+    this._scale = vec3.fromValues(0, 0, 0);
+
     this._triangles = triangles;
     this._material = material;
   }
@@ -76,7 +84,6 @@ export class Object3d {
         return true;
       }
     }
-
     return false;
   }
 
@@ -106,4 +113,7 @@ export class Object3d {
 
   get triangles() { return this._triangles; }
   get material() { return this._material; }
+  get scale(): GLM.IArray { return this._scale; }
+  get rotation(): GLM.IArray { return this._rotation; }
+  get position(): GLM.IArray { return this._position; }
 }

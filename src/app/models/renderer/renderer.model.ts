@@ -8,6 +8,7 @@ import { TracerProgram, TracerProgramInterface } from "./tracer-program.model";
 import { RenderProgram } from "./render-program.model";
 import { BloomProgram } from "./bloom-program.model";
 import { ThresholdProgram } from "./threshold-program.model";
+import {Material} from "../material.model";
 
 export class Renderer implements TracerProgramInterface {
   private _camera: Camera;
@@ -87,8 +88,13 @@ export class Renderer implements TracerProgramInterface {
 
   public addSceneTextures(textureData) {
     this._tracerProgram.addSceneTextures(textureData);
-
     //this._shouldRender = true;
+  }
+
+  // Temporary, in need of better structure
+  public updateMaterialTexture(material: Material) {
+    this._tracerProgram.updateMaterialTexture(material);
+    this.resetBufferTextures();
   }
 
   private animate = () => {

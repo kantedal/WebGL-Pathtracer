@@ -5,6 +5,9 @@
 
 export class DataTexture {
   public _texture: WebGLTexture;
+  private _textureData: Float32Array;
+  private _width: number;
+  private _height: number;
   public _location: WebGLUniformLocation;
 
   constructor(
@@ -17,6 +20,9 @@ export class DataTexture {
     textureLocation: number
   ) {
     this._texture = gl.createTexture();
+    this._textureData = data;
+    this._width = width;
+    this._height = height;
 
     switch (textureLocation) {
       case 0:
@@ -66,5 +72,9 @@ export class DataTexture {
 
 
   get texture() { return this._texture; }
+  get textureData() { return this._textureData; }
+  set textureData(value: Float32Array) { this._textureData = value; }
   get location() { return this._location; }
+  get width(): number { return this._width; }
+  get height(): number { return this._height; }
 }
