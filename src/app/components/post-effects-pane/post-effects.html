@@ -1,0 +1,46 @@
+<md-list style="height:100%;">
+  <div class="list-header" style="">
+    Bloom
+  </div>
+  <md-list-item>
+    <!--<md-slider min="1" max="50"></md-slider>-->
+    <table style="width: 100%" cellspacing="0" style="padding-top: 20px;">
+      <tr>
+        <td style="margin-right:10px;"><md-slide-toggle enabled checked="true" (change)="onBloomSwitch($event)"></md-slide-toggle></td>
+        <td style="padding-right:20px; padding-left:20px;">
+          <md-input placeholder="Alpha"  dividerColor="accent" color="accent" value="{{_renderService.bloomAlpha}}" (change)="onBloomAlphaChange($event)"></md-input>
+        </td>
+      </tr>
+    </table>
+  </md-list-item>
+
+  <md-list-item style="margin-top: 10px;">
+    <table style="width: 100%" cellspacing="0" style="padding-top: 40px;">
+      <tr class="small-subheader">
+        Bloom iterations
+      </tr>
+      <tr>
+        <input type="range" name="points" min="0" max="300" value="{{_renderService.bloomIterations}}" (input)="bloomIterationsChanged($event)">
+      </tr>
+    </table>
+  </md-list-item>
+
+  <div class="list-header" style="margin-top: 20px">
+    Max samples
+  </div>
+  <md-list-item style="margin-top: 10px;">
+    <md-input style="width: 100%;" dividerColor="accent"  color="accent" value="5000"></md-input>
+  </md-list-item>
+
+  <div class="list-header" style="">
+    Resolution
+  </div>
+  <md-list-item style="margin-top: 10px;">
+    <table style="width: 100%" cellspacing="0" style="padding-top: 20px;">
+      <tr>
+        <td><md-input placeholder="Width" style="width: 100%" dividerColor="accent" color="accent" value="512"></md-input></td>
+        <td><md-input placeholder="Height" value style="width: 100%" dividerColor="accent"  color="accent" value="512"></md-input></td>
+      </tr>
+    </table>
+  </md-list-item>
+</md-list>

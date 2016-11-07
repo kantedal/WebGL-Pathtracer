@@ -28,6 +28,7 @@
     precision highp float;
     uniform float samples;
     uniform bool bloomEnabled;
+    uniform float bloomAlpha;
     varying vec2 texCoord;
 
     uniform sampler2D u_bloom_texture;
@@ -37,7 +38,7 @@
       vec3 color;
 
       if (bloomEnabled) {
-        color = vec3(texture2D(u_buffer_texture, texCoord)) * 1.0 / samples + vec3(texture2D(u_bloom_texture, texCoord));
+        color = vec3(texture2D(u_buffer_texture, texCoord)) * 1.0 / samples + bloomAlpha * vec3(texture2D(u_bloom_texture, texCoord));
       }
       else {
         color = vec3(texture2D(u_buffer_texture, texCoord)) * 1.0 / samples;
@@ -116,7 +117,7 @@
       offset[1] = -1.0;
       offset[2] = 0.0;
       offset[3] = 1.0;
-      offset[4] = 1.0;
+      offset[4] = 2.0;
 
       float weightInverse[5];
       weightInverse[0] = 0.0625;

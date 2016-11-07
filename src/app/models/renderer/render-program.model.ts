@@ -8,6 +8,7 @@ export class RenderProgram {
   private _frameBuffer;
   private _samplesLocation: any;
   private _bloomEnabledLocation: any;
+  private _bloomAlphaLocation: any;
 
   constructor(gl: WebGLRenderingContext, vertexBuffer, frameBuffer) {
     this._gl = gl;
@@ -21,7 +22,6 @@ export class RenderProgram {
     // create render shader
     let render_vertex_shader = document.getElementById('vs_render').textContent;
     let render_fragment_shader = document.getElementById('fs_render').textContent;
-    console.log(render_fragment_shader)
     this._program = createProgram(this._gl, render_vertex_shader, render_fragment_shader);
 
     // this._vertexAttribute = gl.getAttribLocation(this._program, 'vertex');
@@ -35,9 +35,10 @@ export class RenderProgram {
 
     this._samplesLocation = gl.getUniformLocation( this._program, 'samples' );
     this._bloomEnabledLocation = gl.getUniformLocation( this._program, 'bloomEnabled' );
+    this._bloomAlphaLocation = gl.getUniformLocation( this._program, 'bloomAlpha' );
   }
 
-  public update(bufferTexture, bloomTexture, samples: number, bloomEnabled) {
+  public update(bufferTexture, bloomTexture, samples: number, bloomEnabled, bloomAlpha: number) {
     this._gl.useProgram(this._program);
 
     this._gl.bindBuffer(this._gl.ARRAY_BUFFER, this._vertexBuffer);
@@ -45,6 +46,7 @@ export class RenderProgram {
 
     this._gl.uniform1f( this._samplesLocation, samples );
     this._gl.uniform1f( this._bloomEnabledLocation, bloomEnabled );
+    this._gl.uniform1f( this._bloomAlphaLocation, bloomAlpha );
 
     this._gl.activeTexture(this._gl.TEXTURE0);
     this._gl.bindTexture(this._gl.TEXTURE_2D, bufferTexture);

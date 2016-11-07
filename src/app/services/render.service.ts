@@ -7,7 +7,7 @@ import { Camera } from "../models/camera.model";
 import { Scene } from "../models/scene.model";
 import { Renderer } from "../models/renderer/renderer.model";
 import { NavigatorService } from "./navigator.service";
-import {Material} from "../models/material.model";
+import { Material } from "../models/material.model";
 
 @Injectable()
 export class RenderService {
@@ -15,6 +15,9 @@ export class RenderService {
   public renderCompletion = 0;
   public renderSamples = 0;
   public samplesPerSecond = 0;
+
+  public bloomIterations = 20;
+  public bloomAlpha = 0.7;
 
   private scene: Scene;
   private camera: Camera;
@@ -27,7 +30,7 @@ export class RenderService {
   public init() {
     this.scene = new Scene();
     this.camera = new Camera(vec3.fromValues(-1,0,0), vec3.fromValues(1,0,0));
-    this.renderer = new Renderer(this.camera);
+    this.renderer = new Renderer(this.camera, this);
     this._navigatorService.init(this.camera, this.scene);
 
     setTimeout(() => this.renderer.addSceneTextures(this.scene.BuildSceneTextures()), 100);

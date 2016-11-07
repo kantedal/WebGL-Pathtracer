@@ -8,11 +8,13 @@ import { RenderService } from "./services/render.service";
 import { MaterialModule } from "@angular/material";
 import { ObjectPaneComponent } from "./components/object-pane/object-pane.component";
 import { NavigatorService } from "./services/navigator.service";
+import { PostEffectsPaneComponent } from "./components/post-effects-pane/post-effects-pane.component";
 
 @NgModule({
   declarations: [
     AppComponent,
-    ObjectPaneComponent
+    ObjectPaneComponent,
+    PostEffectsPaneComponent
   ],
   imports: [
     BrowserModule,

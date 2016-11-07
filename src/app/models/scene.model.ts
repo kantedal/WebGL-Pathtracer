@@ -226,5 +226,8 @@ export class Scene {
 
     return textureData;
   }
+
+  saveSceneToFile() {
+  }
 }
 

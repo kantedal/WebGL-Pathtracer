@@ -9,8 +9,10 @@ import { RenderProgram } from "./render-program.model";
 import { BloomProgram } from "./bloom-program.model";
 import { ThresholdProgram } from "./threshold-program.model";
 import {Material} from "../material.model";
+import {RenderService} from "../../services/render.service";
 
 export class Renderer implements TracerProgramInterface {
+  private _renderService: RenderService;
   private _camera: Camera;
   private _gl: WebGLRenderingContext;
   private _canvas;
@@ -33,7 +35,8 @@ export class Renderer implements TracerProgramInterface {
   private _shouldRender: boolean = false;
   private _bloomEnabled: boolean = true;
 
-  constructor(camera: Camera) {
+  constructor(camera: Camera, renderService: RenderService) {
+    this._renderService = renderService;
     this._camera = camera;
     this.init();
   }
@@ -99,25 +102,25 @@ export class Renderer implements TracerProgramInterface {
 
   private animate = () => {
     if (this._shouldRender && this._samples < this._maxSamples) {
-
       this._tracerProgram.update(this._time, this._canvas.width, this._canvas.height, this._textures, this._camera);
       this._textures.reverse();
+    }
 
-      // Run threshold and bloom shader if enabled
-      if (this._bloomEnabled) {
-        this._thresholdProgram.update(this._textures[0], this._bloomTextures[0], this._samples);
-        for (let bloomIteration = 0; bloomIteration < 10; bloomIteration++)
-          this._bloomProgram.update(this._bloomTextures[0], this._bloomTextures[1]);
-      }
+    // Run threshold and bloom shader if enabled
+    if (this._bloomEnabled) {
+      this._thresholdProgram.update(this._textures[0], this._bloomTextures[0], this._samples);
+      for (let bloomIteration = 0; bloomIteration < this._renderService.bloomIterations; bloomIteration++)
+        this._bloomProgram.update(this._bloomTextures[0], this._bloomTextures[1]);
+    }
 
-      //this._bloomTextures.reverse();
-      this._renderProgram.update(this._textures[0], this._bloomTextures[0], this._samples, this._bloomEnabled);
+    this._renderProgram.update(this._textures[0], this._bloomTextures[0], this._samples, this._bloomEnabled, this._renderService.bloomAlpha);
 
+    if (this._shouldRender && this._samples < this._maxSamples) {
       this._time = (new Date().getTime() - this._startTime) / 10000;
       this._samples += 1;
-
       this.calculateSPS();
     }
+
     requestAnimationFrame( this.animate );
   }
 

@@ -1,60 +1,19 @@
-<div class="main-title">
-  Pathtracer WebGL
-</div>
+<md-toolbar [color]="accent" style="height: 40px;">
+  <button md-button>Render settings</button>
+  <button md-button>Post effects</button>
+</md-toolbar>
+
 <div id="main-content">
   <table>
     <tr>
       <td width="194px">
-        <md-list style="height:512px;">
-            <div class="list-header" style="">
-              Bloom
-            </div>
-            <md-list-item>
-                <!--<md-slider min="1" max="50"></md-slider>-->
-              <table style="width: 100%" cellspacing="0" style="padding-top: 20px;">
-                <tr>
-                  <td style="margin-right:10px;"><md-slide-toggle enabled checked="true" (change)="onBloomSwitch($event)"></md-slide-toggle></td>
-                  <td style="padding-right:20px; padding-left:20px;">
-                    <md-input placeholder="Alpha"  dividerColor="accent" color="accent" value="0.7"></md-input>
-                  </td>
-                </tr>
-              </table>
-            </md-list-item>
-
-            <md-list-item style="margin-top: 10px;">
-              <table style="width: 100%" cellspacing="0" style="padding-top: 40px;">
-                <tr class="small-subheader">
-                  Bloom iterations
-                </tr>
-                <tr>
-                  <md-slider value="10" min="1" max="50"></md-slider>
-                </tr>
-              </table>
-            </md-list-item>
-
-            <div class="list-header" style="margin-top: 20px">
-              Max samples
-            </div>
-            <md-list-item style="margin-top: 10px;">
-              <md-input style="width: 100%;" dividerColor="accent"  color="accent" value="5000"></md-input>
-            </md-list-item>
-
-            <div class="list-header" style="">
-              Resolution
-            </div>
-            <md-list-item style="margin-top: 10px;">
-              <table style="width: 100%" cellspacing="0" style="padding-top: 20px;">
-                <tr>
-                  <td><md-input placeholder="Width" style="width: 100%" dividerColor="accent" color="accent" value="512"></md-input></td>
-                  <td><md-input placeholder="Height" value style="width: 100%" dividerColor="accent"  color="accent" value="512"></md-input></td>
-                </tr>
-              </table>
-            </md-list-item>
-        </md-list>
-
+        <post-effects-pane></post-effects-pane>
       </td>
 
       <td width="512px">
+        <div class="main-title">
+          Pathtracer WebGL
+        </div>
         <md-card class="render-card">
           <canvas id="render-canvas"></canvas>
         </md-card>

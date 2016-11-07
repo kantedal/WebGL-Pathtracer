@@ -1,5 +1,5 @@
 import 'hammerjs';
-import {Component, ViewChild, ElementRef, AfterViewInit} from '@angular/core';
+import {Component, AfterViewInit} from '@angular/core';
 import {RenderService} from "./services/render.service";
 import {NavigatorService} from "./services/navigator.service";
 import {Object3d} from "./models/object3d.model";
@@ -65,10 +65,4 @@ export class AppComponent implements AfterViewInit {
       this.selectedObject = message;
     });
   }
-
-  public onBloomSwitch($event) {
-    this.renderService.bloom($event.checked);
-  }
-
-  title = 'app works!';
 }
