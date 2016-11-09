@@ -3,6 +3,7 @@ import {Component, AfterViewInit} from '@angular/core';
 import {RenderService} from "./services/render.service";
 import {NavigatorService} from "./services/navigator.service";
 import {Object3d} from "./models/object3d.model";
+import {SceneLoaderService} from "./services/scene-loader.service";
 
 declare var ProgressBar: any;
 
@@ -12,16 +13,25 @@ declare var ProgressBar: any;
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements AfterViewInit {
+  public static RENDER_SETTINGS = 0;
+  public static POST_EFFECTS = 1;
+  public static OBJECTS = 2;
+  public static MATERIALS = 3;
+  private _selctedPane = 0;
 
   private selectedObject: Object3d = null;
   private progressBar: any;
 
   constructor(
     private renderService: RenderService,
-    private navigatorService: NavigatorService
-  ) {
+    private navigatorService: NavigatorService,
+    private sceneLoaderService: SceneLoaderService
+  ) {}
 
+  public changePane(paneId: number) {
+    this._selctedPane = paneId;
   }
+
 
   ngAfterViewInit() {
     this.renderService.init();

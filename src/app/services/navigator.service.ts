@@ -137,6 +137,10 @@ export class NavigatorService {
       if (object !== null) {
         this.fire(NavigatorService.OBJECT_SELECTED, object);
       }
+      else {
+        this.fire(NavigatorService.OBJECT_SELECTED, null);
+      }
+
     });
   }
 

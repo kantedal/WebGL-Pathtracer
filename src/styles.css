@@ -45,6 +45,18 @@ md-toolbar-row {
   height: 40px !important;
 }
 
+.md-ripple-background {
+  border-radius: 0px;
+}
+
+[md-button] {
+  border-radius: 0px;
+}
+
+md-toolbar {
+  background: rgb(252, 252, 252);
+}
+
 .render-info-text {
   font-size: 11pt;
   font-weight: 200;

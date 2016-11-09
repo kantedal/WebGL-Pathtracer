@@ -1,7 +1,7 @@
 import { Material } from "./material.model";
 import { Ray } from "./ray.model";
 
-class Triangle {
+export class Triangle {
   private _v0: GLM.IArray;
   private _v1: GLM.IArray;
   private _v2: GLM.IArray;
@@ -85,6 +85,24 @@ export class Object3d {
       }
     }
     return false;
+  }
+
+  public toJSON() {
+    let triangles = [];
+    for (let triangle of this._triangles) {
+      triangles.push([
+        [triangle.v0[0], triangle.v0[1], triangle.v0[2]],
+        [triangle.v1[0], triangle.v1[1], triangle.v1[2]],
+        [triangle.v2[0], triangle.v2[1], triangle.v2[2]],
+      ]);
+    }
+
+    return {
+      position: [this._position[0], this._position[1], this._position[2]],
+      rotation: [this._position[0], this._position[1], this._position[2]],
+      triangles: triangles,
+      material_index: this._material.material_index
+    };
   }
 
   static LoadObj(objData, material) {

@@ -8,6 +8,7 @@ import { Scene } from "../models/scene.model";
 import { Renderer } from "../models/renderer/renderer.model";
 import { NavigatorService } from "./navigator.service";
 import { Material } from "../models/material.model";
+import {SceneLoaderService} from "./scene-loader.service";
 
 @Injectable()
 export class RenderService {
@@ -19,28 +20,30 @@ export class RenderService {
   public bloomIterations = 20;
   public bloomAlpha = 0.7;
 
-  private scene: Scene;
+  private _scene: Scene;
   private camera: Camera;
   private renderer: Renderer;
 
   constructor(
-    private _navigatorService: NavigatorService
+    private _navigatorService: NavigatorService,
+    private _sceneLoaderService: SceneLoaderService
   ) {}
 
   public init() {
-    this.scene = new Scene();
-    this.camera = new Camera(vec3.fromValues(-1,0,0), vec3.fromValues(1,0,0));
-    this.renderer = new Renderer(this.camera, this);
-    this._navigatorService.init(this.camera, this.scene);
+    this._sceneLoaderService.loadScene('./assets/scene2.json', (scene: Scene) => {
+      this._scene = scene;
+      this.camera = new Camera(vec3.fromValues(-1,0,0), vec3.fromValues(1,0,0));
+      this.renderer = new Renderer(this.camera, this);
+      this._navigatorService.init(this.camera, this._scene);
 
-    setTimeout(() => this.renderer.addSceneTextures(this.scene.BuildSceneTextures()), 100);
-    setInterval(() => this.update(), 100);
+      setTimeout(() => this.renderer.addSceneTextures(this._scene.BuildSceneTextures()), 100);
+      setInterval(() => this.update(), 100);
+    });
   }
 
   public updateMaterialTexture(material: Material) {
     this.renderer.updateMaterialTexture(material);
   }
-
 
   public pause() {
     this.renderer.shouldRender = false;
@@ -65,4 +68,5 @@ export class RenderService {
   }
 
   get bloomEnabled() { return this.renderer.bloomEnabled; }
+  get scene(): Scene { return this._scene; }
 }

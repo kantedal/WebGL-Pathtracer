@@ -9,12 +9,15 @@ import { MaterialModule } from "@angular/material";
 import { ObjectPaneComponent } from "./components/object-pane/object-pane.component";
 import { NavigatorService } from "./services/navigator.service";
 import { PostEffectsPaneComponent } from "./components/post-effects-pane/post-effects-pane.component";
+import { RenderSettingsComponent } from "./components/render-settings/render-settings.component";
+import {SceneLoaderService} from "./services/scene-loader.service";
 
 @NgModule({
   declarations: [
     AppComponent,
     ObjectPaneComponent,
-    PostEffectsPaneComponent
+    PostEffectsPaneComponent,
+    RenderSettingsComponent
   ],
   imports: [
     BrowserModule,
@@ -24,7 +27,8 @@ import { PostEffectsPaneComponent } from "./components/post-effects-pane/post-ef
   ],
   providers: [
     NavigatorService,
-    RenderService
+    RenderService,
+    SceneLoaderService
   ],
   bootstrap: [AppComponent]
 })

@@ -1,26 +1,33 @@
-<md-toolbar [color]="accent" style="height: 40px;">
-  <button md-button>Render settings</button>
-  <button md-button>Post effects</button>
+<div class="main-title">
+  Pathtracer WebGL
+</div>
+
+<md-toolbar [color]="accent" class="toolbar">
+  <div style="margin:auto;">
+    <button md-button class="toolbar-button" (click)="changePane(0)">Render settings</button>
+    <button md-button class="toolbar-button" (click)="changePane(1)">Post effects</button>
+    <button md-button class="toolbar-button" (click)="changePane(2)">Objects</button>
+    <button md-button class="toolbar-button" (click)="changePane(3)">Materials</button>
+    <button md-button class="toolbar-button" (click)="changePane(4)">Camera</button>
+  </div>
 </md-toolbar>
 
 <div id="main-content">
   <table>
     <tr>
       <td width="194px">
-        <post-effects-pane></post-effects-pane>
+        <render-settings [hidden]="_selctedPane != 0"></render-settings>
+        <post-effects-pane [hidden]="_selctedPane != 1"></post-effects-pane>
       </td>
 
       <td width="512px">
-        <div class="main-title">
-          Pathtracer WebGL
-        </div>
         <md-card class="render-card">
           <canvas id="render-canvas"></canvas>
         </md-card>
       </td>
 
       <td width="194px">
-        <object-pane [hidden]="selectedObject === null" [selectedObject]="selectedObject"></object-pane>
+        <object-pane [hidden]="selectedObject == null"></object-pane>
       </td>
     </tr>
   </table>

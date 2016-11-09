@@ -7,23 +7,21 @@ import {Sphere} from "./sphere.model";
 import {Object3d} from "./object3d.model";
 
 export class Scene {
-  private objects: Array<Object3d>;
-  private spheres: Array<Sphere>;
-  private materials: Array<Material>;
+  private _objects: Array<Object3d>;
+  private _spheres: Array<Sphere>;
+  private _materials: Array<Material>;
 
   constructor() {
-    this.objects = [];
-    this.spheres = [];
-    this.materials = [];
-
-    this.CreateDefaultScene();
+    this._objects = [];
+    this._spheres = [];
+    this._materials = [];
   }
 
   public sceneIntersection(ray: Ray): Object3d {
     let colliding_objects = [];
     let collision_positions = [];
 
-    for (let object of this.objects) {
+    for (let object of this._objects) {
       let collision_pos: GLM.IArray = vec3.fromValues(0,0,0);
       if (object.rayIntersection(ray, collision_pos)) {
         colliding_objects.push(object);
@@ -57,14 +55,14 @@ export class Scene {
     let emission_red_material = new Material(vec3.fromValues(1,0.7,0.7), MATERIAL_TYPES.emission);
     emission_red_material.emission_rate = 20.0;
 
-    this.materials.push(red_material);
-    this.materials.push(green_material);
-    this.materials.push(blue_material);
-    this.materials.push(white_material);
-    this.materials.push(green_glass);
-    this.materials.push(specular_red_material);
-    this.materials.push(emission_material);
-    this.materials.push(emission_red_material);
+    this._materials.push(red_material);
+    this._materials.push(green_material);
+    this._materials.push(blue_material);
+    this._materials.push(white_material);
+    this._materials.push(green_glass);
+    this._materials.push(specular_red_material);
+    this._materials.push(emission_material);
+    this._materials.push(emission_red_material);
 
     // Load objects from .obj files
     LoadObjects([
@@ -75,14 +73,14 @@ export class Scene {
         {fileName: './assets/models/roof.obj', material: white_material},
       ], (objects) => {
         for (let object of objects) {
-          this.objects.push(object);
+          this._objects.push(object);
         }
       },
       () => {});
 
-    this.spheres.push(new Sphere(vec3.fromValues(5.0, -3, -3.5), 0.5, emission_red_material));
-    this.spheres.push(new Sphere(vec3.fromValues(8.0, 1.8, -3.0), 1.8, green_glass));
-    this.spheres.push(new Sphere(vec3.fromValues(9.0, -1.8, -3.0), 1.8, white_material));
+    this._spheres.push(new Sphere(vec3.fromValues(5.0, -3, -3.5), 0.5, emission_red_material));
+    this._spheres.push(new Sphere(vec3.fromValues(8.0, 1.8, -3.0), 1.8, green_glass));
+    this._spheres.push(new Sphere(vec3.fromValues(9.0, -1.8, -3.0), 1.8, white_material));
   }
 
   BuildSceneTextures() {
@@ -99,8 +97,8 @@ export class Scene {
 
     // Build material data
     let materialData = [];
-    for (let mat_idx = 0; mat_idx < this.materials.length; mat_idx++) {
-      let material = this.materials[mat_idx];
+    for (let mat_idx = 0; mat_idx < this._materials.length; mat_idx++) {
+      let material = this._materials[mat_idx];
 
       // Set material index
       material.material_index = mat_idx;
@@ -116,18 +114,18 @@ export class Scene {
       materialData.push(0);
     }
 
-    textureData.material_count = this.materials.length;
+    textureData.material_count = this._materials.length;
     for (let i = 0; i < materialData.length; i++) {
       textureData.materials[i] = materialData[i];
     }
 
     // Build sphere data
     let sphereData = [];
-    for (let sphere of this.spheres) {
+    for (let sphere of this._spheres) {
       // Find material index for current object
       let material_index = 0;
-      for (let mat_idx = 0; mat_idx < this.materials.length; mat_idx++) {
-        if (this.materials[mat_idx] === sphere.material) {
+      for (let mat_idx = 0; mat_idx < this._materials.length; mat_idx++) {
+        if (this._materials[mat_idx] === sphere.material) {
           material_index = mat_idx;
           break;
         }
@@ -144,7 +142,7 @@ export class Scene {
       sphereData.push(0);
     }
 
-    textureData.sphere_count = this.spheres.length;
+    textureData.sphere_count = this._spheres.length;
     for (let i = 0; i < materialData.length; i++) {
       textureData.spheres[i] = sphereData[i];
     }
@@ -152,12 +150,12 @@ export class Scene {
     // Build triangle data
     let triangleData = [];
     let lightData = [];
-    for (let object of this.objects) {
+    for (let object of this._objects) {
 
       // Find material index for current object
       let material_index = 0;
-      for (let mat_idx = 0; mat_idx < this.materials.length; mat_idx++) {
-        if (this.materials[mat_idx] === object.material) {
+      for (let mat_idx = 0; mat_idx < this._materials.length; mat_idx++) {
+        if (this._materials[mat_idx] === object.material) {
           material_index = mat_idx;
           break;
         }
@@ -228,6 +226,55 @@ export class Scene {
   }
 
   saveSceneToFile() {
+    let objects = [];
+    for (let object of this._objects) {
+      objects.push(object.toJSON());
+    }
+
+    let spheres = [];
+    for (let sphere of this._spheres) {
+      spheres.push(sphere.toJSON());
+    }
+
+    let materials = [];
+    for (let material of this._materials) {
+      materials.push(material.toJSON());
+    }
+
+    let dataStr = JSON.stringify({
+      objects: objects,
+      spheres: spheres,
+      materials: materials
+    });
+
+    let dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+    let exportFileDefaultName = 'scene.json';
+    let linkElement = document.createElement('a');
+    linkElement.setAttribute('href', dataUri);
+    linkElement.setAttribute('download', exportFileDefaultName);
+    linkElement.click();
+  }
+
+  get objects(): Array<Object3d> {
+    return this._objects;
+  }
+
+  set objects(value: Array<Object3d>) {
+    this._objects = value;
+  }
+  get spheres(): Array<Sphere> {
+    return this._spheres;
+  }
+
+  set spheres(value: Array<Sphere>) {
+    this._spheres = value;
+  }
+  get materials(): Array<Material> {
+    return this._materials;
+  }
+
+  set materials(value: Array<Material>) {
+    this._materials = value;
   }
 }
 

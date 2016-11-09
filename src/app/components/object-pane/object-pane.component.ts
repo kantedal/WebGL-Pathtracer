@@ -1,6 +1,7 @@
 import {Component, Input, OnChanges} from "@angular/core";
 import { Object3d } from "../../models/object3d.model";
 import {RenderService} from "../../services/render.service";
+import {NavigatorService} from "../../services/navigator.service";
 
 @Component({
   selector: 'object-pane',
@@ -8,12 +9,15 @@ import {RenderService} from "../../services/render.service";
   styleUrls: ['./object-pane.component.css']
 })
 export class ObjectPaneComponent implements OnChanges {
-  @Input() selectedObject: Object3d = new Object3d([], []);
+  private selectedObject: Object3d;
 
   constructor(
-    private _renderService: RenderService
+    private _renderService: RenderService,
+    private _navigatorService: NavigatorService
   ) {
-    console.log(this.selectedObject.position);
+    this._navigatorService.on(NavigatorService.OBJECT_SELECTED).subscribe(object => {
+      this.selectedObject = object;
+    });
   }
 
   public emissionRateChanged(event) {
