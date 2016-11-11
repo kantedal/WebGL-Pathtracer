@@ -56,8 +56,8 @@
           </div>
           <div class="render-info-text">
             <!--<span id="fps-count">{{renderService.samplesPerSecond}}</span> samples/second.-->
-            <span id="total-samples">{{renderService.renderSamples}} / 5000 </span> samples.
-            <span>{{renderService.samplesPerSecond}} SSP </span> samples.
+            <div style="margin-top: 3px;" class="render-info-row">{{renderService.renderSamples}} / 5000 samples</div>
+            <div class="render-info-row">{{renderService.samplesPerSecond}} samples/second </div>
           </div>
         </div>
       </td>

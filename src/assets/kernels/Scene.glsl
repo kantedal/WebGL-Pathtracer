@@ -100,51 +100,6 @@ int getStackValue(int index, int stack[32]) {
   return -1;
 }
 
-//void getBoundingBoxes(int stackIdx, inout vec3 bottom_bbox, inout vec3 top_bbox) {
-//  vec2 sample_step = vec2(1.0,0) / vec2(2048, 2048);
-//  vec2 start_sample = (vec2(1.0,0) / vec2(2048, 2048)) * float(stackIdx) * 3.0;;
-//
-//  float row = floor(start_sample.x);
-//  if (start_sample.x >= 1.0) {
-//    start_sample.x = start_sample.x - row;
-//    start_sample.y = row / 2048.0;
-//  }
-//
-//  bottom_bbox = vec3(texture2D(u_bvh_texture, start_sample));
-//  top_bbox = vec3(texture2D(u_bvh_texture, start_sample + sample_step));
-//}
-
-void getNodeChildIndices(int stackIdx, inout int left_index, inout int right_index) {
-  vec2 sample_step = vec2(1.0,0) / vec2(2048, 2048);
-  vec2 start_sample = (vec2(1.0,0) / vec2(2048, 2048)) * float(stackIdx) * 3.0;
-
-  float row = floor(start_sample.x);
-  if (start_sample.x >= 1.0) {
-    start_sample.x = start_sample.x - row;
-    start_sample.y = row / 2048.0;
-  }
-
-  vec4 indices = texture2D(u_bvh_texture, start_sample + sample_step * 2.0);
-  left_index = int(indices.y);
-  right_index = int(indices.z);
-}
-//
-void getLeafData(int stackIdx, inout int triangle_count, inout int start_triangle_index, inout int is_leaf) {
-  vec2 sample_step = vec2(1.0,0) / vec2(2048, 2048);
-  vec2 start_sample = (vec2(1.0,0) / vec2(2048, 2048)) * float(stackIdx) * 3.0;
-
-  float row = floor(start_sample.x);
-  if (start_sample.x >= 1.0) {
-    start_sample.x = start_sample.x - row;
-    start_sample.y = row / 2048.0;
-  }
-
-  vec4 indices = texture2D(u_bvh_texture, start_sample + sample_step * 2.0);
-  is_leaf = int(indices.x);
-  triangle_count = int(indices.y);
-  start_triangle_index = int(indices.z);
-}
-
 int getTriangleIndex(int stackIdx) {
   vec2 sample_step = vec2(1.0,0) / vec2(1024, 1024);
   vec2 start_sample = (vec2(1.0,0) / vec2(1024, 1024)) * float(stackIdx);
@@ -239,6 +194,8 @@ bool SceneIntersection(Ray ray, inout Collision collision) {
 
       int index = start_triangle_index;
       int end_index = start_triangle_index + triangle_count;
+
+      
       for (int idx = 0; idx < 30; idx++) {
         int triangle_index = getTriangleIndex(index);
 

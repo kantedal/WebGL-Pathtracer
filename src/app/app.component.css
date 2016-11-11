@@ -77,3 +77,7 @@
   margin-bottom: 10px;
   box-shadow: 0px 2px 6px #ddd;
 }
+
+.render-info-row {
+  line-height: 22px;
+}
