@@ -12,6 +12,8 @@ uniform vec3 camera_up;
 
 uniform sampler2D u_buffer_texture;
 uniform sampler2D u_triangle_texture;
+uniform sampler2D u_triangle_index_texture;
+uniform sampler2D u_bvh_texture;
 uniform sampler2D u_light_texture;
 uniform sampler2D u_sphere_texture;
 uniform sampler2D u_material_texture;

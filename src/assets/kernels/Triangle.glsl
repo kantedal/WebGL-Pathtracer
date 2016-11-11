@@ -27,34 +27,40 @@ struct Triangle {
 
 Triangle GetTriangleFromIndex(int triangle_index) {
   // Fetch triangle from texture
-  vec2 sample = vec2(1.0,0) / vec2(1024, 1024);
-  vec2 start_sample = (vec2(1.0,0) / vec2(1024, 1024)) * float(triangle_index) * 4.0 + 0.5 * sample;
+  vec2 sample_step = vec2(1.0,0) / vec2(2048, 2048);
+  vec2 start_sample = (vec2(1.0,0) / vec2(2048, 2048)) * float(triangle_index) * 4.0;// + 0.5 * sample_step;
+
+  float row = floor(start_sample.x);
+  if (start_sample.x >= 1.0) {
+    start_sample.x = start_sample.x - row;
+    start_sample.y = row / 2048.0;
+  }
 
   vec3 v0 = vec3(texture2D(u_triangle_texture, start_sample));
-  vec3 v1 = vec3(texture2D(u_triangle_texture, start_sample + sample));
-  vec3 v2 = vec3(texture2D(u_triangle_texture, start_sample + 2.0 * sample));
+  vec3 v1 = vec3(texture2D(u_triangle_texture, start_sample + sample_step));
+  vec3 v2 = vec3(texture2D(u_triangle_texture, start_sample + 2.0 * sample_step));
 
   vec3 edge1 = v1 - v0;
   vec3 edge2 = v2 - v0;
 
-  int material_index = int(texture2D(u_triangle_texture, start_sample + 3.0 * sample).x);
+  int material_index = int(texture2D(u_triangle_texture, start_sample + 3.0 * sample_step).x);
 
   return Triangle(v0, edge1, edge2, material_index);
 }
 
 Triangle GetLightTriangleFromIndex(int triangle_index) {
   // Fetch triangle from texture
-  vec2 sample = vec2(1.0,0) / vec2(128, 128);
-  vec2 start_sample = (vec2(1.0,0) / vec2(128, 128)) * float(triangle_index) * 4.0 + 0.5 * sample;
+  vec2 sample_step = vec2(1.0,0) / vec2(128, 128);
+  vec2 start_sample = (vec2(1.0,0) / vec2(128, 128)) * float(triangle_index) * 4.0;// + 0.5 * sample_step;
 
   vec3 v0 = vec3(texture2D(u_light_texture, start_sample));
-  vec3 v1 = vec3(texture2D(u_light_texture, start_sample + sample));
-  vec3 v2 = vec3(texture2D(u_light_texture, start_sample + 2.0 * sample));
+  vec3 v1 = vec3(texture2D(u_light_texture, start_sample + sample_step));
+  vec3 v2 = vec3(texture2D(u_light_texture, start_sample + 2.0 * sample_step));
 
   vec3 edge1 = v1 - v0;
   vec3 edge2 = v2 - v0;
 
-  int material_index = int(texture2D(u_light_texture, start_sample + 3.0 * sample).x);
+  int material_index = int(texture2D(u_light_texture, start_sample + 3.0 * sample_step).x);
 
   return Triangle(v0, edge1, edge2, material_index);
 }
@@ -85,6 +91,7 @@ bool TriangleIntersection(Ray ray, Triangle triangle, inout Collision collision)
       collision.position = ray.start_position + inv_det * t * ray.direction;
       collision.material_index = triangle.material_index;
       collision.normal = normalize(cross(triangle.edge1, triangle.edge2));
+      collision.distance = distance(ray.start_position, collision.position);
       return true;
   }
 
@@ -94,7 +101,7 @@ bool TriangleIntersection(Ray ray, Triangle triangle, inout Collision collision)
 vec3 RandomizePointOnTriangle(Triangle triangle) {
   float u = random(vec3(51.9898, 4567.13, 23.7182), time);
   float v = (1.0 - u) * random(vec3(4.9898, 421.13, 45.7182), time + 245.642);
-  
+
   vec3 v0 = triangle.v0;
   vec3 v1 = triangle.edge1 + v0;
   vec3 v2 = triangle.edge2 + v0;

@@ -85,8 +85,10 @@ vec3 PathTrace(Ray ray) {
 
     float distribution = 1.0;
 
-    if (!SceneIntersections(ray, collision))
+    if (!SceneIntersection(ray, collision))
       return vec3(0,0,0);
+//    else
+//      return vec3(1,0,0);
 
     collision_material = GetMaterial(collision.material_index);
 

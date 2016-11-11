@@ -26,21 +26,24 @@ export class SceneLoaderService {
       }
       scene.materials = materials;
 
-      let objects = new Array<Object3d>();
+      let scene_triangles = [];
+      let objects = [];
       for (let objectJSON of sceneJSON.objects) {
         let triangles = Array<Triangle>();
         for (let triangleJSON of objectJSON.triangles) {
-          triangles.push(new Triangle(
+          let triangle = new Triangle(
             vec3.fromValues(triangleJSON[0][0], triangleJSON[0][1], triangleJSON[0][2]),
             vec3.fromValues(triangleJSON[1][0], triangleJSON[1][1], triangleJSON[1][2]),
             vec3.fromValues(triangleJSON[2][0], triangleJSON[2][1], triangleJSON[2][2])
-          ));
+          );
+          triangles.push(triangle);
+          scene_triangles.push(triangle);
         }
         objects.push(new Object3d(triangles, scene.materials[objectJSON.material_index]));
       }
       scene.objects = objects;
 
-      let spheres = new Array<Sphere>();
+      let spheres = [];
       for (let sphereJSON of sceneJSON.spheres) {
         spheres.push(new Sphere(
           vec3.fromValues(sphereJSON.position[0], sphereJSON.position[1], sphereJSON.position[2]),

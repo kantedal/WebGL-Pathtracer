@@ -6,12 +6,12 @@ struct Material {
 
 Material GetMaterial(int material_index) {
   // Fetch material from texture
-  vec2 sample = vec2(1.0, 0.0) / vec2(512, 512);
-  vec2 start_sample = (vec2(1.0, 0.0) / vec2(512, 512)) * float(material_index) * 2.0 + 0.5 * sample;
+  vec2 sample_step = vec2(1.0, 0.0) / vec2(512, 512);
+  vec2 start_sample = (vec2(1.0, 0.0) / vec2(512, 512)) * float(material_index) * 2.0 + 0.5 * sample_step;
 
   vec3 color = vec3(texture2D(u_material_texture, start_sample));
-  int material_type = int(texture2D(u_material_texture, start_sample + sample).x);
-  float emission_rate = texture2D(u_material_texture, start_sample + sample).y;
+  int material_type = int(texture2D(u_material_texture, start_sample + sample_step).x);
+  float emission_rate = texture2D(u_material_texture, start_sample + sample_step).y;
 
   return Material(color, material_type, emission_rate);
 }

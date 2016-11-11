@@ -1,7 +1,7 @@
 void main( void ) {
     vec3 color = vec3(0,0,0);
-    for (int sample = 0; sample < 4; sample++) {
-      Ray ray = CreateRay(gl_FragCoord.xy, sample);
+    for (int sample_step = 0; sample_step < 4; sample_step++) {
+      Ray ray = CreateRay(gl_FragCoord.xy, sample_step);
       color += PathTrace(ray);
     }
     color /= 4.0;

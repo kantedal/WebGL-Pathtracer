@@ -26,7 +26,13 @@ export class AppComponent implements AfterViewInit {
     private renderService: RenderService,
     private navigatorService: NavigatorService,
     private sceneLoaderService: SceneLoaderService
-  ) {}
+  ) {
+    // let v1 = vec3.fromValues(-1, 1, 0);
+    // let v2 = vec3.fromValues(1, -1, 2);
+    // let v3 = vec3.create();
+    // vec3.min(v3, v1, v2);
+    // console.log(v3[0] + " " + v3[1] + " " + v3[2]);
+  }
 
   public changePane(paneId: number) {
     this._selctedPane = paneId;

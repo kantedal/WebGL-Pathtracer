@@ -24,17 +24,18 @@ bool SphereIntersection(Ray ray, Sphere sphere, inout Collision collision) {
   collision.position = ray.start_position + ray.direction * t;
   collision.normal = normalize(collision.position  - position);
   collision.material_index = sphere.material_index;
+  collision.distance = distance(ray.start_position, collision.position);
 
   return true;
 }
 
 Sphere GetSphere(int sphere_index) {
   // Fetch material from texture
-  vec2 sample = vec2(1.0, 0.0) / vec2(512, 512);
-  vec2 start_sample = (vec2(1.0, 0.0) / vec2(512, 512)) * float(sphere_index) * 2.0 + 0.5 * sample;
+  vec2 sample_step = vec2(1.0, 0.0) / vec2(512, 512);
+  vec2 start_sample = (vec2(1.0, 0.0) / vec2(512, 512)) * float(sphere_index) * 2.0 + 0.5 * sample_step;
 
   vec3 color = vec3(texture2D(u_sphere_texture, start_sample));
-  float radius = texture2D(u_sphere_texture, start_sample + sample).x;
-  int material_index = int(texture2D(u_sphere_texture, start_sample + sample).y);
+  float radius = texture2D(u_sphere_texture, start_sample + sample_step).x;
+  int material_index = int(texture2D(u_sphere_texture, start_sample + sample_step).y);
   return Sphere(color, radius, material_index);
 }

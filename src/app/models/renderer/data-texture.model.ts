@@ -17,7 +17,8 @@ export class DataTexture {
     data: Float32Array,
     name: string,
     program: any,
-    textureLocation: number
+    textureLocation: number,
+    type: any
   ) {
     this._texture = gl.createTexture();
     this._textureData = data;
@@ -66,7 +67,7 @@ export class DataTexture {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, width, height, 0, gl.RGB, gl.FLOAT, data);
+    gl.texImage2D(gl.TEXTURE_2D, 0, type, width, height, 0, type, gl.FLOAT, data);
     this._location = gl.getUniformLocation(program, name);
   }
 

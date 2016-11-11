@@ -17,4 +17,9 @@ export class RenderSettingsComponent {
   public onMaxSamplesChange($event) {
     this._renderService.bloom($event.checked);
   }
+
+  public loadObj() {
+    // $("#load_obj").trigger('click');
+    this._renderService.scene.loadObj();
+  }
 }

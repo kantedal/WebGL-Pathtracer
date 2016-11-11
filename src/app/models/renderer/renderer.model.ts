@@ -45,6 +45,7 @@ export class Renderer implements TracerProgramInterface {
     LoadShaders([
         './assets/kernels/header.glsl',
         './assets/kernels/Ray.glsl',
+        './assets/kernels/BoundingBox.glsl',
         './assets/kernels/Collision.glsl',
         './assets/kernels/Material.glsl',
         './assets/kernels/Triangle.glsl',

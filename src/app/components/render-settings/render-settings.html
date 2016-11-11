@@ -18,6 +18,10 @@
     </table>
   </md-list-item>
   <md-list-item>
-    <button md-raised-button color="primary" (click)="_renderService.scene.saveSceneToFile()" style="margin-top: 30px;">Save scene to .JSON</button>
+    <button md-raised-button (click)="loadObj()" style="margin-top: 30px; background-color: #FF4081; width: 100%; color:#fff;">Load object</button>
+    <!--<input type="file" id="load_obj" style="visibility: hidden;">-->
+  </md-list-item>
+  <md-list-item>
+    <button md-raised-button (click)="_renderService.scene.saveSceneToFile()" style="margin-top: 30px; background-color: #FF4081; width: 100%; color:#fff;">Save scene</button>
   </md-list-item>
 </md-list>

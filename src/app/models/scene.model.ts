@@ -1,33 +1,139 @@
+import {LoadObjects} from "./loader";
 declare var Vector;
 
 import {Ray} from "./ray.model";
 import {MATERIAL_TYPES, Material} from "./material.model";
-import {LoadObjects} from "./loader";
 import {Sphere} from "./sphere.model";
-import {Object3d} from "./object3d.model";
+import {Object3d, Triangle} from "./object3d.model";
+import {BVH} from "./bvh/bvh.model";
+import {BVHNode, BVHLeaf} from "./bvh/bvh-node.model";
 
 export class Scene {
+  private _sceneListener: SceneListener;
+  private _bvh: BVH;
+  private _triangles: Array<Triangle>;
   private _objects: Array<Object3d>;
   private _spheres: Array<Sphere>;
   private _materials: Array<Material>;
 
   constructor() {
+    this._triangles = []
     this._objects = [];
     this._spheres = [];
     this._materials = [];
+  }
+
+  // private recurseBBoxes(node: any, ray: Ray, colliding_objects: Array<Object3d>) {
+  //   if (!node.isLeaf()) {
+  //     if (node.left.rayIntersection(ray)) {
+  //       this.recurseBBoxes(node.left, ray, colliding_objects);
+  //     }
+  //
+  //     if (node.right.rayIntersection(ray)) {
+  //       this.recurseBBoxes(node.right, ray, colliding_objects);
+  //     }
+  //   }
+  //   else {
+  //     for (let triangle of node.triangles) {
+  //       let collision_pos = vec3.create();
+  //       if (triangle.rayIntersection(ray, collision_pos)) {
+  //         colliding_objects.push(this._objects[triangle.objectIndex]);
+  //       }
+  //     }
+  //   }
+  // }
+
+  private recurseBBoxes(node_index: number, ray: Ray, colliding_objects: Array<Object3d>) {
+    let node = new BVHNode();
+    node.bottom = vec3.fromValues(this._bvh.bvhTexture[node_index], this._bvh.bvhTexture[node_index + 1], this._bvh.bvhTexture[node_index + 2]);
+    node.top = vec3.fromValues(this._bvh.bvhTexture[node_index + 3], this._bvh.bvhTexture[node_index + 4], this._bvh.bvhTexture[node_index + 5]);
+
+    let isLeaf = (this._bvh.bvhTexture[node_index + 6] == 1) ? true : false;
+    if (!isLeaf) {
+      let left_index = this._bvh.bvhTexture[node_index + 7];
+      let right_index = this._bvh.bvhTexture[node_index + 8];
+
+      let left_node = new BVHNode();
+      left_node.bottom = vec3.fromValues(this._bvh.bvhTexture[left_index], this._bvh.bvhTexture[left_index + 1], this._bvh.bvhTexture[left_index + 2]);
+      left_node.top = vec3.fromValues(this._bvh.bvhTexture[left_index + 3], this._bvh.bvhTexture[left_index + 4], this._bvh.bvhTexture[left_index + 5]);
+
+      let right_node = new BVHNode();
+      right_node.bottom = vec3.fromValues(this._bvh.bvhTexture[right_index], this._bvh.bvhTexture[right_index + 1], this._bvh.bvhTexture[right_index + 2]);
+      right_node.top = vec3.fromValues(this._bvh.bvhTexture[right_index + 3], this._bvh.bvhTexture[right_index + 4], this._bvh.bvhTexture[right_index + 5]);
+
+      if (left_node.rayIntersection(ray)) {
+        this.recurseBBoxes(left_index, ray, colliding_objects);
+      }
+
+      if (right_node.rayIntersection(ray)) {
+        this.recurseBBoxes(right_index, ray, colliding_objects);
+      }
+    }
+    else {
+      let triangle_count = this._bvh.bvhTexture[node_index + 7];
+      let start_triangle_index = this._bvh.bvhTexture[node_index + 8];
+
+      for (let tri_idx = start_triangle_index; tri_idx < triangle_count + start_triangle_index; tri_idx += 1) {
+        let triangle = this._triangles[this._bvh.triangleIndexTexture[tri_idx * 3]];
+        let collision_pos = vec3.create();
+        if (triangle.rayIntersection(ray, collision_pos)) {
+          console.log(this._bvh.triangleIndexTexture[tri_idx * 3]);
+          colliding_objects.push(this._objects[triangle.objectIndex]);
+        }
+      }
+    }
+  }
+
+  private traverseBBoxes(ray: Ray, colliding_objects: Array<Object3d>) {
+    let stack = [];
+    let stackIdx = 0;
+    stack[stackIdx++] = 0;
+
+    while (stackIdx != 0) {
+      let boxIndex = stack[stackIdx - 1];
+      stackIdx--;
+
+      let currentNode = new BVHNode();
+      currentNode.bottom = vec3.fromValues(this._bvh.bvhTexture[boxIndex], this._bvh.bvhTexture[boxIndex + 1], this._bvh.bvhTexture[boxIndex + 2]);
+      currentNode.top = vec3.fromValues(this._bvh.bvhTexture[boxIndex + 3], this._bvh.bvhTexture[boxIndex + 4], this._bvh.bvhTexture[boxIndex + 5]);
+
+      let isLeaf = (this._bvh.bvhTexture[boxIndex + 6] == 1);
+      if (!isLeaf) {
+        if (currentNode.rayIntersection(ray)) {
+          let left_index = this._bvh.bvhTexture[boxIndex + 7];
+          let right_index = this._bvh.bvhTexture[boxIndex + 8];
+          stack[stackIdx++] = right_index;
+          stack[stackIdx++] = left_index;
+
+          if (stackIdx > 32) {
+            return false;
+          }
+        }
+      }
+      else {
+        let triangle_count = this._bvh.bvhTexture[boxIndex + 7];
+        let start_triangle_index = this._bvh.bvhTexture[boxIndex + 8];
+
+        for (let tri_idx = start_triangle_index; tri_idx < triangle_count + start_triangle_index; tri_idx += 1) {
+          let triangle = this._triangles[this._bvh.triangleIndexTexture[tri_idx * 3]];
+          let collision_pos = vec3.create();
+          if (triangle.rayIntersection(ray, collision_pos)) {
+            console.log(this._bvh.triangleIndexTexture[tri_idx * 3] + " " + tri_idx);
+            colliding_objects.push(this._objects[triangle.objectIndex]);
+          }
+        }
+      }
+
+    }
   }
 
   public sceneIntersection(ray: Ray): Object3d {
     let colliding_objects = [];
     let collision_positions = [];
 
-    for (let object of this._objects) {
-      let collision_pos: GLM.IArray = vec3.fromValues(0,0,0);
-      if (object.rayIntersection(ray, collision_pos)) {
-        colliding_objects.push(object);
-        collision_positions.push(collision_pos);
-      }
-    }
+    //this.recurseBBoxes(this._bvh.root, ray, colliding_objects);
+    this.traverseBBoxes(ray, colliding_objects);
+    console.log("---------------------");
 
     let closestIndex = 0;
     let closestDistance = 1000;
@@ -42,57 +148,37 @@ export class Scene {
     return colliding_objects[closestIndex];
   }
 
-  CreateDefaultScene() {
-    let red_material = new Material(vec3.fromValues(1,0,0), MATERIAL_TYPES.oren_nayar);
-    let green_material = new Material(vec3.fromValues(0,1,0), MATERIAL_TYPES.oren_nayar);
-    let blue_material = new Material(vec3.fromValues(0,0,1), MATERIAL_TYPES.oren_nayar);
-    let white_material = new Material(vec3.fromValues(1.0, 0.5, 1.0), MATERIAL_TYPES.oren_nayar);
-    let green_glass = new Material(vec3.fromValues(0.5, 1.0, 0.5), MATERIAL_TYPES.transmission);
-    let specular_red_material = new Material(vec3.fromValues(1,0.5,0.5), MATERIAL_TYPES.specular);
+  buildScene() {
+    for (let obj_idx = 0; obj_idx < this._objects.length; obj_idx++) {
+      let object = this._objects[obj_idx];
+      for (let triangle of object.triangles) {
+        triangle.objectIndex = obj_idx;
+        this._triangles.push(triangle);
+      }
+    }
 
-    let emission_material = new Material(vec3.fromValues(1,1,1), MATERIAL_TYPES.emission);
-    emission_material.emission_rate = 10.0;
-    let emission_red_material = new Material(vec3.fromValues(1,0.7,0.7), MATERIAL_TYPES.emission);
-    emission_red_material.emission_rate = 20.0;
+    for (let tri_idx = 0; tri_idx < this._triangles.length; tri_idx++) {
+      this._triangles[tri_idx].triangleIndex = tri_idx;
+    }
 
-    this._materials.push(red_material);
-    this._materials.push(green_material);
-    this._materials.push(blue_material);
-    this._materials.push(white_material);
-    this._materials.push(green_glass);
-    this._materials.push(specular_red_material);
-    this._materials.push(emission_material);
-    this._materials.push(emission_red_material);
+    this._bvh = new BVH();
+    this._bvh.createBVH(this._triangles);
 
-    // Load objects from .obj files
-    LoadObjects([
-        {fileName: './assets/models/light_plane.obj', material: emission_material },
-        {fileName: './assets/models/floor.obj', material: white_material },
-        {fileName: './assets/models/right_wall.obj', material: blue_material },
-        {fileName: './assets/models/left_wall.obj', material: red_material},
-        {fileName: './assets/models/roof.obj', material: white_material},
-      ], (objects) => {
-        for (let object of objects) {
-          this._objects.push(object);
-        }
-      },
-      () => {});
-
-    this._spheres.push(new Sphere(vec3.fromValues(5.0, -3, -3.5), 0.5, emission_red_material));
-    this._spheres.push(new Sphere(vec3.fromValues(8.0, 1.8, -3.0), 1.8, green_glass));
-    this._spheres.push(new Sphere(vec3.fromValues(9.0, -1.8, -3.0), 1.8, white_material));
+    console.log(this._bvh.bvhTexture);
   }
 
-  BuildSceneTextures() {
+  buildSceneTextures() {
     let textureData = {
       triangles: new Float32Array(2048 * 2048 * 3),
       triangle_count: 0,
+      bvh: this._bvh.bvhTexture,
+      triangle_indices: this._bvh.triangleIndexTexture,
       materials: new Float32Array(512 * 512 * 3),
       material_count: 0,
       spheres: new Float32Array(512 * 512 * 3),
       sphere_count: 0,
       light_triangles: new Float32Array(128 * 128 * 3),
-      light_count: 0
+      light_count: 0,
     };
 
     // Build material data
@@ -151,7 +237,6 @@ export class Scene {
     let triangleData = [];
     let lightData = [];
     for (let object of this._objects) {
-
       // Find material index for current object
       let material_index = 0;
       for (let mat_idx = 0; mat_idx < this._materials.length; mat_idx++) {
@@ -180,7 +265,7 @@ export class Scene {
 
         // Extra data
         triangleData.push(material_index);
-        triangleData.push(0);
+        triangleData.push(triangle.objectIndex);
         triangleData.push(0);
 
         // Add light data
@@ -225,7 +310,21 @@ export class Scene {
     return textureData;
   }
 
-  saveSceneToFile() {
+  public loadObj() {
+    LoadObjects([
+        {fileName: './assets/models/test.obj', material: this._materials[0] },
+      ], (objects) => {
+        for (let object of objects) {
+          this._objects.splice(0, 0, object);
+        }
+
+        if (this._sceneListener != null)
+          this._sceneListener.sceneUpdated();
+      },
+      () => {});
+  }
+
+  public saveSceneToFile() {
     let objects = [];
     for (let object of this._objects) {
       objects.push(object.toJSON());
@@ -255,26 +354,15 @@ export class Scene {
     linkElement.click();
   }
 
-  get objects(): Array<Object3d> {
-    return this._objects;
-  }
-
-  set objects(value: Array<Object3d>) {
-    this._objects = value;
-  }
-  get spheres(): Array<Sphere> {
-    return this._spheres;
-  }
-
-  set spheres(value: Array<Sphere>) {
-    this._spheres = value;
-  }
-  get materials(): Array<Material> {
-    return this._materials;
-  }
-
-  set materials(value: Array<Material>) {
-    this._materials = value;
-  }
+  set objects(objects: Array<Object3d>) { this._objects = objects;}
+  get objects(): Array<Object3d> { return this._objects; }
+  get spheres(): Array<Sphere> { return this._spheres; }
+  set spheres(value: Array<Sphere>) { this._spheres = value; }
+  get materials(): Array<Material> { return this._materials; }
+  set materials(value: Array<Material>) { this._materials = value;}
+  set sceneListener(value: SceneListener) { this._sceneListener = value; }
 }
 
+export interface SceneListener {
+  sceneUpdated();
+}
