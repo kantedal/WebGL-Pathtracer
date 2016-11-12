@@ -85,7 +85,7 @@ vec3 PathTrace(Ray ray) {
 
     float distribution = 1.0;
 
-    if (!SceneIntersection(ray, collision))
+    if (!SceneIntersections(ray, collision))
       return vec3(0,0,0);
 //    else
 //      return vec3(1,0,0);

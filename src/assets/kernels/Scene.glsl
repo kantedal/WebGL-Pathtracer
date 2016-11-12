@@ -155,7 +155,6 @@ bool SceneIntersection(Ray ray, inout Collision collision) {
   setStackIndex(stackIdx, 0, stack);
   stackIdx++;
 
-
   for (int i = 0; i < 1000; i++) {
     if (stackIdx <= 0) break;
 
@@ -169,19 +168,16 @@ bool SceneIntersection(Ray ray, inout Collision collision) {
     int is_leaf;
     int extra_data1;
     int extra_data2;
-
-    getNodeData(box_index - 1, bottom_bbox, top_bbox, is_leaf, extra_data1, extra_data2);
-
-    //if (box_index == 9) return true;
+    getNodeData(box_index, bottom_bbox, top_bbox, is_leaf, extra_data1, extra_data2);
 
     if (is_leaf == 0) {
       // Check collision with bounding box
       if (BoundingBoxCollision(bottom_bbox, top_bbox, ray)) {
-        int right_index = extra_data2;
-        int left_index = extra_data1;
+        int right_index = extra_data2 / 9;
+        int left_index = extra_data1 / 9;
 
-        setStackIndex(stackIdx++, right_index, stack); // Set left child index
-        setStackIndex(stackIdx++, left_index, stack); // Set right child index
+        setStackIndex(stackIdx++, right_index, stack); // Set right child index
+        setStackIndex(stackIdx++, left_index, stack); // Set left child index
 
         if (stackIdx > 32) {
           return false;
@@ -195,8 +191,7 @@ bool SceneIntersection(Ray ray, inout Collision collision) {
       int index = start_triangle_index;
       int end_index = start_triangle_index + triangle_count;
 
-      
-      for (int idx = 0; idx < 30; idx++) {
+      for (int idx = 0; idx < 2; idx++) {
         int triangle_index = getTriangleIndex(index);
 
         Triangle triangle = GetTriangleFromIndex(triangle_index);
@@ -207,12 +202,18 @@ bool SceneIntersection(Ray ray, inout Collision collision) {
         }
 
         index++;
-        if (index == end_index)
+        if (index >= end_index)
           break;
       }
     }
   }
-  collision = closest_collision;
-  return true;
+
+  if (closest_collision.distance == 1000.0) {
+    return false;
+  }
+  else {
+    collision = closest_collision;
+     return true;
+  }
 }
 

@@ -91,17 +91,22 @@ export class Scene {
 
     while (stackIdx != 0) {
       let boxIndex = stack[stackIdx - 1];
+      console.log(boxIndex);
       stackIdx--;
 
       let currentNode = new BVHNode();
       currentNode.bottom = vec3.fromValues(this._bvh.bvhTexture[boxIndex], this._bvh.bvhTexture[boxIndex + 1], this._bvh.bvhTexture[boxIndex + 2]);
       currentNode.top = vec3.fromValues(this._bvh.bvhTexture[boxIndex + 3], this._bvh.bvhTexture[boxIndex + 4], this._bvh.bvhTexture[boxIndex + 5]);
 
+      console.log(currentNode.bottom[0] + " " + currentNode.bottom[1] + " " + currentNode.bottom[2]);
+      console.log(currentNode.top[0] + " " + currentNode.top[1] + " " + currentNode.top[2]);
+
       let isLeaf = (this._bvh.bvhTexture[boxIndex + 6] == 1);
       if (!isLeaf) {
         if (currentNode.rayIntersection(ray)) {
           let left_index = this._bvh.bvhTexture[boxIndex + 7];
           let right_index = this._bvh.bvhTexture[boxIndex + 8];
+
           stack[stackIdx++] = right_index;
           stack[stackIdx++] = left_index;
 
@@ -114,11 +119,12 @@ export class Scene {
         let triangle_count = this._bvh.bvhTexture[boxIndex + 7];
         let start_triangle_index = this._bvh.bvhTexture[boxIndex + 8];
 
+        console.log("count " + triangle_count);
         for (let tri_idx = start_triangle_index; tri_idx < triangle_count + start_triangle_index; tri_idx += 1) {
           let triangle = this._triangles[this._bvh.triangleIndexTexture[tri_idx * 3]];
           let collision_pos = vec3.create();
           if (triangle.rayIntersection(ray, collision_pos)) {
-            console.log(this._bvh.triangleIndexTexture[tri_idx * 3] + " " + tri_idx);
+            //console.log(this._bvh.triangleIndexTexture[tri_idx * 3] + " " + tri_idx);
             colliding_objects.push(this._objects[triangle.objectIndex]);
           }
         }
@@ -163,8 +169,6 @@ export class Scene {
 
     this._bvh = new BVH();
     this._bvh.createBVH(this._triangles);
-
-    console.log(this._bvh.bvhTexture);
   }
 
   buildSceneTextures() {
