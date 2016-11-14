@@ -10,6 +10,7 @@ import { BloomProgram } from "./bloom-program.model";
 import { ThresholdProgram } from "./threshold-program.model";
 import {Material} from "../material.model";
 import {RenderService} from "../../services/render.service";
+import {DeveloperProgram} from "./developer-program.model";
 
 export class Renderer implements TracerProgramInterface {
   private _renderService: RenderService;
@@ -27,6 +28,7 @@ export class Renderer implements TracerProgramInterface {
   private _thresholdProgram: ThresholdProgram;
   private _bloomProgram: BloomProgram;
   private _renderProgram: RenderProgram;
+  private _developerProgram: DeveloperProgram;
 
   private _startTime: number;
   private _time: number;
@@ -47,6 +49,7 @@ export class Renderer implements TracerProgramInterface {
         './assets/kernels/Ray.glsl',
         './assets/kernels/BoundingBox.glsl',
         './assets/kernels/Collision.glsl',
+        './assets/kernels/LightSphere.glsl',
         './assets/kernels/Material.glsl',
         './assets/kernels/Triangle.glsl',
         './assets/kernels/Sphere.glsl',
@@ -83,6 +86,7 @@ export class Renderer implements TracerProgramInterface {
         this._bloomProgram = new BloomProgram(this._gl, this._vertexBuffer, this._frameBuffer);
         this._tracerProgram = new TracerProgram(this._gl, kernelData, this._vertexBuffer, this._frameBuffer, this);
         this._renderProgram = new RenderProgram(this._gl, this._vertexBuffer, this._frameBuffer);
+        this._developerProgram = new DeveloperProgram(this._gl);
 
 
         this.animate();
@@ -91,8 +95,10 @@ export class Renderer implements TracerProgramInterface {
   }
 
   public addSceneTextures(textureData) {
+
     this._tracerProgram.addSceneTextures(textureData);
-    //this._shouldRender = true;
+    //this._developerProgram.setBVH(this._renderService.scene.bvh);
+    this._developerProgram.setBVHData(textureData.bvh);
   }
 
   // Temporary, in need of better structure
@@ -102,6 +108,8 @@ export class Renderer implements TracerProgramInterface {
   }
 
   private animate = () => {
+    //this._developerProgram.update();
+
     if (this._shouldRender && this._samples < this._maxSamples) {
       this._tracerProgram.update(this._time, this._canvas.width, this._canvas.height, this._textures, this._camera);
       this._textures.reverse();

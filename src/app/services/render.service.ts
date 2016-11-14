@@ -30,11 +30,12 @@ export class RenderService implements SceneListener {
   ) {}
 
   public init() {
-    this._sceneLoaderService.loadScene('./assets/scene2.json', (scene: Scene) => {
-      this._scene = scene;
+    //this._sceneLoaderService.loadScene('./assets/scene6.json', (scene: Scene) => {
+    this._scene = new Scene();
+    this._scene.createDefaultScene(() => {
       this._scene.sceneListener = this;
 
-      this.camera = new Camera(vec3.fromValues(-1,0,0), vec3.fromValues(1,0,0));
+      this.camera = new Camera(vec3.fromValues(-10,3,0), vec3.fromValues(1,0,0));
       this.renderer = new Renderer(this.camera, this);
       this._navigatorService.init(this.camera, this._scene);
 

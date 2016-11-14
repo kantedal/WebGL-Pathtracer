@@ -12,6 +12,10 @@ export class SceneLoaderService {
 
   constructor() {}
 
+  public roundVerticeValue(input: number): number {
+    return Math.round(input * 100000) / 100000;
+  }
+
   public loadScene(filename: string, callback: any) {
     jQuery.get(filename, (sceneJSON) => {
       let scene = new Scene();
@@ -32,9 +36,9 @@ export class SceneLoaderService {
         let triangles = Array<Triangle>();
         for (let triangleJSON of objectJSON.triangles) {
           let triangle = new Triangle(
-            vec3.fromValues(triangleJSON[0][0], triangleJSON[0][1], triangleJSON[0][2]),
-            vec3.fromValues(triangleJSON[1][0], triangleJSON[1][1], triangleJSON[1][2]),
-            vec3.fromValues(triangleJSON[2][0], triangleJSON[2][1], triangleJSON[2][2])
+            vec3.fromValues(this.roundVerticeValue(triangleJSON[0][0]), this.roundVerticeValue(triangleJSON[0][1]), this.roundVerticeValue(triangleJSON[0][2])),
+            vec3.fromValues(this.roundVerticeValue(triangleJSON[1][0]), this.roundVerticeValue(triangleJSON[1][1]), this.roundVerticeValue(triangleJSON[1][2])),
+            vec3.fromValues(this.roundVerticeValue(triangleJSON[2][0]), this.roundVerticeValue(triangleJSON[2][1]), this.roundVerticeValue(triangleJSON[2][2]), )
           );
           triangles.push(triangle);
           scene_triangles.push(triangle);

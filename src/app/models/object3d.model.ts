@@ -127,7 +127,11 @@ export class Object3d {
 
         // Vertex positions
         case 'v':
-          vertices.push(vec3.fromValues(components[1], components[2], components[3]));
+          vertices.push(vec3.fromValues(
+            Math.round(components[1] * 100000) / 100000,
+            Math.round(components[2] * 100000) / 100000,
+            Math.round(components[3] * 100000) / 100000)
+          );
           break;
       }
     }

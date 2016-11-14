@@ -29,11 +29,11 @@ vec3 ShadowRay(vec3 collision_pos, vec3 collision_normal) {
   // Generate emission position and direction
   vec3 light_emission_pos = RandomizePointOnTriangle(light_triangle);
   vec3 light_emission_direction = normalize(collision_pos - light_emission_pos);
-  Ray shadow_ray = Ray(light_emission_pos, light_emission_direction);
+  Ray shadow_ray = newRay(light_emission_pos, light_emission_direction);
 
   // Test ray visibility
   Collision collision;
-  if (SceneIntersections(shadow_ray, collision)) {
+  if (SceneIntersection(shadow_ray, collision)) {
     if (distance(collision.position, collision_pos) < 0.1) {
 
       // Point is visible
@@ -82,13 +82,19 @@ vec3 PathTrace(Ray ray) {
   Material collision_material;
 
   for (int iteration = 0; iteration < 5; iteration++) {
-
     float distribution = 1.0;
 
-    if (!SceneIntersections(ray, collision))
-      return vec3(0,0,0);
-//    else
-//      return vec3(1,0,0);
+    if (!SceneIntersection(ray, collision)) {
+      vec3 lightSphereContribution = LightSphereContributions(ray);
+      if (iteration == 0) {
+        return lightSphereContribution * 10.0;
+      }
+      else {
+        accumulated_color += (mask * lightSphereContribution);
+      }
+
+      break;
+    }
 
     collision_material = GetMaterial(collision.material_index);
 
@@ -105,7 +111,7 @@ vec3 PathTrace(Ray ray) {
     // }
 
     if (!(next_dir.x == 0.0 && next_dir.y == 0.0 && next_dir.z == 0.0)) {
-      ray = Ray(collision.position + next_dir * 0.01, next_dir);
+      ray = newRay(collision.position + next_dir * 0.01, next_dir);
     }
     else {
       break;

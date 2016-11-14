@@ -13,7 +13,7 @@ export class Camera {
 
   constructor(position: GLM.IArray, direction: GLM.IArray) {
     this._position = position;
-    this._look_at = vec3.fromValues(5,0,0);
+    this._look_at = vec3.fromValues(5,2,0);
     this._direction = vec3.fromValues(0,0,0);
     this._hasChanged = false;
     this.update();
@@ -55,7 +55,7 @@ export class Camera {
     vec3.subtract(this._direction, this._look_at, this._position);
     vec3.normalize(this._direction, this._direction);
 
-    let up_vector = vec3.fromValues(0,0,1);
+    let up_vector = vec3.fromValues(0,1,0);
     this._camera_right = vec3.fromValues(0,0,0);
     this._camera_up = vec3.fromValues(0,0,0);
     vec3.cross(this._camera_right, this._direction, up_vector);

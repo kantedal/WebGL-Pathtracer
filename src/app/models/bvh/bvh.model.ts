@@ -73,6 +73,11 @@ export class BVH {
       vec3.max(top, top, box.top);
     }
 
+    // console.log("-------------------");
+    // console.log(bottom[0] + " " + bottom[1] + " " + bottom[2]);
+    // console.log(top[0] + " " + top[1] + " " + top[2]);
+    // console.log("-------------------");
+
     // Dimensions of bounding box
     let side1 = top[0] - bottom[0]; // x
     let side2 = top[1] - bottom[1]; // y
@@ -91,7 +96,7 @@ export class BVH {
         continue;
 
       // Sampling grid size 1024
-      let step = (stop - start) / (1024.0 / (depth + 1.0));
+      let step = (stop - start) / (64.0 / (depth + 1.0));
 
       for (let test_split = start + step; test_split < stop - step; test_split += step) {
         // Left and right bounding box
