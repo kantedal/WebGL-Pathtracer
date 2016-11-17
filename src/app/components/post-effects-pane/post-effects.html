@@ -3,16 +3,16 @@
     Bloom
   </div>
   <md-list-item>
-    <!--<md-slider min="1" max="50"></md-slider>-->
-    <table style="width: 100%" cellspacing="0" style="padding-top: 20px;">
-      <tr>
-        <td style="margin-right:10px;"><md-slide-toggle enabled checked="true" (change)="onBloomSwitch($event)"></md-slide-toggle></td>
-        <td style="padding-right:20px; padding-left:20px;">
-          <md-input placeholder="Alpha"  dividerColor="accent" color="accent" value="{{_renderService.bloomAlpha}}" (change)="onBloomAlphaChange($event)"></md-input>
-        </td>
-      </tr>
-    </table>
-  </md-list-item>
+  <!--<md-slider min="1" max="50"></md-slider>-->
+  <table style="width: 100%" cellspacing="0" style="padding-top: 20px;">
+    <tr>
+      <td style="margin-right:10px;"><md-slide-toggle enabled checked="true" (change)="onBloomSwitch($event)"></md-slide-toggle></td>
+      <td style="padding-right:20px; padding-left:20px;">
+        <md-input placeholder="Alpha"  dividerColor="accent" color="accent" value="{{_renderService.bloomAlpha}}" (change)="onBloomAlphaChange($event)"></md-input>
+      </td>
+    </tr>
+  </table>
+</md-list-item>
 
   <md-list-item style="margin-top: 10px;">
     <table style="width: 100%" cellspacing="0" style="padding-top: 40px;">

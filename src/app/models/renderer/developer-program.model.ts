@@ -1,6 +1,7 @@
 import { createProgram } from "./gl-helper";
 import {BVH} from "../bvh/bvh.model";
 import {BVHNode} from "../bvh/bvh-node.model";
+import {Scene} from "../scene.model";
 
 export class DeveloperProgram {
   private _gl: WebGLRenderingContext;
@@ -78,122 +79,140 @@ export class DeveloperProgram {
     gl.enableVertexAttribArray(coord);
   }
 
+  public setBVH(bvh: BVH) {
+    let vertices = [];
+    this._verticeCount = 0;
+
+    this.recurseBBoxes(bvh.root, vertices);
+
+    this._gl.useProgram(this._program);
+
+    var vertex_buffer = this._gl.createBuffer();
+    this._gl.bindBuffer(this._gl.ARRAY_BUFFER, vertex_buffer);
+    this._gl.bufferData(this._gl.ARRAY_BUFFER, new Float32Array(vertices), this._gl.STATIC_DRAW);
+    this._gl.bindBuffer(this._gl.ARRAY_BUFFER, vertex_buffer);
+
+    var coord = this._gl.getAttribLocation(this._program, "coordinates");
+    this._gl.vertexAttribPointer(coord, 3, this._gl.FLOAT, false, 0, 0);
+    this._gl.enableVertexAttribArray(coord);
+  }
+
+  public addBoundingBox(bottom: GLM.IArray, top: GLM.IArray, vertices: Array<number>) {
+    let factor = 20;
+    vertices.push(bottom[0] / factor);
+    vertices.push(bottom[1] / factor);
+    vertices.push(bottom[2] / factor);
+    vertices.push(top[0] / factor);
+    vertices.push(bottom[1] / factor);
+    vertices.push(bottom[2] / factor);
+
+    // Line 2
+    vertices.push(bottom[0] / factor);
+    vertices.push(bottom[1] / factor);
+    vertices.push(bottom[2] / factor);
+    vertices.push(bottom[0] / factor);
+    vertices.push(top[1] / factor);
+    vertices.push(bottom[2] / factor);
+
+    // Line 3
+    vertices.push(bottom[0] / factor);
+    vertices.push(bottom[1] / factor);
+    vertices.push(bottom[2] / factor);
+    vertices.push(bottom[0] / factor);
+    vertices.push(bottom[1] / factor);
+    vertices.push(top[2] / factor);
+
+    // Line 4
+    vertices.push(top[0] / factor);
+    vertices.push(top[1] / factor);
+    vertices.push(top[2] / factor);
+    vertices.push(bottom[0] / factor);
+    vertices.push(top[1] / factor);
+    vertices.push(top[2] / factor);
+
+    // Line 5
+    vertices.push(top[0] / factor);
+    vertices.push(top[1] / factor);
+    vertices.push(top[2] / factor);
+    vertices.push(top[0] / factor);
+    vertices.push(bottom[1] / factor);
+    vertices.push(top[2] / factor);
+
+    // Line 6
+    vertices.push(top[0] / factor);
+    vertices.push(top[1] / factor);
+    vertices.push(top[2] / factor);
+    vertices.push(top[0] / factor);
+    vertices.push(top[1] / factor);
+    vertices.push(bottom[2] / factor);
+
+    // Line 7
+    vertices.push(bottom[0] / factor);
+    vertices.push(bottom[1] / factor);
+    vertices.push(top[2] / factor);
+    vertices.push(top[0] / factor);
+    vertices.push(bottom[1] / factor);
+    vertices.push(top[2] / factor);
+
+    // Line 8
+    vertices.push(bottom[0] / factor);
+    vertices.push(bottom[1] / factor);
+    vertices.push(top[2] / factor);
+    vertices.push(bottom[0] / factor);
+    vertices.push(top[1] / factor);
+    vertices.push(top[2] / factor);
+
+    // Line 9
+    vertices.push(bottom[0] / factor);
+    vertices.push(top[1] / factor);
+    vertices.push(bottom[2] / factor);
+    vertices.push(top[0] / factor);
+    vertices.push(top[1] / factor);
+    vertices.push(bottom[2] / factor);
+
+    // Line 10
+    vertices.push(bottom[0] / factor);
+    vertices.push(top[1] / factor);
+    vertices.push(bottom[2] / factor);
+    vertices.push(bottom[0] / factor);
+    vertices.push(top[1] / factor);
+    vertices.push(top[2] / factor);
+
+    // Line 11
+    vertices.push(top[0] / factor);
+    vertices.push(bottom[1] / factor);
+    vertices.push(bottom[2] / factor);
+    vertices.push(top[0] / factor);
+    vertices.push(bottom[1] / factor);
+    vertices.push(top[2] / factor);
+
+    // Line 12
+    vertices.push(top[0] / factor);
+    vertices.push(bottom[1] / factor);
+    vertices.push(bottom[2] / factor);
+    vertices.push(top[0] / factor);
+    vertices.push(top[1] / factor);
+    vertices.push(bottom[2] / factor);
+
+    this._verticeCount += 24;
+  }
+
   private recurseBBoxes(node: any, vertices: Array<number>) {
-    let factor = 15;
-
-      // Line 1
-      vertices.push(node.bottom[0] / factor);
-      vertices.push(node.bottom[1] / factor);
-      vertices.push(node.bottom[2] / factor);
-      vertices.push(node.top[0] / factor);
-      vertices.push(node.bottom[1] / factor);
-      vertices.push(node.bottom[2] / factor);
-
-      // Line 2
-      vertices.push(node.bottom[0] / factor);
-      vertices.push(node.bottom[1] / factor);
-      vertices.push(node.bottom[2] / factor);
-      vertices.push(node.bottom[0] / factor);
-      vertices.push(node.top[1] / factor);
-      vertices.push(node.bottom[2] / factor);
-
-      // Line 3
-      vertices.push(node.bottom[0] / factor);
-      vertices.push(node.bottom[1] / factor);
-      vertices.push(node.bottom[2] / factor);
-      vertices.push(node.bottom[0] / factor);
-      vertices.push(node.bottom[1] / factor);
-      vertices.push(node.top[2] / factor);
-
-      // Line 4
-      vertices.push(node.top[0] / factor);
-      vertices.push(node.top[1] / factor);
-      vertices.push(node.top[2] / factor);
-      vertices.push(node.bottom[0] / factor);
-      vertices.push(node.top[1] / factor);
-      vertices.push(node.top[2] / factor);
-
-      // Line 5
-      vertices.push(node.top[0] / factor);
-      vertices.push(node.top[1] / factor);
-      vertices.push(node.top[2] / factor);
-      vertices.push(node.top[0] / factor);
-      vertices.push(node.bottom[1] / factor);
-      vertices.push(node.top[2] / factor);
-
-      // Line 6
-      vertices.push(node.top[0] / factor);
-      vertices.push(node.top[1] / factor);
-      vertices.push(node.top[2] / factor);
-      vertices.push(node.top[0] / factor);
-      vertices.push(node.top[1] / factor);
-      vertices.push(node.bottom[2] / factor);
-
-      // Line 7
-      vertices.push(node.bottom[0] / factor);
-      vertices.push(node.bottom[1] / factor);
-      vertices.push(node.top[2] / factor);
-      vertices.push(node.top[0] / factor);
-      vertices.push(node.bottom[1] / factor);
-      vertices.push(node.top[2] / factor);
-
-      // Line 8
-      vertices.push(node.bottom[0] / factor);
-      vertices.push(node.bottom[1] / factor);
-      vertices.push(node.top[2] / factor);
-      vertices.push(node.bottom[0] / factor);
-      vertices.push(node.top[1] / factor);
-      vertices.push(node.top[2] / factor);
-
-      // Line 9
-      vertices.push(node.bottom[0] / factor);
-      vertices.push(node.top[1] / factor);
-      vertices.push(node.bottom[2] / factor);
-      vertices.push(node.top[0] / factor);
-      vertices.push(node.top[1] / factor);
-      vertices.push(node.bottom[2] / factor);
-
-      // Line 10
-      vertices.push(node.bottom[0] / factor);
-      vertices.push(node.top[1] / factor);
-      vertices.push(node.bottom[2] / factor);
-      vertices.push(node.bottom[0] / factor);
-      vertices.push(node.top[1] / factor);
-      vertices.push(node.top[2] / factor);
-
-      // Line 11
-      vertices.push(node.top[0] / factor);
-      vertices.push(node.bottom[1] / factor);
-      vertices.push(node.bottom[2] / factor);
-      vertices.push(node.top[0] / factor);
-      vertices.push(node.bottom[1] / factor);
-      vertices.push(node.top[2] / factor);
-
-      // Line 12
-      vertices.push(node.top[0] / factor);
-      vertices.push(node.bottom[1] / factor);
-      vertices.push(node.bottom[2] / factor);
-      vertices.push(node.top[0] / factor);
-      vertices.push(node.top[1] / factor);
-      vertices.push(node.bottom[2] / factor);
-
-      // console.log(node.bottom[0] + " " + node.bottom[1] + " " + node.bottom[2]);
-      // console.log(node.top[0] + " " + node.top[1] + " " + node.top[2]);
-      // console.log("----");
-
-      this._verticeCount += 24;
-
+    this.addBoundingBox(node.bottom, node.top, vertices);
     if(!node.isLeaf()) {
       this.recurseBBoxes(node.left, vertices);
       this.recurseBBoxes(node.right, vertices);
     }
   }
 
-  public setBVH(bvh: BVH) {
-    let vertices = [];
+  public buildBVHLines(scene: Scene) {
     this._verticeCount = 0;
+    let vertices = [];
 
-    this.recurseBBoxes(bvh.root, vertices);
+    for (let object of scene.objects) {
+      this.addBoundingBox(object.boundingBox.bottom, object.boundingBox.top, vertices);
+      this.recurseBBoxes(object.bvh.root, vertices);
+    }
 
     this._gl.useProgram(this._program);
 
@@ -216,110 +235,8 @@ export class DeveloperProgram {
       let bottom = [bvh_texture[idx], bvh_texture[idx + 1], bvh_texture[idx + 2]];
       let top = [bvh_texture[idx + 3], bvh_texture[idx + 4], bvh_texture[idx + 5]];
       if (!(bottom[0] == 0 && bottom[1] == 0 && bottom[2] == 0 && top[0] == 0 && top[1] == 0 && top[2] == 0)) {
-        //console.log(bvh_texture[idx + 6])
-        //if (bvh_texture[idx + 6] == 0) {
-          // Line 1
-          vertices.push(bottom[0] / factor);
-          vertices.push(bottom[1] / factor);
-          vertices.push(bottom[2] / factor);
-          vertices.push(top[0] / factor);
-          vertices.push(bottom[1] / factor);
-          vertices.push(bottom[2] / factor);
-
-          // Line 2
-          vertices.push(bottom[0] / factor);
-          vertices.push(bottom[1] / factor);
-          vertices.push(bottom[2] / factor);
-          vertices.push(bottom[0] / factor);
-          vertices.push(top[1] / factor);
-          vertices.push(bottom[2] / factor);
-
-          // Line 3
-          vertices.push(bottom[0] / factor);
-          vertices.push(bottom[1] / factor);
-          vertices.push(bottom[2] / factor);
-          vertices.push(bottom[0] / factor);
-          vertices.push(bottom[1] / factor);
-          vertices.push(top[2] / factor);
-
-          // Line 4
-          vertices.push(top[0] / factor);
-          vertices.push(top[1] / factor);
-          vertices.push(top[2] / factor);
-          vertices.push(bottom[0] / factor);
-          vertices.push(top[1] / factor);
-          vertices.push(top[2] / factor);
-
-          // Line 5
-          vertices.push(top[0] / factor);
-          vertices.push(top[1] / factor);
-          vertices.push(top[2] / factor);
-          vertices.push(top[0] / factor);
-          vertices.push(bottom[1] / factor);
-          vertices.push(top[2] / factor);
-
-          // Line 6
-          vertices.push(top[0] / factor);
-          vertices.push(top[1] / factor);
-          vertices.push(top[2] / factor);
-          vertices.push(top[0] / factor);
-          vertices.push(top[1] / factor);
-          vertices.push(bottom[2] / factor);
-
-          // Line 7
-          vertices.push(bottom[0] / factor);
-          vertices.push(bottom[1] / factor);
-          vertices.push(top[2] / factor);
-          vertices.push(top[0] / factor);
-          vertices.push(bottom[1] / factor);
-          vertices.push(top[2] / factor);
-
-          // Line 8
-          vertices.push(bottom[0] / factor);
-          vertices.push(bottom[1] / factor);
-          vertices.push(top[2] / factor);
-          vertices.push(bottom[0] / factor);
-          vertices.push(top[1] / factor);
-          vertices.push(top[2] / factor);
-
-          // Line 9
-          vertices.push(bottom[0] / factor);
-          vertices.push(top[1] / factor);
-          vertices.push(bottom[2] / factor);
-          vertices.push(top[0] / factor);
-          vertices.push(top[1] / factor);
-          vertices.push(bottom[2] / factor);
-
-          // Line 10
-          vertices.push(bottom[0] / factor);
-          vertices.push(top[1] / factor);
-          vertices.push(bottom[2] / factor);
-          vertices.push(bottom[0] / factor);
-          vertices.push(top[1] / factor);
-          vertices.push(top[2] / factor);
-
-          // Line 11
-          vertices.push(top[0] / factor);
-          vertices.push(bottom[1] / factor);
-          vertices.push(bottom[2] / factor);
-          vertices.push(top[0] / factor);
-          vertices.push(bottom[1] / factor);
-          vertices.push(top[2] / factor);
-
-          // Line 12
-          vertices.push(top[0] / factor);
-          vertices.push(bottom[1] / factor);
-          vertices.push(bottom[2] / factor);
-          vertices.push(top[0] / factor);
-          vertices.push(top[1] / factor);
-          vertices.push(bottom[2] / factor);
-
-          this._verticeCount += 24;
-
-          // console.log(bottom[0] + " " + bottom[1] + " " + bottom[2]);
-          // console.log(top[0] + " " + top[1] + " " + top[2]);
-          // console.log("----");
-       //}
+        this.addBoundingBox(bottom, top, vertices);
+        this._verticeCount += 24;
       }
       else break;
     }

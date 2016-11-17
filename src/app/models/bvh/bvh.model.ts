@@ -1,6 +1,5 @@
 import {BVHNode, BVHLeaf, BVHInner} from "./bvh-node.model";
-import {Triangle} from "../object3d.model";
-
+import {Triangle} from "../triangle.model";
 
 export class BVH {
   private _triangles: Array<Triangle>;

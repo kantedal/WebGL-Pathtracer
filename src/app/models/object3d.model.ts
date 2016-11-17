@@ -1,87 +1,12 @@
 import { Material } from "./material.model";
 import { Ray } from "./ray.model";
-
-export class Triangle {
-  // Verices
-  private _v0: GLM.IArray;
-  private _v1: GLM.IArray;
-  private _v2: GLM.IArray;
-
-  // Vertex normals
-  private _n0: GLM.IArray;
-  private _n1: GLM.IArray;
-  private _n2: GLM.IArray;
-
-  private _edge1: GLM.IArray;
-  private _edge2: GLM.IArray;
-  private _objectIndex: number;
-  private _triangleIndex: number;
-
-  constructor(v0, v1, v2, n0, n1, n2) {
-    this._v0 = v0;
-    this._v1 = v1;
-    this._v2 = v2;
-
-    this._n0 = n0;
-    this._n1 = n1;
-    this._n2 = n2;
-
-    this._edge1 = vec3.create();
-    vec3.subtract(this._edge1, v1, v0);
-    this._edge2 = vec3.create();
-    vec3.subtract(this._edge2, v2, v0);
-  }
-
-  get v0() { return this._v0; }
-  get v1() { return this._v1; }
-  get v2() { return this._v2; }
-  get n2(): GLM.IArray { return this._n2;}
-  get n1(): GLM.IArray { return this._n1; }
-  get n0(): GLM.IArray { return this._n0; }
-  get edge1() { return this._edge1; }
-  get edge2() { return this._edge2; }
-  get objectIndex(): number { return this._objectIndex; }
-  set objectIndex(value: number) { this._objectIndex = value; }
-  get triangleIndex(): number { return this._triangleIndex; }
-  set triangleIndex(value: number) { this._triangleIndex = value; }
-
-  public rayIntersection(ray: Ray, collision_pos: GLM.IArray): boolean {
-    let EPS = 0.0001;
-
-    //Begin calculating determinant - also used to calculate u parameter
-    let P = vec3.fromValues(0,0,0);
-    vec3.cross(P, ray.direction, this._edge2);
-    let det = vec3.dot(this._edge1, P);
-
-    if (det > -EPS && det < EPS) return false;
-    let inv_det = 1.0 / det;
-
-    //Distance from vertex1 to ray origin
-    let T = vec3.fromValues(0,0,0);
-    vec3.subtract(T, ray.startPosition, this._v0);
-    let u = vec3.dot(T, P);
-    if (u < 0.0 || u > det) return false;
-
-    let Q = vec3.fromValues(0,0,0);
-    vec3.cross(Q, T, this._edge1);
-
-    let v = vec3.dot(ray.direction, Q);
-    if(v < 0.0 || u+v > det) return false;
-
-    let t = vec3.dot(this._edge2, Q);
-
-    if(t > EPS) {
-      let dir = vec3.fromValues(0,0,0);
-      vec3.scale(dir, ray.direction, t * inv_det);
-      vec3.add(collision_pos, ray.startPosition, T);
-      return true;
-    }
-
-    return false;
-  }
-}
+import { Triangle } from "./triangle.model";
+import { BVH } from "./bvh/bvh.model";
+import { BoundingBox } from "./bvh/bounding-box.model";
 
 export class Object3d {
+  private _bvh: BVH;
+  private _boundingBox: BoundingBox;
   private _position: GLM.IArray;
   private _rotation: GLM.IArray;
   private _scale: GLM.IArray;
@@ -96,15 +21,53 @@ export class Object3d {
 
     this._triangles = triangles;
     this._material = material;
+
+    this._boundingBox = new BoundingBox();
+    this._boundingBox.calculateBoundingBox(this._triangles);
+    console.log(this._boundingBox.bottom[0] + " " + this._boundingBox.bottom[1] + " " + this._boundingBox.bottom[2]);
+    console.log(this._boundingBox.top[0] + " " + this._boundingBox.top[1] + " " + this._boundingBox.top[2]);
+
+    this._bvh = new BVH();
+    this._bvh.createBVH(this._triangles);
+  }
+
+  private recurseBBoxes(node: any, ray: Ray, colliding_positions: Array<any>) {
+    console.log("Iteration");
+    if (!node.isLeaf()) {
+      if (node.left.rayIntersection(ray)) {
+        this.recurseBBoxes(node.left, ray, colliding_positions);
+      }
+
+      if (node.right.rayIntersection(ray)) {
+        this.recurseBBoxes(node.right, ray, colliding_positions);
+      }
+    }
+    else {
+      for (let triangle of node.triangles) {
+        let collision_pos = vec3.create();
+        if (triangle.rayIntersection(ray, collision_pos)) {
+          colliding_positions.push(collision_pos);
+        }
+      }
+    }
   }
 
   public rayIntersection(ray: Ray, collision_pos: GLM.IArray): boolean {
-    for(let triangle of this._triangles) {
-      if (triangle.rayIntersection(ray, collision_pos)) {
-        return true;
-      }
+    let colliding_positions = [];
+    let node = this._bvh.root;
+    this.recurseBBoxes(node, ray, colliding_positions);
+
+    if (colliding_positions.length != 0) {
+      return true;
     }
-    return false;
+    else {
+      return false;
+    }
+    // for(let triangle of this._triangles) {
+    //   if (triangle.rayIntersection(ray, collision_pos)) {
+    //     return true;
+    //   }
+    // }
   }
 
   public toJSON() {
@@ -165,4 +128,6 @@ export class Object3d {
   get scale(): GLM.IArray { return this._scale; }
   get rotation(): GLM.IArray { return this._rotation; }
   get position(): GLM.IArray { return this._position; }
+  get bvh(): BVH { return this._bvh; }
+  get boundingBox(): BoundingBox { return this._boundingBox; }
 }

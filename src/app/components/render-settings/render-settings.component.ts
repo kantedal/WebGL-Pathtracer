@@ -22,4 +22,8 @@ export class RenderSettingsComponent {
     // $("#load_obj").trigger('click');
     this._renderService.scene.loadObj();
   }
+
+  public onBVHModeSwitch($event) {
+    this._renderService.enableBVHMode($event.checked);
+  }
 }

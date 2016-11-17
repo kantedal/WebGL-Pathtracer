@@ -16,6 +16,7 @@ export class RenderService implements SceneListener {
   public renderCompletion = 0;
   public renderSamples = 0;
   public samplesPerSecond = 0;
+  public BVHModeEnabled = false;
 
   public bloomIterations = 20;
   public bloomAlpha = 0.7;
@@ -33,6 +34,7 @@ export class RenderService implements SceneListener {
     //this._sceneLoaderService.loadScene('./assets/scene6.json', (scene: Scene) => {
     this._scene = new Scene();
     this._scene.createDefaultScene(() => {
+      //this._scene = scene;
       this._scene.sceneListener = this;
 
       this.camera = new Camera(vec3.fromValues(-10,3,0), vec3.fromValues(1,0,0));
@@ -60,6 +62,10 @@ export class RenderService implements SceneListener {
     this.renderer.resetBufferTextures();
   }
 
+  public enableBVHMode(enable: boolean) {
+    this.BVHModeEnabled = enable;
+  }
+
   public bloom(enabled: boolean) {
     this.renderer.bloomEnabled = enabled;
   }
@@ -72,7 +78,7 @@ export class RenderService implements SceneListener {
 
   public sceneUpdated() {
     this._scene.buildScene();
-    this.renderer.addSceneTextures(this._scene.buildSceneTextures())
+    this.renderer.addSceneTextures(this._scene.buildSceneTextures(), this._scene);
   }
 
   get bloomEnabled() { return this.renderer.bloomEnabled; }

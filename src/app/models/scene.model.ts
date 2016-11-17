@@ -1,12 +1,11 @@
 import {LoadObjects} from "./loader";
-declare var Vector;
-
 import {Ray} from "./ray.model";
 import {MATERIAL_TYPES, Material} from "./material.model";
 import {Sphere} from "./sphere.model";
-import {Object3d, Triangle} from "./object3d.model";
+import {Object3d} from "./object3d.model";
 import {BVH} from "./bvh/bvh.model";
 import {BVHNode, BVHLeaf} from "./bvh/bvh-node.model";
+import {Triangle} from "./triangle.model";
 
 export class Scene {
   private _sceneListener: SceneListener;
@@ -17,15 +16,16 @@ export class Scene {
   private _materials: Array<Material>;
 
   constructor() {
-    this._triangles = []
+    this._triangles = [];
     this._objects = [];
     this._spheres = [];
     this._materials = [];
   }
 
   private recurseBBoxes(node: any, ray: Ray, colliding_objects: Array<Object3d>) {
+    console.log("Iteration");
     if (!node.isLeaf()) {
-      console.log("not leaf");
+      //console.log("not leaf");
       if (node.left.rayIntersection(ray)) {
         this.recurseBBoxes(node.left, ray, colliding_objects);
       }
@@ -43,47 +43,6 @@ export class Scene {
       }
     }
   }
-
-  // private recurseBBoxes(node_index: number, ray: Ray, colliding_objects: Array<Object3d>) {
-  //   let node = new BVHNode();
-  //   node.bottom = vec3.fromValues(this._bvh.bvhTexture[node_index], this._bvh.bvhTexture[node_index + 1], this._bvh.bvhTexture[node_index + 2]);
-  //   node.top = vec3.fromValues(this._bvh.bvhTexture[node_index + 3], this._bvh.bvhTexture[node_index + 4], this._bvh.bvhTexture[node_index + 5]);
-  //
-  //   let isLeaf = (this._bvh.bvhTexture[node_index + 6] == 1) ? true : false;
-  //   if (!isLeaf) {
-  //     let left_index = this._bvh.bvhTexture[node_index + 7];
-  //     let right_index = this._bvh.bvhTexture[node_index + 8];
-  //
-  //     let left_node = new BVHNode();
-  //     left_node.bottom = vec3.fromValues(this._bvh.bvhTexture[left_index], this._bvh.bvhTexture[left_index + 1], this._bvh.bvhTexture[left_index + 2]);
-  //     left_node.top = vec3.fromValues(this._bvh.bvhTexture[left_index + 3], this._bvh.bvhTexture[left_index + 4], this._bvh.bvhTexture[left_index + 5]);
-  //
-  //     let right_node = new BVHNode();
-  //     right_node.bottom = vec3.fromValues(this._bvh.bvhTexture[right_index], this._bvh.bvhTexture[right_index + 1], this._bvh.bvhTexture[right_index + 2]);
-  //     right_node.top = vec3.fromValues(this._bvh.bvhTexture[right_index + 3], this._bvh.bvhTexture[right_index + 4], this._bvh.bvhTexture[right_index + 5]);
-  //
-  //     if (left_node.rayIntersection(ray)) {
-  //       this.recurseBBoxes(left_index, ray, colliding_objects);
-  //     }
-  //
-  //     if (right_node.rayIntersection(ray)) {
-  //       this.recurseBBoxes(right_index, ray, colliding_objects);
-  //     }
-  //   }
-  //   else {
-  //     let triangle_count = this._bvh.bvhTexture[node_index + 7];
-  //     let start_triangle_index = this._bvh.bvhTexture[node_index + 8];
-  //
-  //     for (let tri_idx = start_triangle_index; tri_idx < triangle_count + start_triangle_index; tri_idx += 1) {
-  //       let triangle = this._triangles[this._bvh.triangleIndexTexture[tri_idx * 3]];
-  //       let collision_pos = vec3.create();
-  //       if (triangle.rayIntersection(ray, collision_pos)) {
-  //         console.log(this._bvh.triangleIndexTexture[tri_idx * 3]);
-  //         colliding_objects.push(this._objects[triangle.objectIndex]);
-  //       }
-  //     }
-  //   }
-  // }
 
   private traverseBBoxes(ray: Ray, colliding_objects: Array<Object3d>) {
     let stack = [];
@@ -132,12 +91,21 @@ export class Scene {
   }
 
   public sceneIntersection(ray: Ray): Object3d {
+    // for (let object of this._objects) {
+    //   if(object.boundingBox.rayIntersection(ray)) {
+    //     if (object.rayIntersection(ray, vec3.create())) {
+    //       console.log("COLLISION!!");
+    //       break;
+    //     }
+    //   }
+    // }
+    // return null;
+
     let colliding_objects = [];
     let collision_positions = [];
 
     this.recurseBBoxes(this._bvh.root, ray, colliding_objects);
     //this.traverseBBoxes(ray, colliding_objects);
-    console.log("---------------------");
 
     let closestIndex = 0;
     let closestDistance = 1000;

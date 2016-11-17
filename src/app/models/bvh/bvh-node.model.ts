@@ -1,9 +1,6 @@
 import {BoundingBox} from "./bounding-box.model";
-import {Triangle} from "../object3d.model";
 import {Ray} from "../ray.model";
-/**
- * Created by fille on 09/11/16.
- */
+import {Triangle} from "../triangle.model";
 
 export class BVHNode {
   private _bottom: GLM.IArray;
@@ -20,10 +17,6 @@ export class BVHNode {
   }
 
   public rayIntersection(ray: Ray): boolean {
-    // console.log(this._bottom[0] + " " + this._bottom[1] + " " + this._bottom[2]);
-    // console.log(this._top[0] + " " + this._top[1] + " " + this._top[2]);
-    // console.log("---------------");
-
     let tmin = (this._bottom[0] - ray.startPosition[0]) / ray.direction[0];
     let tmax = (this._top[0] - ray.startPosition[0]) / ray.direction[0];
 
