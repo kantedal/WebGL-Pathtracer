@@ -48,6 +48,6 @@ vec3 LightSphereContributions(Ray ray) {
     return vec3(1,0.7,0.7) * 10.0;
   }
   else {
-    return vec3(pow(1.0 - clamp(collision_position.y, 0.0, 1.0), 2.0) * 0.9, 0.9, 1.0) * 0.05;
+    return vec3(pow(1.0 - clamp(collision_position.y, 0.0, 1.0), 2.0) * 0.9, 0.9, 1.0) * 0.1;
   }
 }

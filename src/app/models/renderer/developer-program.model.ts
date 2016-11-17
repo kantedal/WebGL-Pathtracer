@@ -216,7 +216,7 @@ export class DeveloperProgram {
       let bottom = [bvh_texture[idx], bvh_texture[idx + 1], bvh_texture[idx + 2]];
       let top = [bvh_texture[idx + 3], bvh_texture[idx + 4], bvh_texture[idx + 5]];
       if (!(bottom[0] == 0 && bottom[1] == 0 && bottom[2] == 0 && top[0] == 0 && top[1] == 0 && top[2] == 0)) {
-        console.log(bvh_texture[idx + 6])
+        //console.log(bvh_texture[idx + 6])
         //if (bvh_texture[idx + 6] == 0) {
           // Line 1
           vertices.push(bottom[0] / factor);

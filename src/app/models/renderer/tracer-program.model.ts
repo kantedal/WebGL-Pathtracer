@@ -16,6 +16,10 @@ export class TracerProgram {
   private _materialTexture: DataTexture;
   private _bvhTexture: DataTexture;
   private _triangleIndexTexture: DataTexture;
+
+  private _lightSphereTexture: WebGLTexture;
+  private _lightSphereLocation: WebGLUniformLocation;
+
   private _vertexAttribute;
 
   private timeLocation: WebGLUniformLocation;
@@ -69,6 +73,9 @@ export class TracerProgram {
     this._gl.activeTexture(this._gl.TEXTURE6);
     this._gl.bindTexture(this._gl.TEXTURE_2D, this._bvhTexture.texture);
 
+    this._gl.activeTexture(this._gl.TEXTURE7);
+    this._gl.bindTexture(this._gl.TEXTURE_2D, this._lightSphereTexture);
+
     this._gl.drawArrays(this._gl.TRIANGLE_STRIP, 0, 4);
     this._gl.bindFramebuffer(this._gl.FRAMEBUFFER, null);
 
@@ -115,7 +122,22 @@ export class TracerProgram {
     this._triangleIndexTexture = new DataTexture(this._gl, 1024, 1024, textureData.triangle_indices, "u_triangle_index_texture", this._program, 5, this._gl.RGB);
     this._bvhTexture = new DataTexture(this._gl, 2048, 2048, textureData.bvh, "u_bvh_texture", this._program, 6, this._gl.RGB);
 
-    console.log(this._bvhTexture.texture);
+    this._lightSphereTexture = this._gl.createTexture();
+    this._lightSphereLocation = this._gl.getUniformLocation(this._program, "u_light_sphere_texture");
+    this._gl.uniform1i(this._lightSphereLocation, 7);
+
+    let lightSphereImage = new Image();
+    lightSphereImage.onload = () => {
+      this._gl.bindTexture(this._gl.TEXTURE_2D, this._lightSphereTexture);
+      this._gl.texImage2D(this._gl.TEXTURE_2D, 0, this._gl.RGBA, this._gl.RGBA, this._gl.UNSIGNED_BYTE, lightSphereImage);
+      this._gl.texParameteri(this._gl.TEXTURE_2D, this._gl.TEXTURE_WRAP_S, this._gl.CLAMP_TO_EDGE);
+      this._gl.texParameteri(this._gl.TEXTURE_2D, this._gl.TEXTURE_WRAP_T, this._gl.CLAMP_TO_EDGE);
+      this._gl.texParameteri(this._gl.TEXTURE_2D, this._gl.TEXTURE_MIN_FILTER, this._gl.LINEAR);
+      this._gl.texParameteri(this._gl.TEXTURE_2D, this._gl.TEXTURE_MAG_FILTER, this._gl.LINEAR);
+      this._gl.bindTexture(this._gl.TEXTURE_2D, null);
+
+    };
+    lightSphereImage.src = "./assets/sky.jpg";
 
     this._gl.useProgram(this._program);
     this._gl.uniform1i(this.accumulatedBufferLocation, 0);

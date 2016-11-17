@@ -87,7 +87,7 @@ vec3 PathTrace(Ray ray) {
     if (!SceneIntersection(ray, collision)) {
       vec3 lightSphereContribution = LightSphereContributions(ray);
       if (iteration == 0) {
-        return lightSphereContribution * 10.0;
+        return lightSphereContribution * 5.0;
       }
       else {
         accumulated_color += (mask * lightSphereContribution);

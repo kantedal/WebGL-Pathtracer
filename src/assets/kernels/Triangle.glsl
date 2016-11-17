@@ -2,6 +2,9 @@ struct Triangle {
   vec3 v0;
   vec3 edge1;
   vec3 edge2;
+  vec3 n0;
+  vec3 n1;
+  vec3 n2;
   int material_index;
 };
 
@@ -28,7 +31,7 @@ struct Triangle {
 Triangle GetTriangleFromIndex(int triangle_index) {
   // Fetch triangle from texture
   vec2 sample_step = vec2(1.0,0) / vec2(2048, 2048);
-  vec2 start_sample = (vec2(1.0,0) / vec2(2048, 2048)) * float(triangle_index) * 4.0;// + 0.5 * sample_step;
+  vec2 start_sample = (vec2(1.0,0) / vec2(2048, 2048)) * float(triangle_index) * 7.0;// + 0.5 * sample_step;
 
   float row = floor(start_sample.x);
   if (start_sample.x >= 1.0) {
@@ -40,12 +43,16 @@ Triangle GetTriangleFromIndex(int triangle_index) {
   vec3 v1 = vec3(texture2D(u_triangle_texture, start_sample + sample_step));
   vec3 v2 = vec3(texture2D(u_triangle_texture, start_sample + 2.0 * sample_step));
 
+  vec3 n0 = vec3(texture2D(u_triangle_texture, start_sample + 3.0 * sample_step));
+  vec3 n1 = vec3(texture2D(u_triangle_texture, start_sample + 4.0 * sample_step));
+  vec3 n2 = vec3(texture2D(u_triangle_texture, start_sample + 5.0 * sample_step));
+
   vec3 edge1 = v1 - v0;
   vec3 edge2 = v2 - v0;
 
-  int material_index = int(texture2D(u_triangle_texture, start_sample + 3.0 * sample_step).x);
+  int material_index = int(texture2D(u_triangle_texture, start_sample + 6.0 * sample_step).x);
 
-  return Triangle(v0, edge1, edge2, material_index);
+  return Triangle(v0, edge1, edge2, n0, n1, n2, material_index);
 }
 
 Triangle GetLightTriangleFromIndex(int triangle_index) {
@@ -62,7 +69,7 @@ Triangle GetLightTriangleFromIndex(int triangle_index) {
 
   int material_index = int(texture2D(u_light_texture, start_sample + 3.0 * sample_step).x);
 
-  return Triangle(v0, edge1, edge2, material_index);
+  return Triangle(v0, edge1, edge2, vec3(0,0,0), vec3(0,0,0), vec3(0,0,0), material_index);
 }
 
 bool TriangleIntersection(Ray ray, Triangle triangle, inout Collision collision) {
@@ -90,7 +97,14 @@ bool TriangleIntersection(Ray ray, Triangle triangle, inout Collision collision)
   if(t > EPS) {
       collision.position = ray.start_position + inv_det * t * ray.direction;
       collision.material_index = triangle.material_index;
-      collision.normal = normalize(cross(triangle.edge1, triangle.edge2));
+
+//      float v0_distance = distance(collision.position, triangle.v0);
+//      float v1_distance = distance(collision.position, triangle.edge1 + triangle.v0);
+//      float v2_distance = distance(collision.position, triangle.edge2 + triangle.v0);
+//      float total_distance = v0_distance + v1_distance + v2_distance;
+//      collision.normal = (triangle.n0 * v0_distance + triangle.n1 * v1_distance + triangle.n2 * v2_distance) / total_distance;
+
+      collision.normal = (1.0 - u - v) * triangle.n0 + u * triangle.n1 + v * triangle.n2;
       collision.distance = distance(ray.start_position, collision.position);
       return true;
   }

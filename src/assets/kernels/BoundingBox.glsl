@@ -1,3 +1,9 @@
+struct LeafNode {
+  float distance;
+  int triangle_start_index;
+  int triangle_count;
+};
+
 
 bool BoundingBoxCollision(vec3 bottom, vec3 top, Ray ray) {
   float tmin = (bottom.x - ray.start_position.x) / ray.direction.x;

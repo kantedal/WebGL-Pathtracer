@@ -18,6 +18,8 @@ uniform sampler2D u_light_texture;
 uniform sampler2D u_sphere_texture;
 uniform sampler2D u_material_texture;
 
+uniform sampler2D u_light_sphere_texture;
+
 float random(vec3 scale, float seed) {
   return fract(sin(dot(gl_FragCoord.xyz + seed, scale)) * 43758.5453 + seed);
 }

@@ -53,6 +53,7 @@ export class Renderer implements TracerProgramInterface {
         './assets/kernels/Material.glsl',
         './assets/kernels/Triangle.glsl',
         './assets/kernels/Sphere.glsl',
+        './assets/kernels/SceneHelpers.glsl',
         './assets/kernels/Scene.glsl',
         './assets/kernels/RayTracer.glsl',
         './assets/kernels/main.glsl',
@@ -87,7 +88,6 @@ export class Renderer implements TracerProgramInterface {
         this._tracerProgram = new TracerProgram(this._gl, kernelData, this._vertexBuffer, this._frameBuffer, this);
         this._renderProgram = new RenderProgram(this._gl, this._vertexBuffer, this._frameBuffer);
         this._developerProgram = new DeveloperProgram(this._gl);
-
 
         this.animate();
       },

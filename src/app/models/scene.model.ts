@@ -255,15 +255,30 @@ export class Scene {
         triangleData.push(triangle.v0[1]);
         triangleData.push(triangle.v0[2]);
 
-        // Edge 1
+        // v1
         triangleData.push(triangle.v1[0]);
         triangleData.push(triangle.v1[1]);
         triangleData.push(triangle.v1[2]);
 
-        // Edge 2
+        // v2
         triangleData.push(triangle.v2[0]);
         triangleData.push(triangle.v2[1]);
         triangleData.push(triangle.v2[2]);
+
+        // n0
+        triangleData.push(triangle.n0[0]);
+        triangleData.push(triangle.n0[1]);
+        triangleData.push(triangle.n0[2]);
+
+        // n1
+        triangleData.push(triangle.n1[0]);
+        triangleData.push(triangle.n1[1]);
+        triangleData.push(triangle.n1[2]);
+
+        // n2
+        triangleData.push(triangle.n2[0]);
+        triangleData.push(triangle.n2[1]);
+        triangleData.push(triangle.n2[2]);
 
         // Extra data
         triangleData.push(material_index);
@@ -357,7 +372,7 @@ export class Scene {
   }
 
   public createDefaultScene(callback: any) {
-    let red_material = new Material(vec3.fromValues(1,0,0), MATERIAL_TYPES.oren_nayar);
+    let red_material = new Material(vec3.fromValues(1,1,1), MATERIAL_TYPES.lambertian);
     let green_material = new Material(vec3.fromValues(0,1,0), MATERIAL_TYPES.oren_nayar);
     let blue_material = new Material(vec3.fromValues(0,0,1), MATERIAL_TYPES.oren_nayar);
     let white_material = new Material(vec3.fromValues(1,1,1), MATERIAL_TYPES.oren_nayar);
@@ -387,8 +402,8 @@ export class Scene {
         // {fileName: './assets/models/light_plane2.obj', material: emission_material },
         // {fileName: './assets/models/light_plane3.obj', material: emission_material },
         // {fileName: './assets/models/light_plane4.obj', material: emission_material },
-        {fileName: './assets/models/bottom_disc.obj', material: white_material },
-        // {fileName: './assets/models/torus.obj', material: specular_red_material }
+        { fileName: './assets/models/bottom_disc.obj', material: white_material },
+        { fileName: './assets/models/cylinder.obj', material: red_material }
       ], (objects) => {
         for (let object of objects) {
           this.objects.push(object);
@@ -396,9 +411,9 @@ export class Scene {
       },
       () => {});
 
-    //this.spheres.push(new Sphere(vec3.fromValues(5.0, 0.5, -3.5), 0.5, emission_red_material));
+    this.spheres.push(new Sphere(vec3.fromValues(5.0, 0.5, 3.5), 0.5, emission_red_material));
     this.spheres.push(new Sphere(vec3.fromValues(0.0, 1.8, 0.0), 1.8, green_glass));
-    this.spheres.push(new Sphere(vec3.fromValues(-4.0, 1.8, -5.0), 1.8, specular_red_material));
+    this.spheres.push(new Sphere(vec3.fromValues(-4.0, 1.8, 5.0), 1.8, specular_red_material));
 
     callback(this);
   }

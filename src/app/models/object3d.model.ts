@@ -2,18 +2,29 @@ import { Material } from "./material.model";
 import { Ray } from "./ray.model";
 
 export class Triangle {
+  // Verices
   private _v0: GLM.IArray;
   private _v1: GLM.IArray;
   private _v2: GLM.IArray;
+
+  // Vertex normals
+  private _n0: GLM.IArray;
+  private _n1: GLM.IArray;
+  private _n2: GLM.IArray;
+
   private _edge1: GLM.IArray;
   private _edge2: GLM.IArray;
   private _objectIndex: number;
   private _triangleIndex: number;
 
-  constructor(v0, v1, v2) {
+  constructor(v0, v1, v2, n0, n1, n2) {
     this._v0 = v0;
     this._v1 = v1;
     this._v2 = v2;
+
+    this._n0 = n0;
+    this._n1 = n1;
+    this._n2 = n2;
 
     this._edge1 = vec3.create();
     vec3.subtract(this._edge1, v1, v0);
@@ -24,6 +35,9 @@ export class Triangle {
   get v0() { return this._v0; }
   get v1() { return this._v1; }
   get v2() { return this._v2; }
+  get n2(): GLM.IArray { return this._n2;}
+  get n1(): GLM.IArray { return this._n1; }
+  get n0(): GLM.IArray { return this._n0; }
   get edge1() { return this._edge1; }
   get edge2() { return this._edge2; }
   get objectIndex(): number { return this._objectIndex; }
@@ -113,6 +127,7 @@ export class Object3d {
 
   static LoadObj(objData, material) {
     let vertices = [];
+    let vertexNormals = [];
     let triangles = [];
 
     let lines = objData.split('\n');
@@ -122,16 +137,22 @@ export class Object3d {
       switch (components[0]) {
         // Vertex indices
         case 'f':
-          triangles.push(new Triangle(vertices[parseInt(components[1]) - 1], vertices[parseInt(components[2]) - 1], vertices[parseInt(components[3]) - 1]));
+          let indices1 = components[1].split('/');
+          let indices2 = components[2].split('/');
+          let indices3 = components[3].split('/');
+
+          triangles.push(new Triangle(
+              vertices[parseInt(indices1[0]) - 1], vertices[parseInt(indices2[0]) - 1], vertices[parseInt(indices3[0]) - 1],
+              vertexNormals[parseInt(indices1[2]) - 1], vertexNormals[parseInt(indices2[2]) - 1], vertexNormals[parseInt(indices3[2]) - 1])
+          );
           break;
 
         // Vertex positions
         case 'v':
-          vertices.push(vec3.fromValues(
-            Math.round(components[1] * 100000) / 100000,
-            Math.round(components[2] * 100000) / 100000,
-            Math.round(components[3] * 100000) / 100000)
-          );
+          vertices.push(vec3.fromValues(components[1], components[2], components[3]));
+          break;
+        case 'vn':
+          vertexNormals.push(vec3.fromValues(components[1], components[2], components[3]));
           break;
       }
     }

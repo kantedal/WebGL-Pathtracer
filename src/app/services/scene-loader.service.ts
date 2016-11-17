@@ -38,7 +38,8 @@ export class SceneLoaderService {
           let triangle = new Triangle(
             vec3.fromValues(this.roundVerticeValue(triangleJSON[0][0]), this.roundVerticeValue(triangleJSON[0][1]), this.roundVerticeValue(triangleJSON[0][2])),
             vec3.fromValues(this.roundVerticeValue(triangleJSON[1][0]), this.roundVerticeValue(triangleJSON[1][1]), this.roundVerticeValue(triangleJSON[1][2])),
-            vec3.fromValues(this.roundVerticeValue(triangleJSON[2][0]), this.roundVerticeValue(triangleJSON[2][1]), this.roundVerticeValue(triangleJSON[2][2]), )
+            vec3.fromValues(this.roundVerticeValue(triangleJSON[2][0]), this.roundVerticeValue(triangleJSON[2][1]), this.roundVerticeValue(triangleJSON[2][2])),
+            vec3.create(), vec3.create(), vec3.create()
           );
           triangles.push(triangle);
           scene_triangles.push(triangle);
