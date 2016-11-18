@@ -6,11 +6,13 @@ export class BVH {
   private _triangleIndices: Array<number>;
   private _triangleIndexTexture: Float32Array;
   private _bvhTexture: Float32Array;
+  private _bvhArray: Array<number>;
 
   private _root: BVHInner | BVHLeaf | BVHNode;
 
   constructor() {
     this._bvhTexture = new Float32Array(2048 * 2048 * 3);
+    this._bvhArray = [];
     this._triangleIndexTexture = new Float32Array(1024 * 1024 * 3);
   }
 
@@ -201,9 +203,17 @@ export class BVH {
     this._bvhTexture[node.nodeIndex + 1] = node.bottom[1];
     this._bvhTexture[node.nodeIndex + 2] = node.bottom[2];
 
+    this._bvhArray.push(node.bottom[0]);
+    this._bvhArray.push(node.bottom[1]);
+    this._bvhArray.push(node.bottom[2]);
+
     this._bvhTexture[node.nodeIndex + 3] = node.top[0];
     this._bvhTexture[node.nodeIndex + 4] = node.top[1];
     this._bvhTexture[node.nodeIndex + 5] = node.top[2];
+
+    this._bvhArray.push(node.top[0]);
+    this._bvhArray.push(node.top[1]);
+    this._bvhArray.push(node.top[2]);
 
     if (!node.isLeaf()) {
       let node_index_left = node_index.increment(9);
@@ -215,6 +225,10 @@ export class BVH {
       this._bvhTexture[node.nodeIndex + 6] = 0;
       this._bvhTexture[node.nodeIndex + 7] = node_index_left;
       this._bvhTexture[node.nodeIndex + 8] = node_index_right;
+
+      this._bvhArray.push(0);
+      this._bvhArray.push(node_index_left);
+      this._bvhArray.push(node_index_right);
     }
     else {
       let count = node.triangles.length;
@@ -223,6 +237,10 @@ export class BVH {
       this._bvhTexture[node.nodeIndex + 6] = 1;
       this._bvhTexture[node.nodeIndex + 7] = count;
       this._bvhTexture[node.nodeIndex + 8] = start_triangle_index;
+
+      this._bvhArray.push(1);
+      this._bvhArray.push(count);
+      this._bvhArray.push(start_triangle_index);
 
       for (let triangle of node.triangles) {
         //console.log(triangle_index.count + " " + triangle.triangleIndex);
@@ -237,6 +255,7 @@ export class BVH {
   get root(): any { return this._root; }
   get bvhTexture(): Float32Array { return this._bvhTexture; }
   get triangleIndexTexture(): Float32Array { return this._triangleIndexTexture; }
+  get bvhArray(): Array<number> { return this._bvhArray; }
 }
 
 

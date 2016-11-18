@@ -15,10 +15,13 @@ export class TracerProgram {
   private _sphereTexture: DataTexture;
   private _materialTexture: DataTexture;
   private _bvhTexture: DataTexture;
+  private _objectsTexture: DataTexture;
+  private _objectsBVHTexture: DataTexture;
   private _triangleIndexTexture: DataTexture;
 
   private _lightSphereTexture: WebGLTexture;
   private _lightSphereLocation: WebGLUniformLocation;
+  private _objectCountLocation: WebGLUniformLocation;
 
   private _vertexAttribute;
 
@@ -76,6 +79,12 @@ export class TracerProgram {
     this._gl.activeTexture(this._gl.TEXTURE7);
     this._gl.bindTexture(this._gl.TEXTURE_2D, this._lightSphereTexture);
 
+    this._gl.activeTexture(this._gl.TEXTURE8);
+    this._gl.bindTexture(this._gl.TEXTURE_2D, this._lightSphereTexture);
+
+    this._gl.activeTexture(this._gl.TEXTURE9);
+    this._gl.bindTexture(this._gl.TEXTURE_2D, this._lightSphereTexture);
+
     this._gl.drawArrays(this._gl.TRIANGLE_STRIP, 0, 4);
     this._gl.bindFramebuffer(this._gl.FRAMEBUFFER, null);
 
@@ -114,13 +123,14 @@ export class TracerProgram {
   }
 
   public addSceneTextures(textureData) {
-    console.log(textureData);
     this._triangleTexture = new DataTexture(this._gl, 2048, 2048, textureData.triangles, "u_triangle_texture", this._program, 1, this._gl.RGB);
     this._lightTexture = new DataTexture(this._gl, 128, 128, textureData.light_triangles, "u_light_texture", this._program, 2, this._gl.RGB);
     this._sphereTexture = new DataTexture(this._gl, 512, 512, textureData.spheres, "u_sphere_texture", this._program, 3, this._gl.RGB);
     this._materialTexture = new DataTexture(this._gl, 512, 512, textureData.materials, "u_material_texture", this._program, 4, this._gl.RGB);
     this._triangleIndexTexture = new DataTexture(this._gl, 1024, 1024, textureData.triangle_indices, "u_triangle_index_texture", this._program, 5, this._gl.RGB);
     this._bvhTexture = new DataTexture(this._gl, 2048, 2048, textureData.bvh, "u_bvh_texture", this._program, 6, this._gl.RGB);
+    this._objectsBVHTexture = new DataTexture(this._gl, 2048, 2048, textureData.bvh, "u_objects_bvh_texture", this._program, 8, this._gl.RGB);
+    this._objectsTexture = new DataTexture(this._gl, 512, 512, textureData.objects, "u_objects_texture", this._program, 9, this._gl.RGB);
 
     this._lightSphereTexture = this._gl.createTexture();
     this._lightSphereLocation = this._gl.getUniformLocation(this._program, "u_light_sphere_texture");
@@ -147,10 +157,12 @@ export class TracerProgram {
     this._gl.uniform1i(this._materialTexture.location, 4);
     this._gl.uniform1i(this._triangleIndexTexture.location, 5);
     this._gl.uniform1i(this._bvhTexture.location, 6);
+    this._gl.uniform1i(this._objectsBVHTexture.location, 8);
+    this._gl.uniform1i(this._objectsTexture.location, 9);
 
     this._gl.uniform1i(this._gl.getUniformLocation( this._program, 'triangle_count'), textureData.triangle_count );
     this._gl.uniform1i(this._gl.getUniformLocation( this._program, 'sphere_count'), textureData.sphere_count );
-    console.log(textureData.triangle_count);
+    this._gl.uniform1i(this._gl.getUniformLocation( this._program, 'object_count'), textureData.object_count );
   }
 }
 

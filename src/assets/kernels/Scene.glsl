@@ -90,73 +90,78 @@ bool SceneIntersection(Ray ray, inout Collision collision) {
       break;
   }
 
-  LeafNode leafNodes[32];
-  int leafCount = 0;
+  for (int i = 0; i < 100; i++) {
 
-  int stack[32];
-  int stackIdx = 0;
-  setStackIndex(stackIdx, 0, stack);
-  stackIdx++;
-
-  vec3 bottom_bbox;
-  vec3 top_bbox;
-  int is_leaf;
-  int extra_data1;
-  int extra_data2;
-
-  for (int i = 0; i < 1000; i++) {
-    if (stackIdx < 0) break;
-    int box_index = getStackValue(--stackIdx, stack);
-
-    // Fetch node data
-    getNodeData(box_index, bottom_bbox, top_bbox, is_leaf, extra_data1, extra_data2);
-
-    if (is_leaf == 0) {
-      // Check collision with bounding box
-      if (BoundingBoxIntersection(bottom_bbox, top_bbox, ray)) {
-        int right_index = extra_data2 / 9;
-        int left_index = extra_data1 / 9;
-
-        setStackIndex(stackIdx++, right_index, stack); // Set right child index
-        setStackIndex(stackIdx++, left_index, stack); // Set left child index
-
-        if (stackIdx > 10) {
-          return false;
-        }
-      }
-    }
-    else {
-      float distance = 0.0;
-      int triangle_count = extra_data1;
-      int start_triangle_index = extra_data2;
-      //setLeafNode(leafCount++, LeafNode(distance, start_triangle_index, triangle_count), leafNodes);
-
-      int index = start_triangle_index;
-      int end_index = start_triangle_index + triangle_count;
-
-      for (int idx = 0; idx < 1000; idx++) {
-        Triangle triangle = GetTriangleFromIndex(getTriangleIndex(index));
-
-        if (TriangleIntersection(ray, triangle, collision)) {
-          if (collision.distance < closest_collision.distance) {
-            closest_collision = collision;
-          }
-        }
-
-        index++;
-        if (index >= end_index)
-          break;
-      }
+    if (i >= object_count) {
+      break;
     }
   }
 
-  for (int leaf_idx = 0; leaf_idx < 1000; leaf_idx++) {
-
-
-   if (leaf_idx >= leafCount)
-     break;
-  }
-
+//  LeafNode leafNodes[32];
+//  int leafCount = 0;
+//
+//  int stack[32];
+//  int stackIdx = 0;
+//  setStackIndex(stackIdx, 0, stack);
+//  stackIdx++;
+//
+//  vec3 bottom_bbox;
+//  vec3 top_bbox;
+//  int is_leaf;
+//  int extra_data1;
+//  int extra_data2;
+//
+//  for (int i = 0; i < 1000; i++) {
+//    if (stackIdx < 0) break;
+//    int box_index = getStackValue(--stackIdx, stack);
+//
+//    // Fetch node data
+//    getNodeData(box_index, bottom_bbox, top_bbox, is_leaf, extra_data1, extra_data2);
+//
+//    if (is_leaf == 0) {
+//      // Check collision with bounding box
+//      if (BoundingBoxIntersection(bottom_bbox, top_bbox, ray)) {
+//        int right_index = extra_data2 / 9;
+//        int left_index = extra_data1 / 9;
+//
+//        setStackIndex(stackIdx++, right_index, stack); // Set right child index
+//        setStackIndex(stackIdx++, left_index, stack); // Set left child index
+//
+//        if (stackIdx > 10) {
+//          return false;
+//        }
+//      }
+//    }
+//    else {
+//      float distance = 0.0;
+//      int triangle_count = extra_data1;
+//      int start_triangle_index = extra_data2;
+//      //setLeafNode(leafCount++, LeafNode(distance, start_triangle_index, triangle_count), leafNodes);
+//
+//      int index = start_triangle_index;
+//      int end_index = start_triangle_index + triangle_count;
+//
+//      for (int idx = 0; idx < 1000; idx++) {
+//        Triangle triangle = GetTriangleFromIndex(getTriangleIndex(index));
+//
+//        if (TriangleIntersection(ray, triangle, collision)) {
+//          if (collision.distance < closest_collision.distance) {
+//            closest_collision = collision;
+//          }
+//        }
+//
+//        index++;
+//        if (index >= end_index)
+//          break;
+//      }
+//    }
+//  }
+//
+//  for (int leaf_idx = 0; leaf_idx < 1000; leaf_idx++) {
+//   if (leaf_idx >= leafCount)
+//     break;
+//  }
+//
   if (closest_collision.distance == 1000.0) {
     return false;
   }

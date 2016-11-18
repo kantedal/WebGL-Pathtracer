@@ -25,11 +25,9 @@ export class Scene {
   private recurseBBoxes(node: any, ray: Ray, colliding_objects: Array<Object3d>) {
     console.log("Iteration");
     if (!node.isLeaf()) {
-      //console.log("not leaf");
       if (node.left.rayIntersection(ray)) {
         this.recurseBBoxes(node.left, ray, colliding_objects);
       }
-
       if (node.right.rayIntersection(ray)) {
         this.recurseBBoxes(node.right, ray, colliding_objects);
       }
@@ -76,7 +74,6 @@ export class Scene {
         let triangle_count = this._bvh.bvhTexture[boxIndex + 7];
         let start_triangle_index = this._bvh.bvhTexture[boxIndex + 8];
 
-        //console.log("count " + triangle_count);
         for (let tri_idx = start_triangle_index; tri_idx < triangle_count + start_triangle_index; tri_idx += 1) {
           let triangle = this._triangles[this._bvh.triangleIndexTexture[tri_idx * 3]];
           let collision_pos = vec3.create();
@@ -86,7 +83,6 @@ export class Scene {
           }
         }
       }
-
     }
   }
 
@@ -139,6 +135,9 @@ export class Scene {
 
   buildSceneTextures() {
     let textureData = {
+      objects: new Float32Array(512 * 512 * 3),
+      object_count: this._objects.length,
+      objects_bvh: new Float32Array(2048 * 2048 * 3),
       triangles: new Float32Array(2048 * 2048 * 3),
       triangle_count: 0,
       bvh: this._bvh.bvhTexture,
@@ -150,6 +149,38 @@ export class Scene {
       light_triangles: new Float32Array(128 * 128 * 3),
       light_count: 0,
     };
+
+    // Build object data
+    let objectData = [];
+    let bvhCount = 0;
+    for (let obj_idx = 0; obj_idx < this._objects.length; obj_idx++) {
+      let object = this._objects[obj_idx];
+      let bvh_start_index = bvhCount;
+
+      for (let obj_bvh_idx = 0; obj_bvh_idx < object.bvh.bvhArray.length; obj_bvh_idx++) {
+        textureData.objects_bvh[bvhCount] = object.bvh.bvhTexture[obj_bvh_idx];
+        bvhCount++;
+      }
+      let bvh_end_index = bvhCount;
+
+      // Bounding box bottom
+      objectData.push(object.boundingBox.bottom[0]);
+      objectData.push(object.boundingBox.bottom[1]);
+      objectData.push(object.boundingBox.bottom[2]);
+
+      // Bounding box bottom
+      objectData.push(object.boundingBox.top[0]);
+      objectData.push(object.boundingBox.top[1]);
+      objectData.push(object.boundingBox.top[2]);
+
+      // Set indices for bvh texture
+      objectData.push(bvh_start_index); // Start index
+      objectData.push(bvh_end_index); // End index
+      objectData.push(0);
+    }
+    for (let i = 0; i < objectData.length; i++) {
+      textureData.objects[i] = objectData[i];
+    }
 
     // Build material data
     let materialData = [];

@@ -2,6 +2,7 @@ precision highp float;
 uniform float time;
 uniform int triangle_count;
 uniform int sphere_count;
+uniform int object_count;
 uniform vec2 resolution;
 
 // Camera uniforms
@@ -17,6 +18,8 @@ uniform sampler2D u_bvh_texture;
 uniform sampler2D u_light_texture;
 uniform sampler2D u_sphere_texture;
 uniform sampler2D u_material_texture;
+uniform sampler2D u_objects_bvh_texture;
+uniform sampler2D u_objects_texture;
 
 uniform sampler2D u_light_sphere_texture;
 
