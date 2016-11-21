@@ -1,10 +1,12 @@
 
-import {Triangle} from "../triangle.model";
+import {Triangle} from "../primitives/triangle.model";
 import {Ray} from "../ray.model";
+import {Intersectable} from "../primitives/intersectable.model";
 export class BoundingBox {
   private _top: GLM.IArray;
   private _bottom: GLM.IArray;
   private _center: GLM.IArray;
+  private _distanceFromCamera: number;
 
   constructor() {
     this._top = vec3.fromValues(-10000, -10000, -10000);
@@ -12,7 +14,7 @@ export class BoundingBox {
     this._center = vec3.fromValues(0, 0, 0);
   }
 
-  public calculateBoundingBox(triangles: Array<Triangle>) {
+  public calculateBoundingBoxFromTriangles(triangles: Array<Triangle>) {
     this._bottom = vec3.fromValues(10000, 10000, 10000);
     this._top = vec3.fromValues(-10000, -10000, -10000);
 
@@ -29,50 +31,33 @@ export class BoundingBox {
     }
   }
 
+  public calculateBoundingBoxFromSphere(position: GLM.IArray, radius: number) {
+    this._bottom = vec3.fromValues(position[0] - radius, position[1] - radius, position[2] - radius);
+    this._top = vec3.fromValues(position[0] + radius, position[1] + radius, position[2] + radius);
+  }
+
   public rayIntersection(ray: Ray): boolean {
-    // console.log(this.bottom[0] + " " + this.bottom[1] + " " + this.bottom[2]);
-    // console.log(this.top[0] + " " + this.top[1] + " " + this.top[2]);
-    console.log("Iteration");
+    let dirfrac = vec3.fromValues(0,0,0);
+    dirfrac[0] = 1.0 / ray.direction[0];
+    dirfrac[1] = 1.0 / ray.direction[1];
+    dirfrac[2] = 1.0 / ray.direction[2];
 
-    let tmin = (this._bottom[0] - ray.startPosition[0]) / ray.direction[0];
-    let tmax = (this._top[0] - ray.startPosition[0]) / ray.direction[0];
+    // lb is the corner of AABB with minimal coordinates - left bottom, rt is maximal corner
+    // r.org is origin of ray
+    let t1 = (this._bottom[0] - ray.startPosition[0]) * dirfrac[0];
+    let t2 = (this._top[0] - ray.startPosition[0]) * dirfrac[0];
+    let t3 = (this._bottom[1] - ray.startPosition[1]) * dirfrac[1];
+    let t4 = (this._top[1] - ray.startPosition[1]) * dirfrac[1];
+    let t5 = (this._bottom[2] - ray.startPosition[2]) * dirfrac[2];
+    let t6 = (this._top[2] - ray.startPosition[2]) * dirfrac[2];
 
-    if (tmin > tmax) {
-      let temp = tmin;
-      tmin = tmax;
-      tmax = temp;
-    }
+    let tmin = Math.max(Math.max(Math.min(t1, t2), Math.min(t3, t4)), Math.min(t5, t6));
+    let tmax = Math.min(Math.min(Math.max(t1, t2), Math.max(t3, t4)), Math.max(t5, t6));
 
-    let tymin = (this._bottom[1] - ray.startPosition[1]) / ray.direction[1];
-    let tymax = (this._top[1] - ray.startPosition[1]) / ray.direction[1];
+    // if tmax < 0, ray (line) is intersecting AABB, but whole AABB is behing us
+    if (tmax < 0.0 || tmin > tmax) return false;
 
-    if (tymin > tymax) {
-      let temp = tymin;
-      tymin = tymax;
-      tymax = temp;
-    }
-
-    if ((tmin > tymax) || (tymin > tmax))
-      return false;
-
-    if (tymin > tmin)
-      tmin = tymin;
-
-    if (tymax < tmax)
-      tmax = tymax;
-
-    let tzmin = (this._bottom[2] - ray.startPosition[2]) / ray.direction[2];
-    let tzmax = (this._top[2] - ray.startPosition[2]) / ray.direction[2];
-
-    if (tzmin > tzmax) {
-      let temp = tzmin;
-      tzmin = tzmax;
-      tzmax = temp;
-    }
-
-    if ((tmin > tzmax) || (tzmin > tmax))
-      return false;
-
+    let collision_distance = tmin;
     return true;
   }
 
@@ -82,4 +67,6 @@ export class BoundingBox {
   set bottom(value: GLM.IArray) { this._bottom = value; }
   get top(): GLM.IArray { return this._top; }
   set top(value: GLM.IArray) { this._top = value; }
+  get distanceFromCamera(): number { return this._distanceFromCamera; }
+  set distanceFromCamera(value: number) { this._distanceFromCamera = value; }
 }

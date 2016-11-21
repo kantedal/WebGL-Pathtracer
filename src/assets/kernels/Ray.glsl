@@ -1,18 +1,10 @@
 struct Ray {
   vec3 start_position;
   vec3 direction;
-  vec3 inv_direction;
-  vec3 sign;
 };
 
 Ray newRay(vec3 start_position, vec3 direction) {
-  vec3 inv_direction = 1.0 / direction;
-  vec3 sign = vec3(0,0,0);
-  sign.x = (inv_direction.x < 0.0 ? 1.0 : 0.0);
-  sign.y = (inv_direction.y < 0.0 ? 1.0 : 0.0);
-  sign.z = (inv_direction.z < 0.0 ? 1.0 : 0.0);
-
-  return Ray(start_position, direction, inv_direction, sign);
+  return Ray(start_position, direction);
 }
 
 Ray CreateRay(vec2 pixel_position, int sample_step) {
@@ -31,5 +23,5 @@ Ray CreateRay(vec2 pixel_position, int sample_step) {
 
   vec3 direction = normalize(image_point - camera_position);
 
-  return newRay(camera_position, direction);
+  return Ray(camera_position, direction);
 }

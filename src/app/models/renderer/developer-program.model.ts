@@ -98,7 +98,7 @@ export class DeveloperProgram {
   }
 
   public addBoundingBox(bottom: GLM.IArray, top: GLM.IArray, vertices: Array<number>) {
-    let factor = 20;
+    let factor = 10;
     vertices.push(bottom[0] / factor);
     vertices.push(bottom[1] / factor);
     vertices.push(bottom[2] / factor);

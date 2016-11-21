@@ -2,7 +2,7 @@
  * Created by fille on 08/11/16.
  */
 import { Component, Input, OnChanges } from "@angular/core";
-import { Object3d } from "../../models/object3d.model";
+import { Object3d } from "../../models/primitives/object3d.model";
 import { RenderService } from "../../services/render.service";
 
 @Component({

@@ -1,38 +1,26 @@
-import { Material } from "./material.model";
-import { Ray } from "./ray.model";
+import { Material } from "../material.model";
+import { Ray } from "../ray.model";
 import { Triangle } from "./triangle.model";
-import { BVH } from "./bvh/bvh.model";
-import { BoundingBox } from "./bvh/bounding-box.model";
+import { BVH } from "../bvh/bvh.model";
+import { BoundingBox } from "../bvh/bounding-box.model";
+import { Intersectable } from "./intersectable.model";
 
-export class Object3d {
+export class Object3d extends Intersectable {
   private _bvh: BVH;
-  private _boundingBox: BoundingBox;
-  private _position: GLM.IArray;
-  private _rotation: GLM.IArray;
-  private _scale: GLM.IArray;
-
   private _triangles: Array<Triangle>;
-  private _material: Material;
+  private _smoothShading: boolean = false;
 
   constructor(triangles, material) {
-    this._position = vec3.fromValues(1, 0, 0);
-    this._rotation = vec3.fromValues(0, 0, 0);
-    this._scale = vec3.fromValues(0, 0, 0);
+    super(Intersectable.TRIANLGES, material);
 
     this._triangles = triangles;
-    this._material = material;
-
-    this._boundingBox = new BoundingBox();
-    this._boundingBox.calculateBoundingBox(this._triangles);
-    console.log(this._boundingBox.bottom[0] + " " + this._boundingBox.bottom[1] + " " + this._boundingBox.bottom[2]);
-    console.log(this._boundingBox.top[0] + " " + this._boundingBox.top[1] + " " + this._boundingBox.top[2]);
+    this.boundingBox.calculateBoundingBoxFromTriangles(this._triangles);
 
     this._bvh = new BVH();
-    this._bvh.createBVH(this._triangles);
   }
 
   private recurseBBoxes(node: any, ray: Ray, colliding_positions: Array<any>) {
-    console.log("Iteration");
+    //console.log("Iteration");
     if (!node.isLeaf()) {
       if (node.left.rayIntersection(ray)) {
         this.recurseBBoxes(node.left, ray, colliding_positions);
@@ -81,10 +69,10 @@ export class Object3d {
     }
 
     return {
-      position: [this._position[0], this._position[1], this._position[2]],
-      rotation: [this._position[0], this._position[1], this._position[2]],
+      position: [this.position[0], this.position[1], this.position[2]],
+      rotation: [this.position[0], this.position[1], this.position[2]],
       triangles: triangles,
-      material_index: this._material.material_index
+      material_index: this.material.material_index
     };
   }
 
@@ -124,10 +112,7 @@ export class Object3d {
   }
 
   get triangles() { return this._triangles; }
-  get material() { return this._material; }
-  get scale(): GLM.IArray { return this._scale; }
-  get rotation(): GLM.IArray { return this._rotation; }
-  get position(): GLM.IArray { return this._position; }
   get bvh(): BVH { return this._bvh; }
-  get boundingBox(): BoundingBox { return this._boundingBox; }
+  get smoothShading(): boolean { return this._smoothShading; }
+  set smoothShading(value: boolean) { this._smoothShading = value; }
 }

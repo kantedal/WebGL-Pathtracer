@@ -1,4 +1,4 @@
-import {Ray} from "./ray.model";
+import {Ray} from "../ray.model";
 
 export class Triangle {
   // Verices

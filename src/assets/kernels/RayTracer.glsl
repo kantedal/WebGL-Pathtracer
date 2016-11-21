@@ -89,10 +89,8 @@ vec3 PathTrace(Ray ray) {
       if (iteration == 0) {
         return lightSphereContribution * 5.0;
       }
-      else {
-        accumulated_color += (mask * lightSphereContribution);
-      }
 
+      accumulated_color += (mask * lightSphereContribution);
       break;
     }
 
@@ -101,36 +99,17 @@ vec3 PathTrace(Ray ray) {
     vec3 next_dir = PDF(ray, collision_material, collision.normal, iteration, distribution);
     mask *= BRDF(ray, collision_material, collision.normal, next_dir) * distribution;
 
-    if (collision_material.emission_rate != 0.0) {
-      accumulated_color += (mask * collision_material.color * collision_material.emission_rate);
-      //break;
-    }
+    accumulated_color += mask * collision_material.color * collision_material.emission_rate;
     // else {
     //   vec3 light_intensity = ShadowRay(collision.position, collision.normal);
     //   accumulated_color += (mask * collision_material.color * light_intensity);
     // }
-
-    if (!(next_dir.x == 0.0 && next_dir.y == 0.0 && next_dir.z == 0.0)) {
-      ray = newRay(collision.position + next_dir * 0.01, next_dir);
-    }
-    else {
-      break;
-    }
+    if (length(next_dir) == 0.0) break;
+    ray = Ray(collision.position + next_dir * 0.01, next_dir);
   }
 
   return accumulated_color;
 }
 
 
-vec3 TracePath(Ray ray) {
-  Collision collision;
 
-  if (!SceneIntersections(ray, collision))
-    return vec3(0,0,0);
-
-  Material collision_material = GetMaterial(collision.material_index);
-  if (collision_material.emission_rate != 0.0)
-    return vec3(1,0,1);
-
-  return collision_material.color;
-}

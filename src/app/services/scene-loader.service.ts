@@ -2,11 +2,11 @@
  * Created by fille on 09/11/16.
  */
 import { Injectable } from '@angular/core';
-import { Object3d } from "../models/object3d.model";
+import { Object3d } from "../models/primitives/object3d.model";
 import { Scene } from "../models/scene.model";
 import { Material } from "../models/material.model";
-import { Sphere } from "../models/sphere.model";
-import { Triangle } from "../models/triangle.model";
+import { Sphere } from "../models/primitives/sphere.model";
+import { Triangle } from "../models/primitives/triangle.model";
 
 @Injectable()
 export class SceneLoaderService {

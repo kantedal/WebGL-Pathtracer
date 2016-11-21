@@ -11,9 +11,9 @@ export class Camera {
   private _camera_right: GLM.IArray;
   private _camera_up: GLM.IArray;
 
-  constructor(position: GLM.IArray, direction: GLM.IArray) {
+  constructor(position: GLM.IArray, look_at: GLM.IArray) {
     this._position = position;
-    this._look_at = vec3.fromValues(5,2,0);
+    this._look_at = look_at;
     this._direction = vec3.fromValues(0,0,0);
     this._hasChanged = false;
     this.update();

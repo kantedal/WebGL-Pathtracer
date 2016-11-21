@@ -36,7 +36,7 @@ export class Renderer implements TracerProgramInterface {
   private _samples: number;
   private _maxSamples: number = 5000;
   private _shouldRender: boolean = false;
-  private _bloomEnabled: boolean = true;
+  private _bloomEnabled: boolean = false;
 
   constructor(camera: Camera, renderService: RenderService) {
     this._renderService = renderService;
@@ -55,6 +55,8 @@ export class Renderer implements TracerProgramInterface {
         './assets/kernels/Triangle.glsl',
         './assets/kernels/Sphere.glsl',
         './assets/kernels/SceneHelpers.glsl',
+        './assets/kernels/Intersectable.glsl',
+        './assets/kernels/BVH.glsl',
         './assets/kernels/Scene.glsl',
         './assets/kernels/RayTracer.glsl',
         './assets/kernels/main.glsl',

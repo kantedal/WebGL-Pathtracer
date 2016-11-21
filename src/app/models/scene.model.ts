@@ -1,21 +1,24 @@
 import {LoadObjects} from "./loader";
 import {Ray} from "./ray.model";
 import {MATERIAL_TYPES, Material} from "./material.model";
-import {Sphere} from "./sphere.model";
-import {Object3d} from "./object3d.model";
+import {Sphere} from "./primitives/sphere.model";
+import {Object3d} from "./primitives/object3d.model";
 import {BVH} from "./bvh/bvh.model";
 import {BVHNode, BVHLeaf} from "./bvh/bvh-node.model";
-import {Triangle} from "./triangle.model";
+import {Triangle} from "./primitives/triangle.model";
+import {Intersectable} from "./primitives/intersectable.model";
 
 export class Scene {
   private _sceneListener: SceneListener;
   private _bvh: BVH;
+  private _intersectables: Array<Intersectable>;
   private _triangles: Array<Triangle>;
   private _objects: Array<Object3d>;
   private _spheres: Array<Sphere>;
   private _materials: Array<Material>;
 
   constructor() {
+    this._intersectables = [];
     this._triangles = [];
     this._objects = [];
     this._spheres = [];
@@ -23,7 +26,6 @@ export class Scene {
   }
 
   private recurseBBoxes(node: any, ray: Ray, colliding_objects: Array<Object3d>) {
-    console.log("Iteration");
     if (!node.isLeaf()) {
       if (node.left.rayIntersection(ray)) {
         this.recurseBBoxes(node.left, ray, colliding_objects);
@@ -57,7 +59,6 @@ export class Scene {
 
       let isLeaf = (this._bvh.bvhTexture[boxIndex + 6] == 1);
       if (!isLeaf) {
-        console.log(boxIndex);
         if (currentNode.rayIntersection(ray)) {
           let left_index = this._bvh.bvhTexture[boxIndex + 7];
           let right_index = this._bvh.bvhTexture[boxIndex + 8];
@@ -87,33 +88,35 @@ export class Scene {
   }
 
   public sceneIntersection(ray: Ray): Object3d {
-    // for (let object of this._objects) {
-    //   if(object.boundingBox.rayIntersection(ray)) {
-    //     if (object.rayIntersection(ray, vec3.create())) {
-    //       console.log("COLLISION!!");
-    //       break;
-    //     }
-    //   }
-    // }
-    // return null;
 
-    let colliding_objects = [];
-    let collision_positions = [];
-
-    this.recurseBBoxes(this._bvh.root, ray, colliding_objects);
-    //this.traverseBBoxes(ray, colliding_objects);
-
-    let closestIndex = 0;
-    let closestDistance = 1000;
-    for (let i = 0; i < collision_positions.length; i++) {
-      let distance = vec3.squaredDistance(ray.startPosition, collision_positions[i]);
-      if (distance < closestDistance) {
-        closestIndex = i;
-        closestDistance = distance;
+    for (let object of this._objects) {
+      if(object.boundingBox.rayIntersection(ray)) {
+        if (object.rayIntersection(ray, vec3.create())) {
+          console.log("COLLISION!!");
+          break;
+        }
       }
     }
 
-    return colliding_objects[closestIndex];
+    return null;
+
+    // let colliding_objects = [];
+    // let collision_positions = [];
+    //
+    // this.recurseBBoxes(this._bvh.root, ray, colliding_objects);
+    // //this.traverseBBoxes(ray, colliding_objects);
+    //
+    // let closestIndex = 0;
+    // let closestDistance = 1000;
+    // for (let i = 0; i < collision_positions.length; i++) {
+    //   let distance = vec3.squaredDistance(ray.startPosition, collision_positions[i]);
+    //   if (distance < closestDistance) {
+    //     closestIndex = i;
+    //     closestDistance = distance;
+    //   }
+    // }
+    //
+    // return colliding_objects[closestIndex];
   }
 
   buildScene() {
@@ -129,19 +132,24 @@ export class Scene {
       this._triangles[tri_idx].triangleIndex = tri_idx;
     }
 
+    for (let object of this._objects) {
+      object.bvh.createBVH(object.triangles);
+    }
+
     this._bvh = new BVH();
-    this._bvh.createBVH(this._triangles);
+    //this._bvh.createBVH(this._triangles);
   }
 
   buildSceneTextures() {
     let textureData = {
       objects: new Float32Array(512 * 512 * 3),
-      object_count: this._objects.length,
+      object_count: this._intersectables.length,
       objects_bvh: new Float32Array(2048 * 2048 * 3),
       triangles: new Float32Array(2048 * 2048 * 3),
       triangle_count: 0,
       bvh: this._bvh.bvhTexture,
-      triangle_indices: this._bvh.triangleIndexTexture,
+      //triangle_indices: this._bvh.triangleIndexTexture,
+      triangle_indices: new Float32Array(1024 * 1024 * 3),
       materials: new Float32Array(512 * 512 * 3),
       material_count: 0,
       spheres: new Float32Array(512 * 512 * 3),
@@ -150,34 +158,108 @@ export class Scene {
       light_count: 0,
     };
 
+    // Build sphere data
+    let sphereData = [];
+    let sphereIndex = 0;
+    for (let sphere of this._spheres) {
+      sphere.sphereIndex = sphereIndex;
+      sphereIndex++;
+
+      // Find material index for current object
+      let material_index = 0;
+      for (let mat_idx = 0; mat_idx < this._materials.length; mat_idx++) {
+        if (this._materials[mat_idx] === sphere.material) {
+          material_index = mat_idx;
+          break;
+        }
+      }
+
+      // Position
+      sphereData.push(sphere.position[0]);
+      sphereData.push(sphere.position[1]);
+      sphereData.push(sphere.position[2]);
+
+      // Extra data
+      sphereData.push(sphere.radius);
+      sphereData.push(material_index);
+      sphereData.push(0);
+    }
+
+    textureData.sphere_count = this._spheres.length;
+    for (let i = 0; i < sphereData.length; i++) {
+      textureData.spheres[i] = sphereData[i];
+    }
+
     // Build object data
     let objectData = [];
     let bvhCount = 0;
-    for (let obj_idx = 0; obj_idx < this._objects.length; obj_idx++) {
-      let object = this._objects[obj_idx];
-      let bvh_start_index = bvhCount;
+    let triangleCount = 0;
+    for (let obj_idx = 0; obj_idx < this._intersectables.length; obj_idx++) {
+      let intersectable = this._intersectables[obj_idx];
 
-      for (let obj_bvh_idx = 0; obj_bvh_idx < object.bvh.bvhArray.length; obj_bvh_idx++) {
-        textureData.objects_bvh[bvhCount] = object.bvh.bvhTexture[obj_bvh_idx];
-        bvhCount++;
+      if (intersectable.type == Intersectable.TRIANLGES) {
+        let object = intersectable as Object3d;
+        let bvh_start_index = bvhCount;
+
+        for (let obj_bvh_idx = 0; obj_bvh_idx < object.bvh.bvhArray.length ; obj_bvh_idx++) {
+          textureData.objects_bvh[bvhCount] = object.bvh.bvhTexture[obj_bvh_idx];
+          //console.log(object.bvh.bvhTexture[obj_bvh_idx]);
+          bvhCount++;
+        }
+
+        let triangle_start_index = triangleCount / 3;
+        let bvh_end_index = bvhCount;
+
+        for (let tri_idx = 0; tri_idx < object.bvh.triangleCount; tri_idx++) {
+          textureData.triangle_indices[triangleCount] = object.bvh.triangleIndexTexture[tri_idx];
+          triangleCount++;
+        }
+
+        // Bounding box bottom
+        objectData.push(object.boundingBox.bottom[0]);
+        objectData.push(object.boundingBox.bottom[1]);
+        objectData.push(object.boundingBox.bottom[2]);
+
+        // Bounding box bottom
+        objectData.push(object.boundingBox.top[0]);
+        objectData.push(object.boundingBox.top[1]);
+        objectData.push(object.boundingBox.top[2]);
+
+        // Set indices for bvh texture
+        objectData.push(intersectable.type); // Object type
+        objectData.push(bvh_start_index / 9); // BVH start index
+        objectData.push(triangle_start_index);
+
+        console.log(object.smoothShading == true ? 1.0 : 0.0);
+        objectData.push(object.smoothShading);
+        objectData.push(0);
+        objectData.push(0);
       }
-      let bvh_end_index = bvhCount;
+      else if (intersectable.type == Intersectable.SPHERE) {
+        let sphere = intersectable as Sphere;
 
-      // Bounding box bottom
-      objectData.push(object.boundingBox.bottom[0]);
-      objectData.push(object.boundingBox.bottom[1]);
-      objectData.push(object.boundingBox.bottom[2]);
+        // Bottom boudning box
+        objectData.push(sphere.boundingBox.bottom[0]);
+        objectData.push(sphere.boundingBox.bottom[1]);
+        objectData.push(sphere.boundingBox.bottom[2]);
 
-      // Bounding box bottom
-      objectData.push(object.boundingBox.top[0]);
-      objectData.push(object.boundingBox.top[1]);
-      objectData.push(object.boundingBox.top[2]);
+        // Top boudning box
+        objectData.push(sphere.boundingBox.top[0]);
+        objectData.push(sphere.boundingBox.top[1]);
+        objectData.push(sphere.boundingBox.top[2]);
 
-      // Set indices for bvh texture
-      objectData.push(bvh_start_index); // Start index
-      objectData.push(bvh_end_index); // End index
-      objectData.push(0);
+        // Position
+        objectData.push(sphere.type);
+        objectData.push(sphere.sphereIndex);
+        objectData.push(0);
+
+        objectData.push(0);
+        objectData.push(0);
+        objectData.push(0);
+      }
     }
+
+
     for (let i = 0; i < objectData.length; i++) {
       textureData.objects[i] = objectData[i];
     }
@@ -206,34 +288,6 @@ export class Scene {
       textureData.materials[i] = materialData[i];
     }
 
-    // Build sphere data
-    let sphereData = [];
-    for (let sphere of this._spheres) {
-      // Find material index for current object
-      let material_index = 0;
-      for (let mat_idx = 0; mat_idx < this._materials.length; mat_idx++) {
-        if (this._materials[mat_idx] === sphere.material) {
-          material_index = mat_idx;
-          break;
-        }
-      }
-
-      // Position
-      sphereData.push(sphere.position[0]);
-      sphereData.push(sphere.position[1]);
-      sphereData.push(sphere.position[2]);
-
-      // Extra data
-      sphereData.push(sphere.radius);
-      sphereData.push(material_index);
-      sphereData.push(0);
-    }
-
-    textureData.sphere_count = this._spheres.length;
-    for (let i = 0; i < materialData.length; i++) {
-      textureData.spheres[i] = sphereData[i];
-    }
-
     // Build triangle data
     let triangleData = [];
     let lightData = [];
@@ -254,15 +308,15 @@ export class Scene {
         triangleData.push(triangle.v0[1]);
         triangleData.push(triangle.v0[2]);
 
-        // v1
-        triangleData.push(triangle.v1[0]);
-        triangleData.push(triangle.v1[1]);
-        triangleData.push(triangle.v1[2]);
+        // edge1
+        triangleData.push(triangle.edge1[0]);
+        triangleData.push(triangle.edge1[1]);
+        triangleData.push(triangle.edge1[2]);
 
-        // v2
-        triangleData.push(triangle.v2[0]);
-        triangleData.push(triangle.v2[1]);
-        triangleData.push(triangle.v2[2]);
+        // edge2
+        triangleData.push(triangle.edge2[0]);
+        triangleData.push(triangle.edge2[1]);
+        triangleData.push(triangle.edge2[2]);
 
         // n0
         triangleData.push(triangle.n0[0]);
@@ -292,14 +346,14 @@ export class Scene {
           lightData.push(triangle.v0[2]);
 
           // Edge 1
-          lightData.push(triangle.v1[0]);
-          lightData.push(triangle.v1[1]);
-          lightData.push(triangle.v1[2]);
+          lightData.push(triangle.edge1[0]);
+          lightData.push(triangle.edge1[1]);
+          lightData.push(triangle.edge1[2]);
 
           // Edge 2
-          lightData.push(triangle.v2[0]);
-          lightData.push(triangle.v2[1]);
-          lightData.push(triangle.v2[2]);
+          lightData.push(triangle.edge2[0]);
+          lightData.push(triangle.edge2[1]);
+          lightData.push(triangle.edge2[2]);
 
           // Extra data
           lightData.push(material_index);
@@ -377,6 +431,7 @@ export class Scene {
     let white_material = new Material(vec3.fromValues(1,1,1), MATERIAL_TYPES.oren_nayar);
     let green_glass = new Material(vec3.fromValues(0.5,1,0.5), MATERIAL_TYPES.transmission);
     let specular_red_material = new Material(vec3.fromValues(1,0.5,0.5), MATERIAL_TYPES.specular);
+    let specular_blue_material = new Material(vec3.fromValues(0.5,0.5,1.0), MATERIAL_TYPES.specular);
 
     let emission_material = new Material(vec3.fromValues(1,1,1), MATERIAL_TYPES.emission);
     emission_material.emission_rate = 10.0;
@@ -393,26 +448,36 @@ export class Scene {
     this.materials.push(specular_red_material);
     this.materials.push(emission_material);
     this.materials.push(emission_red_material);
+    this.materials.push(specular_blue_material);
     this.materials.push(light_emission_material);
 
     // Load objects from .obj files
     LoadObjects([
         // {fileName: './assets/models/light_plane1.obj', material: emission_material },
         // {fileName: './assets/models/light_plane2.obj', material: emission_material },
-        // {fileName: './assets/models/light_plane3.obj', material: emission_material },
-        // {fileName: './assets/models/light_plane4.obj', material: emission_material },
-        { fileName: './assets/models/bottom_disc.obj', material: white_material },
-        { fileName: './assets/models/cylinder.obj', material: red_material }
+        { fileName: './assets/models/bottom_disc.obj', material: white_material, smooth_shading: false },
+        { fileName: './assets/models/torus.obj', material: specular_red_material, smooth_shading: true },
+        { fileName: './assets/models/cylinder.obj', material: specular_blue_material, smooth_shading: true },
+        { fileName: './assets/models/light_plane4.obj', material: emission_material, smooth_shading: false },
       ], (objects) => {
         for (let object of objects) {
           this.objects.push(object);
+          this._intersectables.push(object);
         }
       },
       () => {});
 
-    this.spheres.push(new Sphere(vec3.fromValues(5.0, 0.5, 3.5), 0.5, emission_red_material));
-    this.spheres.push(new Sphere(vec3.fromValues(0.0, 1.8, 0.0), 1.8, green_glass));
-    this.spheres.push(new Sphere(vec3.fromValues(-4.0, 1.8, 5.0), 1.8, specular_red_material));
+    let sphere1 = new Sphere(vec3.fromValues(5.0, 0.5, 3.5), 0.5, emission_red_material);
+    let sphere2 = new Sphere(vec3.fromValues(0.0, 1.8, 0.0), 1.8, green_glass);
+    let sphere3 = new Sphere(vec3.fromValues(-4.0, 1.8, 5.0), 1.8, specular_red_material);
+
+    this.spheres.push(sphere1);
+    this.spheres.push(sphere2);
+    this.spheres.push(sphere3);
+    //
+    // this._intersectables.push(sphere1);
+    // this._intersectables.push(sphere2);
+    // this._intersectables.push(sphere3);
 
     callback(this);
   }

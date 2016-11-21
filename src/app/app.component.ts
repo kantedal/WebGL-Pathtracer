@@ -2,7 +2,7 @@ import 'hammerjs';
 import {Component, AfterViewInit} from '@angular/core';
 import {RenderService} from "./services/render.service";
 import {NavigatorService} from "./services/navigator.service";
-import {Object3d} from "./models/object3d.model";
+import {Object3d} from "./models/primitives/object3d.model";
 import {SceneLoaderService} from "./services/scene-loader.service";
 
 declare var ProgressBar: any;

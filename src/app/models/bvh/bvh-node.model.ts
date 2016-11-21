@@ -1,6 +1,6 @@
 import {BoundingBox} from "./bounding-box.model";
 import {Ray} from "../ray.model";
-import {Triangle} from "../triangle.model";
+import {Triangle} from "../primitives/triangle.model";
 
 export class BVHNode {
   private _bottom: GLM.IArray;

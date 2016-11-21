@@ -1,4 +1,6 @@
 struct Sphere {
+  vec3 bounding_bottom;
+  vec3 bounding_top;
   vec3 position;
   float radius;
   int material_index;
@@ -24,18 +26,19 @@ bool SphereIntersection(Ray ray, Sphere sphere, inout Collision collision) {
   collision.position = ray.start_position + ray.direction * t;
   collision.normal = normalize(collision.position  - position);
   collision.material_index = sphere.material_index;
-  collision.distance = distance(ray.start_position, collision.position);
+  collision.distance = distanceSquared(ray.start_position, collision.position);
 
   return true;
 }
 
-Sphere GetSphere(int sphere_index) {
-  // Fetch material from texture
+Sphere GetSphere(int sphere_index, vec3 bounding_bottom, vec3 bounding_top) {
   vec2 sample_step = vec2(1.0, 0.0) / vec2(512, 512);
-  vec2 start_sample = (vec2(1.0, 0.0) / vec2(512, 512)) * float(sphere_index) * 2.0 + 0.5 * sample_step;
+  vec2 start_sample = (vec2(1.0, 0.0) / vec2(512, 512)) * float(sphere_index) * 2.0;
 
-  vec3 color = vec3(texture2D(u_sphere_texture, start_sample));
+  vec3 position = vec3(texture2D(u_sphere_texture, start_sample));
+
   float radius = texture2D(u_sphere_texture, start_sample + sample_step).x;
   int material_index = int(texture2D(u_sphere_texture, start_sample + sample_step).y);
-  return Sphere(color, radius, material_index);
+
+  return Sphere(bounding_bottom, bounding_top, position, radius, material_index);
 }

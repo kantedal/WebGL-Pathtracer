@@ -1,10 +1,11 @@
 import {BVHNode, BVHLeaf, BVHInner} from "./bvh-node.model";
-import {Triangle} from "../triangle.model";
+import {Triangle} from "../primitives/triangle.model";
 
 export class BVH {
   private _triangles: Array<Triangle>;
   private _triangleIndices: Array<number>;
   private _triangleIndexTexture: Float32Array;
+  private _triangleCount: number;
   private _bvhTexture: Float32Array;
   private _bvhArray: Array<number>;
 
@@ -14,6 +15,7 @@ export class BVH {
     this._bvhTexture = new Float32Array(2048 * 2048 * 3);
     this._bvhArray = [];
     this._triangleIndexTexture = new Float32Array(1024 * 1024 * 3);
+    this._triangleCount = 0;
   }
 
   public createBVH(triangles: Array<Triangle>) {
@@ -223,8 +225,8 @@ export class BVH {
       this.createBVHTexture(node.right, node_index, triangle_index);
 
       this._bvhTexture[node.nodeIndex + 6] = 0;
-      this._bvhTexture[node.nodeIndex + 7] = node_index_left;
-      this._bvhTexture[node.nodeIndex + 8] = node_index_right;
+      this._bvhTexture[node.nodeIndex + 7] = node_index_left / 9;
+      this._bvhTexture[node.nodeIndex + 8] = node_index_right / 9;
 
       this._bvhArray.push(0);
       this._bvhArray.push(node_index_left);
@@ -243,11 +245,11 @@ export class BVH {
       this._bvhArray.push(start_triangle_index);
 
       for (let triangle of node.triangles) {
-        //console.log(triangle_index.count + " " + triangle.triangleIndex);
         this._triangleIndexTexture[3*triangle_index.count] = triangle.triangleIndex;
         this._triangleIndexTexture[3*triangle_index.count + 1] = 0;
         this._triangleIndexTexture[3*triangle_index.count + 2] = 0;
         triangle_index.increment(1);
+        this._triangleCount += 3;
       }
     }
   }
@@ -256,6 +258,7 @@ export class BVH {
   get bvhTexture(): Float32Array { return this._bvhTexture; }
   get triangleIndexTexture(): Float32Array { return this._triangleIndexTexture; }
   get bvhArray(): Array<number> { return this._bvhArray; }
+  get triangleCount(): number { return this._triangleCount; }
 }
 
 
