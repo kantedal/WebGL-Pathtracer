@@ -58,6 +58,7 @@ export class NavigatorService {
         vec3.add(uv, u, v);
         vec3.add(this.camera.position, this.start_camera_position, uv);
         vec3.add(this.camera.look_at, this.start_lookat_position, uv);
+        console.log(this.camera.position[0] + " " + this.camera.position[1] + " " + this.camera.position[2])
 
         this.camera.hasChanged = true;
       }

@@ -37,7 +37,9 @@ export class RenderService implements SceneListener {
       //this._scene = scene;
       this._scene.sceneListener = this;
 
-      this.camera = new Camera(vec3.fromValues(4.25, 1.84, 5.62), vec3.fromValues(1.22, 1.91, 3.64));
+      this.camera = new Camera(vec3.fromValues(10.90, 3.51, 4.00), vec3.fromValues(1.59, 3.79, 2.27));
+      this.camera.position = vec3.fromValues(10.29, 3.29, 7.22);
+
       this.renderer = new Renderer(this.camera, this);
       this._navigatorService.init(this.camera, this._scene);
 
