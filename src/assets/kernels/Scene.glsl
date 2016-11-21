@@ -4,10 +4,9 @@ bool SceneIntersection(in Ray ray, inout Collision collision) {
   float collision_distance = 0.0;
 
   Object object;
-  Sphere sphere;
   int object_type;
   for (int i = 0; i < 1000; i++) {
-    getObjectAtIndex(i, object, sphere, object_type);
+    getObjectAtIndex(i, object, object_type);
 
     if (BoundingBoxCollision(object.bounding_bottom, object.bounding_top, ray, collision_distance)) {
       if (collision_distance < closest_collision.distance) {
@@ -23,12 +22,6 @@ bool SceneIntersection(in Ray ray, inout Collision collision) {
   }
   else {
     collision = closest_collision;
-
-    float u = collision.uv.x;
-    float v = collision.uv.y;
-    float shade = 0.0;
-    collision.normal = mix(collision.n0, (1.0 - u - v) * collision.n0 + u * collision.n1 + v * collision.n2, shade);
-
     return true;
   }
 }

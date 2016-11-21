@@ -23,6 +23,9 @@ uniform lowp sampler2D u_objects_bvh_texture;
 uniform lowp sampler2D u_objects_texture;
 uniform lowp sampler2D u_light_sphere_texture;
 
+#define EPS 0.0001
+#define TEST(i) ( (i) )
+
 float random(vec3 scale, float seed) {
   return fract(sin(dot(gl_FragCoord.xyz + seed, scale)) * 43758.5453 + seed);
 }

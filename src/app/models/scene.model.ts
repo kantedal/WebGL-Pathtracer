@@ -92,7 +92,6 @@ export class Scene {
     for (let object of this._objects) {
       if(object.boundingBox.rayIntersection(ray)) {
         if (object.rayIntersection(ray, vec3.create())) {
-          console.log("COLLISION!!");
           break;
         }
       }
@@ -226,35 +225,8 @@ export class Scene {
         objectData.push(object.boundingBox.top[2]);
 
         // Set indices for bvh texture
-        objectData.push(intersectable.type); // Object type
         objectData.push(bvh_start_index / 9); // BVH start index
         objectData.push(triangle_start_index);
-
-        console.log(object.smoothShading == true ? 1.0 : 0.0);
-        objectData.push(object.smoothShading);
-        objectData.push(0);
-        objectData.push(0);
-      }
-      else if (intersectable.type == Intersectable.SPHERE) {
-        let sphere = intersectable as Sphere;
-
-        // Bottom boudning box
-        objectData.push(sphere.boundingBox.bottom[0]);
-        objectData.push(sphere.boundingBox.bottom[1]);
-        objectData.push(sphere.boundingBox.bottom[2]);
-
-        // Top boudning box
-        objectData.push(sphere.boundingBox.top[0]);
-        objectData.push(sphere.boundingBox.top[1]);
-        objectData.push(sphere.boundingBox.top[2]);
-
-        // Position
-        objectData.push(sphere.type);
-        objectData.push(sphere.sphereIndex);
-        objectData.push(0);
-
-        objectData.push(0);
-        objectData.push(0);
         objectData.push(0);
       }
     }

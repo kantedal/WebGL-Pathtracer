@@ -73,6 +73,7 @@ export class Renderer implements TracerProgramInterface {
 
         // Initialise WebGL
         this._gl = this._canvas.getContext('experimental-webgl');
+        //this._gl = this._canvas.getContext('webgl2');
         this._gl.getExtension('OES_texture_float');
         this._gl.viewport( 0, 0, this._canvas.width, this._canvas.height );
 
