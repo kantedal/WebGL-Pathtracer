@@ -1,7 +1,7 @@
 struct BVHNode {
   vec3 bottom_bbox;
   vec3 top_bbox;
-  bool is_leaf;
+  float is_leaf;
   int extra_data1;
   int extra_data2;
 };
@@ -24,7 +24,7 @@ void getNodeData(int index, inout BVHNode node) {
   node.top_bbox = vec3(texture2D(u_objects_bvh_texture, sample2));
 
   vec3 extra_data = vec3(texture2D(u_objects_bvh_texture, sample3));
-  node.is_leaf = extra_data.x == 0.0 ? true : false;
+  node.is_leaf = extra_data.x;
   node.extra_data1 = int(extra_data.y);
   node.extra_data2 = int(extra_data.z);
 }
@@ -43,8 +43,7 @@ void traverseObjectTree(Ray ray, inout Collision closest_collision, int start_in
     BVHNode node;
     getNodeData(box_index + start_index, node);
 
-    if (node.is_leaf) {
-
+    if (node.is_leaf == 0.0) {
       // Check collision with bounding box
       float collision_distance = 0.0;
       if (BoundingBoxCollision(node.bottom_bbox, node.top_bbox, ray, collision_distance)) {

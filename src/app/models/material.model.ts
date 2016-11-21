@@ -7,7 +7,8 @@ export const MATERIAL_TYPES = {
   specular: 1,
   emission: 2,
   transmission: 3,
-  oren_nayar: 4
+  oren_nayar: 4,
+  glossy: 5
 }
 
 export class Material {

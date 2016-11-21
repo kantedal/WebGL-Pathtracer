@@ -250,6 +250,7 @@ export class Scene {
       materialData.push(material.color[2]);
 
       // Extra data
+      console.log(material.material_type);
       materialData.push(material.material_type);
       materialData.push(material.emission_rate);
       materialData.push(0);
@@ -402,8 +403,10 @@ export class Scene {
     let blue_material = new Material(vec3.fromValues(0,0,1), MATERIAL_TYPES.oren_nayar);
     let white_material = new Material(vec3.fromValues(1,1,1), MATERIAL_TYPES.oren_nayar);
     let green_glass = new Material(vec3.fromValues(0.5,1,0.5), MATERIAL_TYPES.transmission);
-    let specular_red_material = new Material(vec3.fromValues(1,0.5,0.5), MATERIAL_TYPES.specular);
-    let specular_blue_material = new Material(vec3.fromValues(0.5,0.5,1.0), MATERIAL_TYPES.specular);
+    let glossy_red_material = new Material(vec3.fromValues(1,0.5,0.5), MATERIAL_TYPES.glossy);
+    let glossy_blue_material = new Material(vec3.fromValues(0.5,0.5,1.0), MATERIAL_TYPES.glossy);
+    let gold_material = new Material(vec3.fromValues(1.0,0.8,0.3), MATERIAL_TYPES.glossy);
+    let silver_material = new Material(vec3.fromValues(0.8,0.8,0.8), MATERIAL_TYPES.glossy);
 
     let emission_material = new Material(vec3.fromValues(1,1,1), MATERIAL_TYPES.emission);
     emission_material.emission_rate = 10.0;
@@ -417,20 +420,23 @@ export class Scene {
     this.materials.push(blue_material);
     this.materials.push(white_material);
     this.materials.push(green_glass);
-    this.materials.push(specular_red_material);
+    this.materials.push(glossy_red_material);
     this.materials.push(emission_material);
     this.materials.push(emission_red_material);
-    this.materials.push(specular_blue_material);
+    this.materials.push(glossy_blue_material);
     this.materials.push(light_emission_material);
+    this.materials.push(gold_material);
+    this.materials.push(silver_material);
 
     // Load objects from .obj files
     LoadObjects([
         // {fileName: './assets/models/light_plane1.obj', material: emission_material },
         // {fileName: './assets/models/light_plane2.obj', material: emission_material },
         { fileName: './assets/models/bottom_disc.obj', material: white_material, smooth_shading: false },
-        { fileName: './assets/models/torus.obj', material: specular_red_material, smooth_shading: true },
-        { fileName: './assets/models/cylinder.obj', material: specular_blue_material, smooth_shading: true },
-        { fileName: './assets/models/light_plane4.obj', material: emission_material, smooth_shading: false },
+        { fileName: './assets/models/torus.obj', material: glossy_red_material, smooth_shading: true },
+        { fileName: './assets/models/cylinder.obj', material: glossy_blue_material, smooth_shading: true },
+        { fileName: './assets/models/teapot5.obj', material: silver_material, smooth_shading: true },
+        { fileName: './assets/models/light_plane4.obj', material: emission_material, smooth_shading: false }
       ], (objects) => {
         for (let object of objects) {
           this.objects.push(object);
@@ -441,7 +447,7 @@ export class Scene {
 
     let sphere1 = new Sphere(vec3.fromValues(5.0, 0.5, 3.5), 0.5, emission_red_material);
     let sphere2 = new Sphere(vec3.fromValues(0.0, 1.8, 0.0), 1.8, green_glass);
-    let sphere3 = new Sphere(vec3.fromValues(-4.0, 1.8, 5.0), 1.8, specular_red_material);
+    let sphere3 = new Sphere(vec3.fromValues(-4.0, 1.8, 5.0), 1.8, glossy_red_material);
 
     this.spheres.push(sphere1);
     this.spheres.push(sphere2);

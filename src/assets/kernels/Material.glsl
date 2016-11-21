@@ -23,22 +23,22 @@ vec3 BRDF(Ray ray, Material material, vec3 collision_normal, vec3 next_dir) {
   }
 
   // Specular material
-  if (material.material_type == 1) {
+  else if (material.material_type == 1) {
     return material.color;
   }
 
   // Emission material
-  if (material.material_type == 2) {
+  else if (material.material_type == 2) {
     return material.color;
   }
 
   // Transmission material
-  if (material.material_type == 3) {
+  else if (material.material_type == 3) {
     return material.color;
   }
 
   // Oren nayar diffuse material
-  if (material.material_type == 4) {
+  else if (material.material_type == 4) {
     float albedo = 1.8;
     float roughness = 1.0;
     vec3 view_direction = -1.0 * ray.direction;
@@ -70,15 +70,22 @@ vec3 BRDF(Ray ray, Material material, vec3 collision_normal, vec3 next_dir) {
     // get the final color
     return material.color * L1;
   }
+
+  // Glossy material
+  else if (material.material_type == 5) {
+    return material.color;
+  }
+
+
 }
 
 vec3 PDF(Ray ray, Material material, vec3 collision_normal, int iteration, inout float distribution) {
   vec3 real_normal = dot(collision_normal, ray.direction) > 0.0 ? -1.0 * collision_normal : collision_normal;
   vec3 next_dir;
 
-  if (material.material_type == 0 ) {
-    float r1 = 2.0 * 3.14 * random(vec3(12.9898, 78.233, 151.7182), time + float(iteration));
-    float r2 = random(vec3(63.7264, 10.873, 623.6736), time + float(iteration));
+  if (material.material_type == 0 || material.material_type == 4) {
+    float r1 = 2.0 * 3.14 * random(vec3(12.9898, 78.233, 151.7182), time + 100.0 * float(iteration));
+    float r2 = random(vec3(63.7264, 10.873, 623.6736), time + 12.0 * float(iteration));
     float r2s = sqrt(r2);
 
     vec3 w = collision_normal;
@@ -91,26 +98,29 @@ vec3 PDF(Ray ray, Material material, vec3 collision_normal, int iteration, inout
     return next_dir;
   }
 
-  if (material.material_type == 4) {
-    float r1 = 2.0 * 3.14 * random(vec3(12.9898, 78.233, 151.7182), time + float(iteration));
-    float r2 = random(vec3(63.7264, 10.873, 623.6736), time + float(iteration));
-    float r2s = sqrt(r2);
-
-    vec3 w = collision_normal;
-    vec3 u = normalize(cross((abs(w.x) > .1 ? vec3(0, 1, 0) : vec3(1, 0, 0)), w));
-    vec3 v = cross(w, u);
-
-    // compute cosine weighted random ray direction on hemisphere
-    next_dir = normalize(u * cos(r1) * r2s + v * sin(r1) * r2s + w * sqrt(1.0 - r2));
-
-    return next_dir;
-  }
-
-  if (material.material_type == 1) {
+  // Fully specular material
+  else if (material.material_type == 1) {
     return normalize(ray.direction - 2.0 * dot(ray.direction, collision_normal) * collision_normal);
   }
 
-  if (material.material_type == 3) {
+  // Glossy material
+  else if (material.material_type == 5) {
+    vec3 reflected = normalize(ray.direction - 2.0 * dot(ray.direction, collision_normal) * collision_normal);
+
+    float r1 = 2.0 * 3.14 * random(vec3(12.9898, 78.233, 151.7182), time + 100.0 * float(iteration));
+    float r2 = random(vec3(63.7264, 10.873, 623.6736), time + 12.0 * float(iteration));
+    float r2s = pow(r2, 3.0);
+
+    vec3 w = reflected;
+    vec3 u = normalize(cross((abs(w.x) > .1 ? vec3(0, 1, 0) : vec3(1, 0, 0)), w));
+    vec3 v = cross(w, u);
+
+    // compute cosine weighted random ray direction on hemisphere
+    next_dir = normalize(u * cos(r1) * r2s + v * sin(r1) * r2s + w * sqrt(1.0 - r2));
+    return next_dir;
+  }
+
+  else if (material.material_type == 3) {
     bool into = dot(collision_normal, real_normal) > 0.0; // is ray entering or leaving refractive material?
     float nc = 1.0;  // Index of Refraction air
     float nt = 1.3;  // Index of Refraction glass/water
