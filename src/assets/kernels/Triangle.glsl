@@ -13,19 +13,23 @@ Triangle GetTriangleFromIndex(int triangle_index) {
   vec2 sample_step = vec2(1.0,0) / vec2(2048, 2048);
   vec2 start_sample = (vec2(1.0,0) / vec2(2048, 2048)) * float(triangle_index) * 7.0;
 
-  float row = floor(start_sample.x);
-  start_sample.x = start_sample.x - row;
-  start_sample.y = row / 2048.0;
+  vec2 sample1 = vec2(start_sample.x - floor(start_sample.x), floor(start_sample.x) / 2048.0);
+  vec2 sample2 = vec2((start_sample.x + 1.0*sample_step.x) - floor((start_sample.x + 1.0*sample_step.x)), floor((start_sample.x + 1.0*sample_step.x)) / 2048.0);
+  vec2 sample3 = vec2((start_sample.x + 2.0*sample_step.x) - floor((start_sample.x + 2.0*sample_step.x)), floor((start_sample.x + 2.0*sample_step.x)) / 2048.0);
+  vec2 sample4 = vec2((start_sample.x + 3.0*sample_step.x) - floor((start_sample.x + 3.0*sample_step.x)), floor((start_sample.x + 3.0*sample_step.x)) / 2048.0);
+  vec2 sample5 = vec2((start_sample.x + 4.0*sample_step.x) - floor((start_sample.x + 4.0*sample_step.x)), floor((start_sample.x + 4.0*sample_step.x)) / 2048.0);
+  vec2 sample6 = vec2((start_sample.x + 5.0*sample_step.x) - floor((start_sample.x + 5.0*sample_step.x)), floor((start_sample.x + 5.0*sample_step.x)) / 2048.0);
+  vec2 sample7 = vec2((start_sample.x + 6.0*sample_step.x) - floor((start_sample.x + 6.0*sample_step.x)), floor((start_sample.x + 6.0*sample_step.x)) / 2048.0);
 
-  vec3 v0 = vec3(texture2D(u_triangle_texture, start_sample));
-  vec3 edge1 = vec3(texture2D(u_triangle_texture, start_sample + sample_step));
-  vec3 edge2 = vec3(texture2D(u_triangle_texture, start_sample + 2.0 * sample_step));
+  vec3 v0 = vec3(texture2D(u_triangle_texture, sample1));
+  vec3 edge1 = vec3(texture2D(u_triangle_texture, sample2));
+  vec3 edge2 = vec3(texture2D(u_triangle_texture, sample3));
 
-  vec3 n0 = vec3(texture2D(u_triangle_texture, start_sample + 3.0 * sample_step));
-  vec3 n1 = vec3(texture2D(u_triangle_texture, start_sample + 4.0 * sample_step));
-  vec3 n2 = vec3(texture2D(u_triangle_texture, start_sample + 5.0 * sample_step));
+  vec3 n0 = vec3(texture2D(u_triangle_texture, sample4));
+  vec3 n1 = vec3(texture2D(u_triangle_texture, sample5));
+  vec3 n2 = vec3(texture2D(u_triangle_texture, sample6));
 
-  int material_index = int(texture2D(u_triangle_texture, start_sample + 6.0 * sample_step).x);
+  int material_index = int(texture2D(u_triangle_texture, sample7).x);
 
   return Triangle(v0, edge1, edge2, n0, n1, n2, material_index);
 }

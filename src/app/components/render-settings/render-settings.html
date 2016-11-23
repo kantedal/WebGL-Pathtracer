@@ -1,14 +1,13 @@
 <md-list style="height:100%;">
-  <div class="list-header" style="margin-top: 20px">
-    Max samples
-  </div>
   <md-list-item style="margin-top: 10px;">
-    <md-input style="width: 100%;" dividerColor="accent"  color="accent" value="5000"></md-input>
+    <table style="width: 100%" cellspacing="0">
+      <tr>
+        <td><md-input placeholder="Samples" dividerColor="accent"  color="accent" value="{{_renderService.maxSamples}}" (change)="onMaxSamplesChange($event)"></md-input></td>
+        <td><md-input placeholder="Trace depth" value style="width: 100%" dividerColor="accent"  color="accent" (change)="onTraceDepthChange($event)" value="{{_renderService.traceDepth}}"></md-input></td>
+      </tr>
+    </table>
   </md-list-item>
 
-  <div class="list-header" style="">
-    Resolution
-  </div>
   <md-list-item style="margin-top: 10px;">
     <table style="width: 100%" cellspacing="0" style="padding-top: 20px;">
       <tr>
@@ -17,22 +16,13 @@
       </tr>
     </table>
   </md-list-item>
+
   <md-list-item>
     <button md-raised-button (click)="loadObj()" style="margin-top: 30px; background-color: #FF4081; width: 100%; color:#fff;">Load object</button>
     <!--<input type="file" id="load_obj" style="visibility: hidden;">-->
   </md-list-item>
+
   <md-list-item>
     <button md-raised-button (click)="_renderService.scene.saveSceneToFile()" style="margin-top: 30px; background-color: #FF4081; width: 100%; color:#fff;">Save scene</button>
-  </md-list-item>
-  <md-list-item>
-    <table style="width: 100%" cellspacing="0" style="padding-top: 20px;">
-      <tr>
-        <td style="margin-right:10px;"><div class="list-header">BVH mode</div></td>
-        <td style="padding-right:5px; padding-left:5px; margin-top:10px;">
-          <md-slide-toggle enabled checked="false" (change)="onBVHModeSwitch($event)">
-          </md-slide-toggle>
-        </td>
-      </tr>
-    </table>
   </md-list-item>
 </md-list>

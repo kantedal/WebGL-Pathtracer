@@ -14,10 +14,6 @@ export class RenderSettingsComponent {
 
   constructor(private _renderService: RenderService) {}
 
-  public onMaxSamplesChange($event) {
-    this._renderService.bloom($event.checked);
-  }
-
   public loadObj() {
     // $("#load_obj").trigger('click');
     this._renderService.scene.loadObj();
@@ -25,5 +21,15 @@ export class RenderSettingsComponent {
 
   public onBVHModeSwitch($event) {
     this._renderService.enableBVHMode($event.checked);
+  }
+
+  public onMaxSamplesChange(event) {
+    this._renderService.maxSamples = parseFloat((<HTMLInputElement>event.target).value);
+    console.log(this._renderService.maxSamples);
+  }
+
+  public onTraceDepthChange(event) {
+    this._renderService.traceDepth = parseFloat((<HTMLInputElement>event.target).value);
+    this._renderService.restart();
   }
 }

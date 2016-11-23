@@ -30,6 +30,14 @@
   border-radius: 3px;
 }
 
+#render-canvas:hover {
+  cursor: crosshair;
+}
+
+#render-canvas:active {
+  cursor: crosshair;
+}
+
 .render-card {
   padding: 0px !important;
 }

@@ -1,6 +1,7 @@
 precision lowp float;
 
 uniform float time;
+uniform int trace_depth;
 uniform int triangle_count;
 uniform int sphere_count;
 uniform int object_count;

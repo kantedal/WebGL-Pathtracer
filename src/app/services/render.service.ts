@@ -12,7 +12,8 @@ import {SceneLoaderService} from "./scene-loader.service";
 
 @Injectable()
 export class RenderService implements SceneListener {
-  public maxSamples = 5000;
+  public maxSamples = 10000;
+  public traceDepth = 5;
   public renderCompletion = 0;
   public renderSamples = 0;
   public samplesPerSecond = 0;
@@ -38,7 +39,6 @@ export class RenderService implements SceneListener {
       this._scene.sceneListener = this;
 
       this.camera = new Camera(vec3.fromValues(10.90, 3.51, 4.00), vec3.fromValues(1.59, 3.79, 2.27));
-      this.camera.position = vec3.fromValues(10.29, 3.29, 7.22);
 
       this.renderer = new Renderer(this.camera, this);
       this._navigatorService.init(this.camera, this._scene);
@@ -74,7 +74,7 @@ export class RenderService implements SceneListener {
 
   private update() {
     this.renderSamples = this.renderer.samples;
-    this.renderCompletion = this.renderer.samples / 5000;
+    this.renderCompletion = this.renderer.samples / this.maxSamples;
     this.samplesPerSecond = this.renderer.fps;
   }
 

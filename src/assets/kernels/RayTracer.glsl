@@ -81,16 +81,17 @@ vec3 PathTrace(Ray ray) {
   Collision collision;
   Material collision_material;
 
-  for (int iteration = 0; iteration < 5; iteration++) {
+  for (int iteration = 0; iteration < 10; iteration++) {
+    if (iteration == trace_depth) break;
     float distribution = 1.0;
 
     if (!SceneIntersection(ray, collision)) {
-      vec3 lightSphereContribution = LightSphereContributions(ray);
-      if (iteration == 0) {
-        return lightSphereContribution * 5.0;
-      }
-
-      accumulated_color += (mask * lightSphereContribution);
+//      vec3 lightSphereContribution = LightSphereContributions(ray);
+//      if (iteration == 0) {
+//        return lightSphereContribution * 5.0;
+//      }
+//
+//      accumulated_color += (mask * lightSphereContribution);
       break;
     }
 
@@ -100,10 +101,7 @@ vec3 PathTrace(Ray ray) {
     mask *= BRDF(ray, collision_material, collision.normal, next_dir) * distribution;
 
     accumulated_color += mask * collision_material.color * collision_material.emission_rate;
-    // else {
-    //   vec3 light_intensity = ShadowRay(collision.position, collision.normal);
-    //   accumulated_color += (mask * collision_material.color * light_intensity);
-    // }
+
     if (length(next_dir) == 0.0) break;
     ray = Ray(collision.position + next_dir * 0.01, next_dir);
   }

@@ -432,11 +432,14 @@ export class Scene {
     LoadObjects([
         // {fileName: './assets/models/light_plane1.obj', material: emission_material },
         // {fileName: './assets/models/light_plane2.obj', material: emission_material },
-        { fileName: './assets/models/bottom_disc.obj', material: white_material, smooth_shading: false },
-        { fileName: './assets/models/torus.obj', material: glossy_red_material, smooth_shading: true },
+        //{ fileName: './assets/models/bottom_disc.obj', material: white_material, smooth_shading: false },
+       // { fileName: './assets/models/torus.obj', material: glossy_red_material, smooth_shading: true },
         { fileName: './assets/models/cylinder.obj', material: glossy_blue_material, smooth_shading: true },
         { fileName: './assets/models/teapot5.obj', material: silver_material, smooth_shading: true },
-        { fileName: './assets/models/light_plane4.obj', material: emission_material, smooth_shading: false }
+        { fileName: './assets/models/bunny.obj', material: gold_material, smooth_shading: true },
+        { fileName: './assets/models/light_plane4.obj', material: emission_material, smooth_shading: false },
+        { fileName: './assets/models/light_plane5.obj', material: emission_material, smooth_shading: false },
+        { fileName: './assets/models/box.obj', material: white_material, smooth_shading: false }
       ], (objects) => {
         for (let object of objects) {
           this.objects.push(object);

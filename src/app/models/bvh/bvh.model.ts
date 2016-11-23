@@ -2,6 +2,8 @@ import {BVHNode, BVHLeaf, BVHInner} from "./bvh-node.model";
 import {Triangle} from "../primitives/triangle.model";
 
 export class BVH {
+  public static MAX_SIZE = 100;
+
   private _triangles: Array<Triangle>;
   private _triangleIndices: Array<number>;
   private _triangleIndexTexture: Float32Array;
@@ -21,8 +23,8 @@ export class BVH {
   public createBVH(triangles: Array<Triangle>) {
     this._triangles = triangles;
     let workBoxes = [];
-    let bottom = vec3.fromValues(10000, 10000, 10000);
-    let top = vec3.fromValues(-10000, -10000, -10000);
+    let bottom = vec3.fromValues(BVH.MAX_SIZE, BVH.MAX_SIZE, BVH.MAX_SIZE);
+    let top = vec3.fromValues(-BVH.MAX_SIZE, -BVH.MAX_SIZE, -BVH.MAX_SIZE);
 
     for (let triangle of triangles) {
       let bbox = new WorkBoundingBox();
@@ -67,8 +69,8 @@ export class BVH {
     }
 
     // Continue splitting if there are more than 4 triangles
-    let bottom = vec3.fromValues(10000, 10000, 10000);
-    let top = vec3.fromValues(-10000, -10000, -10000);
+    let bottom = vec3.fromValues(BVH.MAX_SIZE, BVH.MAX_SIZE, BVH.MAX_SIZE);
+    let top = vec3.fromValues(-BVH.MAX_SIZE, -BVH.MAX_SIZE, -BVH.MAX_SIZE);
 
     // Set size of box for remaining elements
     for (let box of workBoxes) {
@@ -97,10 +99,10 @@ export class BVH {
 
       for (let test_split = start + step; test_split < stop - step; test_split += step) {
         // Left and right bounding box
-        let left_bottom = vec3.fromValues(10000, 10000, 10000);
-        let left_top = vec3.fromValues(-10000, -10000, -10000);
-        let right_bottom = vec3.fromValues(10000, 10000, 10000);
-        let right_top = vec3.fromValues(-10000, -10000, -10000);
+        let left_bottom = vec3.fromValues(BVH.MAX_SIZE, BVH.MAX_SIZE, BVH.MAX_SIZE);
+        let left_top = vec3.fromValues(-BVH.MAX_SIZE, -BVH.MAX_SIZE, -BVH.MAX_SIZE);
+        let right_bottom = vec3.fromValues(BVH.MAX_SIZE, BVH.MAX_SIZE, BVH.MAX_SIZE);
+        let right_top = vec3.fromValues(-BVH.MAX_SIZE, -BVH.MAX_SIZE, -BVH.MAX_SIZE);
 
         let count_left = 0;
         let count_right = 0;
@@ -158,10 +160,10 @@ export class BVH {
     let left = []; // Left split bounding boxes
     let right = []; // Right split bounding boxes
 
-    let left_bottom = vec3.fromValues(10000, 10000, 10000);
-    let left_top = vec3.fromValues(-10000, -10000, -10000);
-    let right_bottom = vec3.fromValues(10000, 10000, 10000);
-    let right_top = vec3.fromValues(-10000, -10000, -10000);
+    let left_bottom = vec3.fromValues(BVH.MAX_SIZE, BVH.MAX_SIZE, BVH.MAX_SIZE);
+    let left_top = vec3.fromValues(-BVH.MAX_SIZE, -BVH.MAX_SIZE, -BVH.MAX_SIZE);
+    let right_bottom = vec3.fromValues(BVH.MAX_SIZE, BVH.MAX_SIZE, BVH.MAX_SIZE);
+    let right_top = vec3.fromValues(-BVH.MAX_SIZE, -BVH.MAX_SIZE, -BVH.MAX_SIZE);
 
     for (let box of workBoxes) {
       let value = box.center[best_axis];
@@ -276,8 +278,8 @@ export class WorkBoundingBox {
   private _center: GLM.IArray;
 
   constructor() {
-    this._top = vec3.fromValues(-10000, -10000, -10000);
-    this._bottom = vec3.fromValues(10000, 10000, 10000);
+    this._top = vec3.fromValues(-BVH.MAX_SIZE, -BVH.MAX_SIZE, -BVH.MAX_SIZE);
+    this._bottom = vec3.fromValues(BVH.MAX_SIZE, BVH.MAX_SIZE, BVH.MAX_SIZE);
     this._center = vec3.fromValues(0, 0, 0);
   }
 

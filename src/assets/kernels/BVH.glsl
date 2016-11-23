@@ -10,13 +10,9 @@ void getNodeData(int index, inout BVHNode node) {
   vec2 sample_step = vec2(1,0) / vec2(2048, 2048);
   vec2 start_sample = (vec2(1,0) / vec2(2048, 2048)) * float(index) * 3.0;
 
-  float row = floor(start_sample.x);
-  start_sample.x = start_sample.x - row;
-  start_sample.y = row / 2048.0;
-
-  vec2 sample1 = start_sample;
-  vec2 sample2 = start_sample + sample_step;
-  vec2 sample3 = start_sample + 2.0 * sample_step;
+  vec2 sample1 = vec2(start_sample.x - floor(start_sample.x), floor(start_sample.x) / 2048.0);
+  vec2 sample2 = vec2((start_sample.x + 1.0*sample_step.x) - floor((start_sample.x + 1.0*sample_step.x)), floor((start_sample.x + 1.0*sample_step.x)) / 2048.0);
+  vec2 sample3 = vec2((start_sample.x + 2.0*sample_step.x) - floor((start_sample.x + 2.0*sample_step.x)), floor((start_sample.x + 2.0*sample_step.x)) / 2048.0);
 
   node.bottom_bbox = vec3(texture2D(u_objects_bvh_texture, sample1));
   node.top_bbox = vec3(texture2D(u_objects_bvh_texture, sample2));
@@ -62,7 +58,7 @@ void traverseObjectTree(Ray ray, inout Collision closest_collision, int start_in
       int current_index = start_triangle_index;
       int end_index = start_triangle_index + triangle_count;
 
-      for (int idx = 0; idx < 10; idx++) {
+      for (int idx = 0; idx < 20; idx++) {
         Triangle triangle = GetTriangleFromIndex(getTriangleIndex(current_index));
 
         if (TriangleIntersection(ray, triangle, collision, closest_collision.distance)) {

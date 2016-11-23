@@ -15,7 +15,7 @@
   <script src="./lib/gl-matrix.js"></script>
   <script src="./lib/jquery.min.js"></script>
   <script src="./lib/circle-progress.min.js"></script>
-  <script id="vs_render" type="x-shader/vertex">
+  <script id="vs_render" type="x-shader/x-vertex">
     attribute vec3 vertex;
     varying vec2 texCoord;
     void main() {
@@ -24,7 +24,7 @@
     }
   </script>
 
-  <script id="fs_render" type="x-shader/fragment">
+  <script id="fs_render" type="x-shader/x-fragment">
     precision highp float;
     uniform float samples;
     uniform bool bloomEnabled;
@@ -54,7 +54,7 @@
     }
   </script>
 
-  <script id="fs_combine" type="x-shader/fragment">
+  <script id="fs_combine" type="x-shader/x-fragment">
     precision highp float;
     uniform float samples;
     varying vec2 texCoord;
@@ -76,7 +76,7 @@
     }
   </script>
 
-  <script id="horizontal-blur" type="x-shader/fragment">
+  <script id="horizontal-blur" type="x-shader/x-fragment">
     precision highp float;
     varying vec2 texCoord;
     uniform sampler2D u_buffer_texture;
@@ -106,7 +106,7 @@
     }
   </script>
 
-  <script id="vertical-blur" type="x-shader/fragment">
+  <script id="vertical-blur" type="x-shader/x-fragment">
     precision highp float;
     varying vec2 texCoord;
     uniform sampler2D u_buffer_texture;
@@ -136,7 +136,7 @@
     }
   </script>
 
-  <script id="threshold" type="x-shader/fragment">
+  <script id="threshold" type="x-shader/x-fragment">
     precision highp float;
     varying vec2 texCoord;
     uniform float samples;

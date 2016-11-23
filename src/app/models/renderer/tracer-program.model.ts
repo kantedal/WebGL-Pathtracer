@@ -2,8 +2,10 @@ import {Camera} from "../camera.model";
 import {createProgram} from "./gl-helper";
 import {DataTexture} from "./data-texture.model";
 import {Material} from "../material.model";
+import {RenderService} from "../../services/render.service";
 
 export class TracerProgram {
+  private _renderService: RenderService;
   private _gl: WebGLRenderingContext;
   private _program: WebGLProgram;
   private _vertexBuffer;
@@ -22,15 +24,17 @@ export class TracerProgram {
   private _lightSphereTexture: WebGLTexture;
   private _lightSphereLocation: WebGLUniformLocation;
   private _objectCountLocation: WebGLUniformLocation;
-
-  private _vertexAttribute;
-
+  private _traceDepthLocation: WebGLUniformLocation;
   private timeLocation: WebGLUniformLocation;
   private resolutionLocation: WebGLUniformLocation;
 
+  private _vertexAttribute;
+
+
   private accumulatedBufferLocation;
 
-  constructor(gl: WebGLRenderingContext, kernelData, vertexBuffer, frameBuffer, callback: TracerProgramInterface) {
+  constructor(renderService: RenderService, gl: WebGLRenderingContext, kernelData, vertexBuffer, frameBuffer, callback: TracerProgramInterface) {
+    this._renderService = renderService;
     this._gl = gl;
     this._vertexBuffer = vertexBuffer;
     this._frameBuffer = frameBuffer;
@@ -44,6 +48,7 @@ export class TracerProgram {
     this.accumulatedBufferLocation = gl.getUniformLocation(this._program, "u_buffer_texture");
     this.timeLocation = gl.getUniformLocation( this._program, 'time' );
     this.resolutionLocation = gl.getUniformLocation( this._program, 'resolution' );
+    this._traceDepthLocation = gl.getUniformLocation( this._program, 'trace_depth' );
   }
 
   public update(time, width, height, bufferTextures: Array<any>, camera: Camera) {
@@ -90,6 +95,7 @@ export class TracerProgram {
 
     this._gl.uniform1f( this.timeLocation, time );
     this._gl.uniform2f( this.resolutionLocation, width, height );
+    this._gl.uniform1i( this._traceDepthLocation, this._renderService.traceDepth );
   }
 
   private updateCamera(camera: Camera) {
