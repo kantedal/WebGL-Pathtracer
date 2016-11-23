@@ -35,10 +35,8 @@ int getTriangleIndex(int stackIdx) {
   vec2 start_sample = (vec2(1.0,0) / vec2(1024, 1024)) * float(stackIdx);
 
   float row = floor(start_sample.x);
-  if (start_sample.x >= 1.0) {
-    start_sample.x = start_sample.x - row;
-    start_sample.y = row / 1024.0;
-  }
+  start_sample.x = start_sample.x - row;
+  start_sample.y = row / 1024.0;
 
   vec3 triangle_index_slot = vec3(texture2D(u_triangle_index_texture, start_sample));
   return int(triangle_index_slot.x);
@@ -61,7 +59,7 @@ Triangle GetLightTriangleFromIndex(int triangle_index) {
   return Triangle(v0, edge1, edge2, vec3(0,0,0), vec3(0,0,0), vec3(0,0,0), material_index);
 }
 
-bool TriangleIntersection(Ray ray, Triangle triangle, inout Collision collision) {
+bool TriangleIntersection(Ray ray, Triangle triangle, inout Collision collision, float closest_collision_distance) {
   if (dot(ray.direction, triangle.n0) > 0.0) return false;
 
   //Begin calculating determinant - also used to calculate u parameter
@@ -85,15 +83,18 @@ bool TriangleIntersection(Ray ray, Triangle triangle, inout Collision collision)
 
   if(t > EPS) {
     collision.position = ray.start_position + inv_det * t * ray.direction;
-    collision.material_index = triangle.material_index;
-    collision.uv = vec2(u, v);
+    collision.distance = distance(ray.start_position, collision.position);
 
+    if (closest_collision_distance < collision.distance){
+      return false;
+    }
+
+    collision.material_index = triangle.material_index;
     // Interpolate normal
     float m = (triangle.n0 == triangle.n1 && triangle.n0 == triangle.n2) ? 0.0 : 1.0;
     collision.normal = mix(triangle.n0, (1.0 - u - v) * triangle.n0 + u * triangle.n1 + v * triangle.n2, m);
-
-    collision.distance = distance(ray.start_position, collision.position);
     return true;
+
   }
 
   return false;

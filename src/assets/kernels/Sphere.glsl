@@ -17,7 +17,6 @@ bool SphereIntersection(Ray ray, Sphere sphere, inout Collision collision) {
   if (disc < 0.0) return false;
   else disc = sqrt(disc);
 
-
   t = (t = b - disc) > epsilon ? t : ((t = b + disc) > epsilon ? t : 0.0);
 
   if (t < 0.01)

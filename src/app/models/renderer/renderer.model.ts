@@ -8,10 +8,10 @@ import { TracerProgram, TracerProgramInterface } from "./tracer-program.model";
 import { RenderProgram } from "./render-program.model";
 import { BloomProgram } from "./bloom-program.model";
 import { ThresholdProgram } from "./threshold-program.model";
-import {Material} from "../material.model";
-import {RenderService} from "../../services/render.service";
-import {DeveloperProgram} from "./developer-program.model";
-import {Scene} from "../scene.model";
+import { Material } from "../material.model";
+import { RenderService } from "../../services/render.service";
+import { DeveloperProgram } from "./developer-program.model";
+import { Scene} from "../scene.model";
 
 export class Renderer implements TracerProgramInterface {
   private _renderService: RenderService;

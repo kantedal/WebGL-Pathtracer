@@ -11,10 +11,8 @@ void getNodeData(int index, inout BVHNode node) {
   vec2 start_sample = (vec2(1,0) / vec2(2048, 2048)) * float(index) * 3.0;
 
   float row = floor(start_sample.x);
-  if (start_sample.x >= 1.0) {
-    start_sample.x = start_sample.x - row;
-    start_sample.y = row / 2048.0;
-  }
+  start_sample.x = start_sample.x - row;
+  start_sample.y = row / 2048.0;
 
   vec2 sample1 = start_sample;
   vec2 sample2 = start_sample + sample_step;
@@ -67,10 +65,8 @@ void traverseObjectTree(Ray ray, inout Collision closest_collision, int start_in
       for (int idx = 0; idx < 10; idx++) {
         Triangle triangle = GetTriangleFromIndex(getTriangleIndex(current_index));
 
-        if (TriangleIntersection(ray, triangle, collision)) {
-          if (collision.distance < closest_collision.distance) {
-            closest_collision = collision;
-          }
+        if (TriangleIntersection(ray, triangle, collision, closest_collision.distance)) {
+          closest_collision = collision;
         }
 
         if (++current_index >= end_index)
