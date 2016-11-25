@@ -88,19 +88,20 @@ export class Scene {
   }
 
   public sceneIntersection(ray: Ray): Object3d {
-
+    let colliding_objects = [];
+    let collision_positions = [];
     for (let object of this._objects) {
       if(object.boundingBox.rayIntersection(ray)) {
         if (object.rayIntersection(ray, vec3.create())) {
+          colliding_objects.push(object);
           break;
         }
       }
     }
+    console.log(colliding_objects);
+    return colliding_objects[0];
 
-    return null;
 
-    // let colliding_objects = [];
-    // let collision_positions = [];
     //
     // this.recurseBBoxes(this._bvh.root, ray, colliding_objects);
     // //this.traverseBBoxes(ray, colliding_objects);
@@ -114,8 +115,9 @@ export class Scene {
     //     closestDistance = distance;
     //   }
     // }
-    //
-    // return colliding_objects[closestIndex];
+    // console.log(colliding_objects);
+
+
   }
 
   buildScene() {
@@ -438,7 +440,7 @@ export class Scene {
         { fileName: './assets/models/teapot5.obj', material: silver_material, smooth_shading: true },
         { fileName: './assets/models/bunny.obj', material: gold_material, smooth_shading: true },
         { fileName: './assets/models/light_plane4.obj', material: emission_material, smooth_shading: false },
-        { fileName: './assets/models/light_plane5.obj', material: emission_material, smooth_shading: false },
+        { fileName: './assets/models/light_plane5.obj', material: emission_red_material, smooth_shading: false },
         { fileName: './assets/models/box.obj', material: white_material, smooth_shading: false }
       ], (objects) => {
         for (let object of objects) {

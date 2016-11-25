@@ -13,7 +13,7 @@ import {SceneLoaderService} from "./scene-loader.service";
 @Injectable()
 export class RenderService implements SceneListener {
   public maxSamples = 10000;
-  public traceDepth = 5;
+  public traceDepth = 3;
   public renderCompletion = 0;
   public renderSamples = 0;
   public samplesPerSecond = 0;

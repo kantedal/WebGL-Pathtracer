@@ -8,9 +8,9 @@
   <md-list-item style="margin-top: 10px;">
     <table style="width: 100%" cellspacing="0" style="padding-top: 10px;">
       <tr>
-        <td><md-input placeholder="X" style="width: 100%" dividerColor="accent" color="accent" value="{{selectedObject && selectedObject?.position[0]}}"></md-input></td>
-        <td><md-input placeholder="Y" style="width: 100%" dividerColor="accent" color="accent" value="{{selectedObject && selectedObject?.position[1]}}"></md-input></td>
-        <td><md-input placeholder="Z" style="width: 100%" dividerColor="accent" color="accent" value="{{selectedObject && selectedObject?.position[2]}}"></md-input></td>
+        <td><md-input placeholder="X" style="width: 100%" dividerColor="accent" color="accent" value="{{selectedObject && selectedObject?.position[0].toFixed(2)}}"></md-input></td>
+        <td><md-input placeholder="Y" style="width: 100%" dividerColor="accent" color="accent" value="{{selectedObject && selectedObject?.position[1].toFixed(2)}}"></md-input></td>
+        <td><md-input placeholder="Z" style="width: 100%" dividerColor="accent" color="accent" value="{{selectedObject && selectedObject?.position[2].toFixed(2)}}"></md-input></td>
       </tr>
     </table>
   </md-list-item>
@@ -50,9 +50,9 @@
   <md-list-item style="margin-top: 10px;">
     <table style="width: 100%" cellspacing="0" style="padding-top: 10px;">
       <tr>
-        <td><md-input (input)="redChannelChanged($event)" placeholder="R" style="width: 100%" dividerColor="accent" color="red" value="{{selectedObject && selectedObject?.material?.color[0]}}"></md-input></td>
-        <td><md-input (input)="greenChannelChanged($event)" placeholder="G" style="width: 100%" dividerColor="accent" color="green" value="{{selectedObject && selectedObject?.material?.color[1]}}"></md-input></td>
-        <td><md-input (input)="blueChannelChanged($event)" placeholder="B" style="width: 100%" dividerColor="accent" color="blue" value="{{selectedObject && selectedObject?.material?.color[2]}}"></md-input></td>
+        <td><md-input (input)="redChannelChanged($event)" placeholder="R" style="width: 100%" dividerColor="accent" color="red" value="{{selectedObject && selectedObject?.material?.color[0].toFixed(2)}}"></md-input></td>
+        <td><md-input (input)="greenChannelChanged($event)" placeholder="G" style="width: 100%" dividerColor="accent" color="green" value="{{selectedObject && selectedObject?.material?.color[1].toFixed(2)}}"></md-input></td>
+        <td><md-input (input)="blueChannelChanged($event)" placeholder="B" style="width: 100%" dividerColor="accent" color="blue" value="{{selectedObject && selectedObject?.material?.color[2].toFixed(2)}}"></md-input></td>
       </tr>
     </table>
   </md-list-item>
@@ -60,7 +60,7 @@
     Emission rate
   </div>
   <md-list-item style="margin-top: 10px;">
-    <md-input (input)="emissionRateChanged($event)" style="width: 100%" dividerColor="accent" value="{{selectedObject && selectedObject?.material?.emission_rate}}"></md-input>
+    <md-input (input)="emissionRateChanged($event)" style="width: 100%" dividerColor="accent" value="{{selectedObject && selectedObject?.material?.emission_rate.toFixed(2)}}"></md-input>
   </md-list-item>
 
 </md-list>
