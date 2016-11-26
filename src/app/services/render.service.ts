@@ -23,8 +23,8 @@ export class RenderService implements SceneListener {
   public bloomAlpha = 0.7;
 
   private _scene: Scene;
-  private camera: Camera;
-  private renderer: Renderer;
+  private _camera: Camera;
+  private _renderer: Renderer;
 
   constructor(
     private _navigatorService: NavigatorService,
@@ -32,36 +32,35 @@ export class RenderService implements SceneListener {
   ) {}
 
   public init() {
-    //this._sceneLoaderService.loadScene('./assets/scene6.json', (scene: Scene) => {
     this._scene = new Scene();
-    this._scene.createDefaultScene(() => {
-      //this._scene = scene;
-      this._scene.sceneListener = this;
+    this._camera = new Camera(vec3.fromValues(10.90, 3.51, 4.00), vec3.fromValues(1.59, 3.79, 2.27));
+    this._navigatorService.init(this._camera, this._scene);
 
-      this.camera = new Camera(vec3.fromValues(10.90, 3.51, 4.00), vec3.fromValues(1.59, 3.79, 2.27));
-
-      this.renderer = new Renderer(this.camera, this);
-      this._navigatorService.init(this.camera, this._scene);
-
-      setTimeout(() => this.sceneUpdated(), 100);
-      setInterval(() => this.update(), 100);
+    this._renderer = new Renderer(this._camera, this);
+    this._renderer.init(() => {
+      this._scene.createDefaultScene(() => {
+        this._scene.sceneListener = this;
+        this.sceneUpdated();
+        setInterval(() => this.update(), 50);
+      });
     });
+
   }
 
   public updateMaterialTexture(material: Material) {
-    this.renderer.updateMaterialTexture(material);
+    this._renderer.updateMaterialTexture(material);
   }
 
   public pause() {
-    this.renderer.shouldRender = false;
+    this._renderer.shouldRender = false;
   }
 
   public start() {
-    this.renderer.shouldRender = true;
+    this._renderer.shouldRender = true;
   }
 
   public restart() {
-    this.renderer.resetBufferTextures();
+    this._renderer.resetBufferTextures();
   }
 
   public enableBVHMode(enable: boolean) {
@@ -69,20 +68,22 @@ export class RenderService implements SceneListener {
   }
 
   public bloom(enabled: boolean) {
-    this.renderer.bloomEnabled = enabled;
+    this._renderer.bloomEnabled = enabled;
   }
 
   private update() {
-    this.renderSamples = this.renderer.samples;
-    this.renderCompletion = this.renderer.samples / this.maxSamples;
-    this.samplesPerSecond = this.renderer.fps;
+    this.renderSamples = this._renderer.samples;
+    this.renderCompletion = this._renderer.samples / this.maxSamples;
+    this.samplesPerSecond = this._renderer.fps;
   }
 
   public sceneUpdated() {
     this._scene.buildScene();
-    this.renderer.addSceneTextures(this._scene.buildSceneTextures(), this._scene);
+    this._renderer.addSceneTextures(this._scene.buildSceneTextures(), this._scene);
   }
 
-  get bloomEnabled() { return this.renderer.bloomEnabled; }
+  get bloomEnabled() { return this._renderer.bloomEnabled; }
   get scene(): Scene { return this._scene; }
+  get renderer(): Renderer { return this._renderer; }
+  get camera(): Camera { return this._camera; }
 }

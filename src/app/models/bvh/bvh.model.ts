@@ -95,7 +95,7 @@ export class BVH {
       if (Math.abs(stop - start) < 0.0001)
         continue;
 
-      let step = (stop - start) / (64.0 / (depth + 1.0));
+      let step = (stop - start) / (32.0 / (depth + 1.0));
 
       for (let test_split = start + step; test_split < stop - step; test_split += step) {
         // Left and right bounding box

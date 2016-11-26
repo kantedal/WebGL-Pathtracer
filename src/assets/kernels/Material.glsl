@@ -19,32 +19,9 @@ Material GetMaterial(int material_index) {
 vec3 BRDF(Ray ray, Material material, vec3 collision_normal, vec3 next_dir) {
   // Lambertian diffuse material
   if (material.material_type == 0) {
-    return material.color * dot(ray.direction, -collision_normal);// / 3.14 * 2.0;
-  }
-
-  // Specular material
-  else if (material.material_type == 1) {
-    return material.color;
-  }
-
-  // Emission material
-  else if (material.material_type == 2) {
-    return material.color;
-  }
-
-  // Transmission material
-  else if (material.material_type == 3) {
-    return material.color;
-  }
-
-  // Oren nayar diffuse material
-  else if (material.material_type == 4) {
     float albedo = 1.8;
     float roughness = 1.0;
     vec3 view_direction = -1.0 * ray.direction;
-
-    // set value depending on materia
-    const float PI = 3.14159;
 
     // calculate intermediary values
     float NdotL = dot(collision_normal, next_dir);
@@ -71,6 +48,16 @@ vec3 BRDF(Ray ray, Material material, vec3 collision_normal, vec3 next_dir) {
     return material.color * L1;
   }
 
+  // Specular material
+  else if (material.material_type == 1) {
+    return material.color;
+  }
+
+  // Transmission material
+  else if (material.material_type == 3) {
+    return material.color;
+  }
+
   // Glossy material
   else if (material.material_type == 5) {
     return material.color;
@@ -83,7 +70,7 @@ vec3 PDF(Ray ray, Material material, vec3 collision_normal, int iteration, inout
   vec3 real_normal = dot(collision_normal, ray.direction) > 0.0 ? -1.0 * collision_normal : collision_normal;
   vec3 next_dir;
 
-  if (material.material_type == 0 || material.material_type == 4) {
+  if (material.material_type == 0) {
     float r1 = 2.0 * 3.14 * random(vec3(12.9898, 78.233, 151.7182), time + 100.0 * float(iteration));
     float r2 = random(vec3(63.7264, 10.873, 623.6736), time + 12.0 * float(iteration));
     float r2s = sqrt(r2);

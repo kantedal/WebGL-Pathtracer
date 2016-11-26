@@ -1,8 +1,6 @@
-import { Material } from "../material.model";
 import { Ray } from "../ray.model";
 import { Triangle } from "./triangle.model";
 import { BVH } from "../bvh/bvh.model";
-import { BoundingBox } from "../bvh/bounding-box.model";
 import { Intersectable } from "./intersectable.model";
 
 export class Object3d extends Intersectable {
@@ -11,16 +9,27 @@ export class Object3d extends Intersectable {
   private _smoothShading: boolean = false;
 
   constructor(triangles, material) {
-    super(Intersectable.TRIANLGES, material);
+    super(material);
 
     this._triangles = triangles;
     this.boundingBox.calculateBoundingBoxFromTriangles(this._triangles);
-
     this._bvh = new BVH();
   }
 
+  public updatePosition(new_position: GLM.IArray) {
+    for (let triangle of this._triangles) {
+      vec3.sub(triangle.v0, triangle.v0, this.position);
+      vec3.sub(triangle.v1, triangle.v1, this.position);
+      vec3.sub(triangle.v2, triangle.v2, this.position);
+
+      vec3.add(triangle.v0, triangle.v0, new_position);
+      vec3.add(triangle.v1, triangle.v1, new_position);
+      vec3.add(triangle.v2, triangle.v2, new_position);
+    }
+    this.position = new_position;
+  }
+
   private recurseBBoxes(node: any, ray: Ray, colliding_positions: Array<any>) {
-    //console.log("Iteration");
     if (!node.isLeaf()) {
       if (node.left.rayIntersection(ray)) {
         this.recurseBBoxes(node.left, ray, colliding_positions);
@@ -51,11 +60,6 @@ export class Object3d extends Intersectable {
     else {
       return false;
     }
-    // for(let triangle of this._triangles) {
-    //   if (triangle.rayIntersection(ray, collision_pos)) {
-    //     return true;
-    //   }
-    // }
   }
 
   public toJSON() {

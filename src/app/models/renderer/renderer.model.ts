@@ -40,20 +40,19 @@ export class Renderer implements TracerProgramInterface {
   constructor(camera: Camera, renderService: RenderService) {
     this._renderService = renderService;
     this._camera = camera;
-    this.init();
   }
 
-  public init() {
+  public init(callback: any) {
     LoadShaders([
         './assets/kernels/header.glsl',
         './assets/kernels/Ray.glsl',
-        './assets/kernels/BoundingBox.glsl',
         './assets/kernels/Collision.glsl',
         './assets/kernels/LightSphere.glsl',
         './assets/kernels/Material.glsl',
         './assets/kernels/Triangle.glsl',
         './assets/kernels/SceneHelpers.glsl',
         './assets/kernels/Intersectable.glsl',
+        './assets/kernels/BoundingBox.glsl',
         './assets/kernels/BVH.glsl',
         './assets/kernels/Scene.glsl',
         './assets/kernels/RayTracer.glsl',
@@ -91,15 +90,14 @@ export class Renderer implements TracerProgramInterface {
         this._developerProgram = new DeveloperProgram(this._gl);
 
         this.animate();
+
+        callback();
       },
       () => {});
   }
 
   public addSceneTextures(textureData, scene: Scene) {
-
     this._tracerProgram.addSceneTextures(textureData);
-    //this._developerProgram.setBVH(this._renderService.scene.bvh);
-    //this._developerProgram.setBVHData(textureData.bvh);
     this._developerProgram.buildBVHLines(scene);
   }
 
@@ -136,7 +134,7 @@ export class Renderer implements TracerProgramInterface {
     }
 
     requestAnimationFrame( this.animate );
-  }
+  };
 
   // Calcuate samples per second
   private _elapsedTime = 0;

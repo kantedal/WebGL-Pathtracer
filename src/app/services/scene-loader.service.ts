@@ -5,7 +5,6 @@ import { Injectable } from '@angular/core';
 import { Object3d } from "../models/primitives/object3d.model";
 import { Scene } from "../models/scene.model";
 import { Material } from "../models/material.model";
-import { Sphere } from "../models/primitives/sphere.model";
 import { Triangle } from "../models/primitives/triangle.model";
 
 @Injectable()
@@ -47,17 +46,7 @@ export class SceneLoaderService {
         }
         objects.push(new Object3d(triangles, scene.materials[objectJSON.material_index]));
       }
-      scene.objects = objects;
-
-      let spheres = [];
-      for (let sphereJSON of sceneJSON.spheres) {
-        spheres.push(new Sphere(
-          vec3.fromValues(sphereJSON.position[0], sphereJSON.position[1], sphereJSON.position[2]),
-          sphereJSON.radius,
-          scene.materials[sphereJSON.material_index]
-        ));
-      }
-      scene.spheres = spheres;
+      scene.intersectables = objects;
 
       callback(scene);
     });

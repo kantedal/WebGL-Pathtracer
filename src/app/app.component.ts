@@ -14,9 +14,10 @@ declare var ProgressBar: any;
 })
 export class AppComponent implements AfterViewInit {
   public static RENDER_SETTINGS = 0;
-  public static POST_EFFECTS = 1;
-  public static OBJECTS = 2;
-  public static MATERIALS = 3;
+  public static LIGHTNING_SETTINGS = 1;
+  public static POST_EFFECTS = 2;
+  public static OBJECTS = 3;
+  public static MATERIALS = 4;
   private _selctedPane = 0;
 
   private selectedObject: Object3d = null;

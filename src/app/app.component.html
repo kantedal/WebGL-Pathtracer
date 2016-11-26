@@ -1,10 +1,11 @@
 <md-toolbar [color]="accent" class="toolbar">
   <div style="margin:auto;">
     <button md-button class="toolbar-button" (click)="changePane(0)">Render settings</button>
-    <button md-button class="toolbar-button" (click)="changePane(1)">Post effects</button>
-    <button md-button class="toolbar-button" (click)="changePane(2)">Objects</button>
-    <button md-button class="toolbar-button" (click)="changePane(3)">Materials</button>
-    <button md-button class="toolbar-button" (click)="changePane(4)">Camera</button>
+    <button md-button class="toolbar-button" (click)="changePane(1)">Lightning</button>
+    <button md-button class="toolbar-button" (click)="changePane(2)">Post effects</button>
+    <button md-button class="toolbar-button" (click)="changePane(3)">Objects</button>
+    <button md-button class="toolbar-button" (click)="changePane(4)">Materials</button>
+    <button md-button class="toolbar-button" (click)="changePane(5)">Camera</button>
   </div>
 </md-toolbar>
 
@@ -17,7 +18,8 @@
     <tr>
       <td width="194px">
         <render-settings [hidden]="_selctedPane != 0"></render-settings>
-        <post-effects-pane [hidden]="_selctedPane != 1"></post-effects-pane>
+        <lightning-settings [hidden]="_selctedPane != 1"></lightning-settings>
+        <post-effects-pane [hidden]="_selctedPane != 2"></post-effects-pane>
       </td>
 
       <td width="512px">

@@ -23,7 +23,10 @@ void getNodeData(int index, inout BVHNode node) {
   node.extra_data2 = int(extra_data.z);
 }
 
-void traverseObjectTree(Ray ray, inout Collision closest_collision, int start_index, int triangle_start_index) {
+void traverseObjectTree(Ray ray, inout Collision closest_collision, Object object) {
+  int start_index = object.object_bvh_start_index;
+  int triangle_start_index = object.triangle_start_index;
+
   Collision collision;
   int stack[32];
   int stackIdx = 0;
@@ -58,7 +61,7 @@ void traverseObjectTree(Ray ray, inout Collision closest_collision, int start_in
       int current_index = start_triangle_index;
       int end_index = start_triangle_index + triangle_count;
 
-      for (int idx = 0; idx < 20; idx++) {
+      for (int idx = 0; idx < 10; idx++) {
         Triangle triangle = GetTriangleFromIndex(getTriangleIndex(current_index));
 
         if (TriangleIntersection(ray, triangle, collision, closest_collision.distance)) {

@@ -3,11 +3,10 @@
  */
 
 export const MATERIAL_TYPES = {
-  lambertian: 0,
+  diffuse: 0,
   specular: 1,
   emission: 2,
   transmission: 3,
-  oren_nayar: 4,
   glossy: 5
 }
 

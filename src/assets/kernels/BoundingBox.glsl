@@ -1,11 +1,16 @@
-struct LeafNode {
-  float distance;
-  int triangle_start_index;
-  int triangle_count;
+struct BBoxCollision {
+  float collision_distance;
+  Object object;
 };
 
+bool PointInsideBox(vec3 bottom, vec3 top, vec3 point) {
+  return (bottom.x < point.x && bottom.y < point.y && bottom.z < point.z && top.x > point.x && top.y > point.y && top.z > point.z);
+}
 
 bool BoundingBoxCollision(vec3 bottom, vec3 top, Ray r, inout float collision_distance) {
+  // Disables self collision, which speeds up the render quite a bit
+  //if (PointInsideBox(bottom, top, r.start_position)) return false;
+
   vec3 dirfrac = vec3(0,0,0);
   dirfrac.x = 1.0 / r.direction.x;
   dirfrac.y = 1.0 / r.direction.y;

@@ -209,7 +209,7 @@ export class DeveloperProgram {
     this._verticeCount = 0;
     let vertices = [];
 
-    for (let object of scene.objects) {
+    for (let object of scene.intersectables) {
       this.addBoundingBox(object.boundingBox.bottom, object.boundingBox.top, vertices);
       this.recurseBBoxes(object.bvh.root, vertices);
     }
@@ -229,7 +229,6 @@ export class DeveloperProgram {
   public setBVHData(bvh_texture: Float32Array) {
     this._verticeCount = 0;
 
-    let factor = 20;
     let vertices = [];
     for (let idx = 0; idx < 50000; idx += 9) {
       let bottom = [bvh_texture[idx], bvh_texture[idx + 1], bvh_texture[idx + 2]];

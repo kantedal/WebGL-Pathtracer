@@ -3,7 +3,6 @@ precision lowp float;
 uniform float time;
 uniform int trace_depth;
 uniform int triangle_count;
-uniform int sphere_count;
 uniform int object_count;
 uniform vec2 resolution;
 
@@ -18,13 +17,13 @@ uniform lowp sampler2D u_triangle_texture;
 uniform lowp sampler2D u_triangle_index_texture;
 uniform lowp sampler2D u_bvh_texture;
 uniform lowp sampler2D u_light_texture;
-uniform lowp sampler2D u_sphere_texture;
 uniform lowp sampler2D u_material_texture;
 uniform lowp sampler2D u_objects_bvh_texture;
 uniform lowp sampler2D u_objects_texture;
 uniform lowp sampler2D u_light_sphere_texture;
 
 #define EPS 0.0001
+#define PI 3.14
 #define TEST(i) ( (i) )
 
 float random(vec3 scale, float seed) {

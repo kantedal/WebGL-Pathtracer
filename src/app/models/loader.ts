@@ -36,7 +36,6 @@ export function LoadObjects(fileNames, callback, errorCallback) {
 
     LoadShader(fileNames[file_index].fileName, file_index, (data, shader_index) => {
       let object = Object3d.LoadObj(data, fileNames[shader_index].material);
-      object.smoothShading = fileNames[shader_index].smooth_shading;
 
       object_files[shader_index] = object;
       loaded_files++;

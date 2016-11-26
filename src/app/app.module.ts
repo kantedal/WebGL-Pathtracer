@@ -10,14 +10,16 @@ import { ObjectPaneComponent } from "./components/object-pane/object-pane.compon
 import { NavigatorService } from "./services/navigator.service";
 import { PostEffectsPaneComponent } from "./components/post-effects-pane/post-effects-pane.component";
 import { RenderSettingsComponent } from "./components/render-settings/render-settings.component";
-import {SceneLoaderService} from "./services/scene-loader.service";
+import { SceneLoaderService } from "./services/scene-loader.service";
+import { LightningSettingsComponent } from "./components/lightning-settings/lightning-settings.component";
 
 @NgModule({
   declarations: [
     AppComponent,
     ObjectPaneComponent,
     PostEffectsPaneComponent,
-    RenderSettingsComponent
+    RenderSettingsComponent,
+    LightningSettingsComponent
   ],
   imports: [
     BrowserModule,

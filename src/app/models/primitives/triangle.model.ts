@@ -31,9 +31,20 @@ export class Triangle {
     vec3.subtract(this._edge2, v2, v0);
   }
 
+  public updateTriangle() {
+    // this._edge1 = vec3.create();
+    // vec3.subtract(this._edge1, v1, v0);
+    // this._edge2 = vec3.create();
+    // vec3.subtract(this._edge2, v2, v0);
+  }
+
+
   get v0() { return this._v0; }
   get v1() { return this._v1; }
   get v2() { return this._v2; }
+  set v2(value: GLM.IArray) { this._v2 = value; }
+  set v1(value: GLM.IArray) { this._v1 = value; }
+  set v0(value: GLM.IArray) { this._v0 = value; }
   get n2(): GLM.IArray { return this._n2;}
   get n1(): GLM.IArray { return this._n1; }
   get n0(): GLM.IArray { return this._n0; }
