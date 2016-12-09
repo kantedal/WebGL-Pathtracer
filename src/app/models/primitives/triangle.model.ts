@@ -13,6 +13,7 @@ export class Triangle {
 
   private _edge1: GLM.IArray;
   private _edge2: GLM.IArray;
+  private _triangleArea: number;
   private _objectIndex: number;
   private _triangleIndex: number;
 
@@ -29,6 +30,14 @@ export class Triangle {
     vec3.subtract(this._edge1, v1, v0);
     this._edge2 = vec3.create();
     vec3.subtract(this._edge2, v2, v0);
+
+    // console.log(this._edge1[0] + " " + this._edge1[1] + " " + this._edge1[2]);
+    // console.log(this._edge2[0] + " " + this._edge2[1] + " " + this._edge2[2]);
+
+    let edge_cross = vec3.create();
+    vec3.cross(edge_cross, this._edge1, this._edge2);
+    this._triangleArea = 0.5 * vec3.length(edge_cross);
+    //console.log(this._triangleArea);
   }
 
   public updateTriangle() {
@@ -54,6 +63,7 @@ export class Triangle {
   set objectIndex(value: number) { this._objectIndex = value; }
   get triangleIndex(): number { return this._triangleIndex; }
   set triangleIndex(value: number) { this._triangleIndex = value; }
+  get triangleArea() { return this._triangleArea; }
 
   public rayIntersection(ray: Ray, collision_pos: GLM.IArray): boolean {
     let EPS = 0.0001;

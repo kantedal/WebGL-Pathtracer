@@ -144,13 +144,13 @@ export class Scene {
 
     // Load objects from .obj files
     LoadObjects([
-        { fileName: './assets/models/cylinder.obj', material: glossy_blue_material, smooth_shading: true },
-        { fileName: './assets/models/teapot5.obj', material: silver_material, smooth_shading: true },
-        { fileName: './assets/models/bunny.obj', material: gold_material, smooth_shading: true },
-        // { fileName: './assets/models/dragon.obj', material: gold_material, smooth_shading: true },
+        // { fileName: './assets/models/cylinder.obj', material: glossy_blue_material, smooth_shading: true },
+        //{ fileName: './assets/models/teapot5.obj', material: silver_material, smooth_shading: true },
+        //{ fileName: './assets/models/bunny.obj', material: gold_material, smooth_shading: true },
+        { fileName: './assets/models/dragon.obj', material: gold_material, smooth_shading: true },
+        { fileName: './assets/models/box.obj', material: white_material, smooth_shading: false },
         { fileName: './assets/models/light_plane4.obj', material: emission_material, smooth_shading: false },
         { fileName: './assets/models/light_plane5.obj', material: emission_red_material, smooth_shading: false },
-        { fileName: './assets/models/box.obj', material: white_material, smooth_shading: false }
       ], (objects) => {
         for (let object of objects) {
           this._intersectables.push(object);

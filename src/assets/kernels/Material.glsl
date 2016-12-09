@@ -1,3 +1,8 @@
+#define DIFFUSE_MATERIAL 0
+#define SPECULAR_MATERIAL 1
+#define TRANSMISSION_MATERIAL 3
+#define GLOSSY_MATERIAL 5
+
 struct Material {
   vec3 color;
   int material_type;
@@ -18,7 +23,7 @@ Material GetMaterial(int material_index) {
 
 vec3 BRDF(Ray ray, Material material, vec3 collision_normal, vec3 next_dir) {
   // Lambertian diffuse material
-  if (material.material_type == 0) {
+  if (material.material_type == DIFFUSE_MATERIAL) {
     float albedo = 1.8;
     float roughness = 1.0;
     vec3 view_direction = -1.0 * ray.direction;
@@ -49,17 +54,17 @@ vec3 BRDF(Ray ray, Material material, vec3 collision_normal, vec3 next_dir) {
   }
 
   // Specular material
-  else if (material.material_type == 1) {
+  else if (material.material_type == SPECULAR_MATERIAL) {
     return material.color;
   }
 
   // Transmission material
-  else if (material.material_type == 3) {
+  else if (material.material_type == TRANSMISSION_MATERIAL) {
     return material.color;
   }
 
   // Glossy material
-  else if (material.material_type == 5) {
+  else if (material.material_type == GLOSSY_MATERIAL) {
     return material.color;
   }
 
@@ -70,7 +75,7 @@ vec3 PDF(Ray ray, Material material, vec3 collision_normal, int iteration, inout
   vec3 real_normal = dot(collision_normal, ray.direction) > 0.0 ? -1.0 * collision_normal : collision_normal;
   vec3 next_dir;
 
-  if (material.material_type == 0) {
+  if (material.material_type == DIFFUSE_MATERIAL) {
     float r1 = 2.0 * 3.14 * random(vec3(12.9898, 78.233, 151.7182), time + 100.0 * float(iteration));
     float r2 = random(vec3(63.7264, 10.873, 623.6736), time + 12.0 * float(iteration));
     float r2s = sqrt(r2);
@@ -86,12 +91,12 @@ vec3 PDF(Ray ray, Material material, vec3 collision_normal, int iteration, inout
   }
 
   // Fully specular material
-  else if (material.material_type == 1) {
+  else if (material.material_type == SPECULAR_MATERIAL) {
     return normalize(ray.direction - 2.0 * dot(ray.direction, collision_normal) * collision_normal);
   }
 
   // Glossy material
-  else if (material.material_type == 5) {
+  else if (material.material_type == GLOSSY_MATERIAL) {
     vec3 reflected = normalize(ray.direction - 2.0 * dot(ray.direction, collision_normal) * collision_normal);
 
     float r1 = 2.0 * 3.14 * random(vec3(12.9898, 78.233, 151.7182), time + 100.0 * float(iteration));
@@ -107,7 +112,7 @@ vec3 PDF(Ray ray, Material material, vec3 collision_normal, int iteration, inout
     return next_dir;
   }
 
-  else if (material.material_type == 3) {
+  else if (material.material_type == TRANSMISSION_MATERIAL) {
     bool into = dot(collision_normal, real_normal) > 0.0; // is ray entering or leaving refractive material?
     float nc = 1.0;  // Index of Refraction air
     float nt = 1.3;  // Index of Refraction glass/water

@@ -24,7 +24,7 @@ export function buildScene(scene: Scene) {
     let object = scene.intersectables[obj_idx] as Object3d;
 
     let bvh_start_index = bvhCount;
-    for (let obj_bvh_idx = 0; obj_bvh_idx < object.bvh.bvhArray.length ; obj_bvh_idx++) {
+    for (let obj_bvh_idx = 0; obj_bvh_idx < object.bvh.count; obj_bvh_idx++) {
       textureData.objects_bvh[bvhCount++] = object.bvh.bvhTexture[obj_bvh_idx];
     }
     let bvh_end_index = bvhCount;
@@ -51,7 +51,7 @@ export function buildScene(scene: Scene) {
     objectData.push(object.position[2]);
 
     // Set indices for bvh texture
-    objectData.push(bvh_start_index / 9); // BVH start index
+    objectData.push(bvh_start_index / 12); // BVH start index
     objectData.push(triangle_start_index / 3);
     objectData.push(0);
   }
@@ -133,26 +133,47 @@ export function buildScene(scene: Scene) {
       triangleData.push(material_index);
       triangleData.push(triangle.objectIndex);
       triangleData.push(0);
+      triangleData.push(0);
+      triangleData.push(0);
+      triangleData.push(0);
 
       // Add light data
-      if (object.material.material_type == MATERIAL_TYPES.emission) {
+      if (object.material.emission_rate != 0.0) {
         // v0
         lightData.push(triangle.v0[0]);
         lightData.push(triangle.v0[1]);
         lightData.push(triangle.v0[2]);
 
-        // Edge 1
+        // edge1
         lightData.push(triangle.edge1[0]);
         lightData.push(triangle.edge1[1]);
         lightData.push(triangle.edge1[2]);
 
-        // Edge 2
+        // edge2
         lightData.push(triangle.edge2[0]);
         lightData.push(triangle.edge2[1]);
         lightData.push(triangle.edge2[2]);
 
+        // n0
+        lightData.push(triangle.n0[0]);
+        lightData.push(triangle.n0[1]);
+        lightData.push(triangle.n0[2]);
+
+        // n1
+        lightData.push(triangle.n1[0]);
+        lightData.push(triangle.n1[1]);
+        lightData.push(triangle.n1[2]);
+
+        // n2
+        lightData.push(triangle.n2[0]);
+        lightData.push(triangle.n2[1]);
+        lightData.push(triangle.n2[2]);
+
         // Extra data
         lightData.push(material_index);
+        lightData.push(triangle.objectIndex);
+        lightData.push(triangle.triangleArea);
+        lightData.push(0);
         lightData.push(0);
         lightData.push(0);
       }

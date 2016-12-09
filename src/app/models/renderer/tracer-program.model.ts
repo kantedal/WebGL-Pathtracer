@@ -76,9 +76,6 @@ export class TracerProgram {
     this._gl.activeTexture(this._gl.TEXTURE5);
     this._gl.bindTexture(this._gl.TEXTURE_2D, this._bvhTexture.texture);
 
-    // this._gl.activeTexture(this._gl.TEXTURE7);
-    // this._gl.bindTexture(this._gl.TEXTURE_2D, this._lightSphereTexture);
-
     this._gl.activeTexture(this._gl.TEXTURE6);
     this._gl.bindTexture(this._gl.TEXTURE_2D, this._objectsBVHTexture.texture);
 

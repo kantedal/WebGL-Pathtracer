@@ -10,6 +10,7 @@ export class BVH {
   private _triangleCount: number;
   private _bvhTexture: Float32Array;
   private _bvhArray: Array<number>;
+  public count = 0;
 
   private _root: BVHInner | BVHLeaf | BVHNode;
 
@@ -55,7 +56,7 @@ export class BVH {
     this._root.top = top;
 
     console.log("Create BVH texture");
-    this.createBVHTexture(this._root, new NodeCounter(0), new NodeCounter(0));
+    this.createBVHTexture(this._root, new NodeCounter(0), new NodeCounter(0), 0);
   }
 
   private recurse(workBoxes: Array<WorkBoundingBox>, depth): BVHNode {
@@ -193,7 +194,7 @@ export class BVH {
     return inner;
   }
 
-  public createBVHTexture(node: any, node_index: NodeCounter, triangle_index: NodeCounter) {
+  public createBVHTexture(node: any, node_index: NodeCounter, triangle_index: NodeCounter, parent_index: number) {
     node.nodeIndex = node_index.count;
 
     //First slots gets filled with bounding box
@@ -201,32 +202,31 @@ export class BVH {
     this._bvhTexture[node.nodeIndex + 1] = node.bottom[1];
     this._bvhTexture[node.nodeIndex + 2] = node.bottom[2];
 
-    this._bvhArray.push(node.bottom[0]);
-    this._bvhArray.push(node.bottom[1]);
-    this._bvhArray.push(node.bottom[2]);
-
     this._bvhTexture[node.nodeIndex + 3] = node.top[0];
     this._bvhTexture[node.nodeIndex + 4] = node.top[1];
     this._bvhTexture[node.nodeIndex + 5] = node.top[2];
 
-    this._bvhArray.push(node.top[0]);
-    this._bvhArray.push(node.top[1]);
-    this._bvhArray.push(node.top[2]);
+    this.count += 6;
 
     if (!node.isLeaf()) {
-      let node_index_left = node_index.increment(9);
-      this.createBVHTexture(node.left, node_index, triangle_index);
+      let node_index_left = node_index.increment(12);
+      this.createBVHTexture(node.left, node_index, triangle_index, node.nodeIndex / 12);
 
-      let node_index_right = node_index.increment(9);
-      this.createBVHTexture(node.right, node_index, triangle_index);
+      let node_index_right = node_index.increment(12);
+      this.createBVHTexture(node.right, node_index, triangle_index, node.nodeIndex / 12);
+
+      this.setSibling(node.right, node_index_left / 12);
+      this.setSibling(node.left, node_index_right / 12);
 
       this._bvhTexture[node.nodeIndex + 6] = 0;
-      this._bvhTexture[node.nodeIndex + 7] = node_index_left / 9;
-      this._bvhTexture[node.nodeIndex + 8] = node_index_right / 9;
+      this._bvhTexture[node.nodeIndex + 7] = node_index_left / 12;
+      this._bvhTexture[node.nodeIndex + 8] = node_index_right / 12;
 
-      this._bvhArray.push(0);
-      this._bvhArray.push(node_index_left);
-      this._bvhArray.push(node_index_right);
+      this._bvhTexture[node.nodeIndex + 9] = parent_index;
+      this._bvhTexture[node.nodeIndex + 10] = 0;
+      this._bvhTexture[node.nodeIndex + 11] = 0;
+
+      this.count += 6;
     }
     else {
       let count = node.triangles.length;
@@ -236,18 +236,24 @@ export class BVH {
       this._bvhTexture[node.nodeIndex + 7] = count;
       this._bvhTexture[node.nodeIndex + 8] = start_triangle_index;
 
-      this._bvhArray.push(1);
-      this._bvhArray.push(count);
-      this._bvhArray.push(start_triangle_index);
+      this._bvhTexture[node.nodeIndex + 9] = parent_index;
+      this._bvhTexture[node.nodeIndex + 10] = 0;
+      this._bvhTexture[node.nodeIndex + 11] = 0;
+
+      this.count += 6;
 
       for (let triangle of node.triangles) {
-        this._triangleIndexTexture[3*triangle_index.count] = triangle.triangleIndex;
-        this._triangleIndexTexture[3*triangle_index.count + 1] = 0;
-        this._triangleIndexTexture[3*triangle_index.count + 2] = 0;
+        this._triangleIndexTexture[3 * triangle_index.count] = triangle.triangleIndex;
+        this._triangleIndexTexture[3 * triangle_index.count + 1] = 0;
+        this._triangleIndexTexture[3 * triangle_index.count + 2] = 0;
         triangle_index.increment(1);
         this._triangleCount += 3;
       }
     }
+  }
+
+  setSibling(node: any, sibling: number) {
+    this._bvhTexture[node.nodeIndex + 10] = sibling;
   }
 
   get root(): any { return this._root; }

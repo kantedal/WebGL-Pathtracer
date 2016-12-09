@@ -65,10 +65,6 @@ export class Camera {
     let negative_direction = vec3.fromValues(0,0,0);
     vec3.scale(negative_direction, this._direction, -distance);
     vec3.add(this._position, this._position, negative_direction);
-
-    console.log(this._position[0] + " " + this._position[1] + " " + this._position[2]);
-    console.log(this._look_at[0] + " " + this._look_at[1] + " " + this._look_at[2]);
-    console.log("-----");
   }
 
   get camera_up() { return this._camera_up; }

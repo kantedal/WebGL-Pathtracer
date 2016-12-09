@@ -96,7 +96,6 @@ void setBBoxCollisionIndex(int index, BBoxCollision value, inout BBoxCollision s
 bool SceneIntersection(in Ray ray, inout Collision collision) {
   Collision closest_collision;
   closest_collision.distance = 1000.0;
-  float collision_distance = 0.0;
 
   Object object;
   //BBoxCollision collisions[32]; // Stores all bounding box collision in sorted order
@@ -104,11 +103,12 @@ bool SceneIntersection(in Ray ray, inout Collision collision) {
   for (int i = 0; i < 1000; i++) {
     getObjectAtIndex(i, object);
 
-    if (BoundingBoxCollision(object.bounding_bottom + object.position, object.bounding_top + object.position, ray, collision_distance)) {
-      if (collision_distance < closest_collision.distance) {
-        traverseObjectTree(ray, closest_collision, object);
-      }
+    float collision_distance = BoundingBoxCollision(object.bounding_bottom + object.position, object.bounding_top + object.position, ray);
+
+    if (collision_distance < closest_collision.distance) {
+      traverseObjectTree(ray, closest_collision, object);
     }
+
     if (i >= object_count) break;
   }
 
