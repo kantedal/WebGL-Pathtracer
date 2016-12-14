@@ -8,9 +8,13 @@ bool PointInsideBox(vec3 bottom, vec3 top, vec3 point) {
 }
 
 // Returns collision distance
-float BoundingBoxCollision(vec3 bottom, vec3 top, Ray r) {
+float BoundingBoxCollision(vec3 bottom, vec3 top, Ray r, float is_leaf) {
   // Disables self collision, which speeds up the render quite a bit
-  //if (PointInsideBox(bottom, top, r.start_position)) return false;
+//  if (is_leaf == 1.0 ) {
+//    if (PointInsideBox(bottom, top, r.start_position)) return 0.0;
+//  }
+
+  //if (PointInsideBox(bottom, top, r.start_position)) return 0.0;
 
   vec3 dirfrac = vec3(0,0,0);
   dirfrac.x = 1.0 / r.direction.x;

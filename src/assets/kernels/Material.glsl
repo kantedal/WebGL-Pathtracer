@@ -81,7 +81,8 @@ vec3 PDF(Ray ray, Material material, vec3 collision_normal, int iteration, inout
     float r2s = sqrt(r2);
 
     vec3 w = collision_normal;
-    vec3 u = normalize(cross((abs(w.x) > .1 ? vec3(0, 1, 0) : vec3(1, 0, 0)), w));
+
+    vec3 u = normalize(cross(mix(vec3(1,0,0), vec3(0,1,0), step(0.1, abs(w.x))), w));
     vec3 v = cross(w, u);
 
     // compute cosine weighted random ray direction on hemisphere
@@ -104,7 +105,7 @@ vec3 PDF(Ray ray, Material material, vec3 collision_normal, int iteration, inout
     float r2s = pow(r2, 3.0);
 
     vec3 w = reflected;
-    vec3 u = normalize(cross((abs(w.x) > .1 ? vec3(0, 1, 0) : vec3(1, 0, 0)), w));
+    vec3 u = normalize(cross(mix(vec3(1,0,0), vec3(0,1,0), step(0.1, abs(w.x))), w));
     vec3 v = cross(w, u);
 
     // compute cosine weighted random ray direction on hemisphere

@@ -124,9 +124,9 @@ export class Scene {
     let silver_material = new Material(vec3.fromValues(0.8,0.8,0.8), MATERIAL_TYPES.glossy);
 
     let emission_material = new Material(vec3.fromValues(1,1,1), MATERIAL_TYPES.diffuse);
-    emission_material.emission_rate = 10.0;
+    emission_material.emission_rate = 35.0;
     let emission_red_material = new Material(vec3.fromValues(1,0.7,0.7), MATERIAL_TYPES.diffuse);
-    emission_red_material.emission_rate = 20.0;
+    emission_red_material.emission_rate = 5.0;
     let light_emission_material = new Material(vec3.fromValues(0, 1.0, 1.0), MATERIAL_TYPES.diffuse);
     light_emission_material.emission_rate = 0.3;
 
@@ -144,10 +144,10 @@ export class Scene {
 
     // Load objects from .obj files
     LoadObjects([
-        // { fileName: './assets/models/cylinder.obj', material: glossy_blue_material, smooth_shading: true },
-        //{ fileName: './assets/models/teapot5.obj', material: silver_material, smooth_shading: true },
-        //{ fileName: './assets/models/bunny.obj', material: gold_material, smooth_shading: true },
-        { fileName: './assets/models/dragon.obj', material: gold_material, smooth_shading: true },
+        //{ fileName: './assets/models/cylinder.obj', material: glossy_blue_material, smooth_shading: true },
+        { fileName: './assets/models/teapot5.obj', material: silver_material, smooth_shading: true },
+        { fileName: './assets/models/bunny.obj', material: gold_material, smooth_shading: true },
+        //{ fileName: './assets/models/dragon.obj', material: gold_material, smooth_shading: true },
         { fileName: './assets/models/box.obj', material: white_material, smooth_shading: false },
         { fileName: './assets/models/light_plane4.obj', material: emission_material, smooth_shading: false },
         { fileName: './assets/models/light_plane5.obj', material: emission_red_material, smooth_shading: false },

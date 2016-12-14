@@ -105,8 +105,7 @@ vec3 PathTrace(Ray ray) {
 
     if (collision_material.emission_rate != 0.0) break;
 
-    if (length(next_dir) == 0.0) break;
-    ray = Ray(collision.position + next_dir * 0.01, next_dir);
+    ray = Ray(collision.position + next_dir * EPS, next_dir);
 
     if (iteration == trace_depth - 1) {
       // Cast shadow ray to end point of ray chain if it has not hit any light source
@@ -117,6 +116,8 @@ vec3 PathTrace(Ray ray) {
       break;
     }
   }
+
+  //return vec3(clamp(accumulated_color.x, 0.0, 1.0), clamp(accumulated_color.y, 0.0, 1.0), clamp(accumulated_color.z, 0.0, 1.0));
   return accumulated_color;
 }
 

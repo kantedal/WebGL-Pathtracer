@@ -8,3 +8,8 @@ struct Collision {
   int material_index;
   float distance;
 };
+
+struct BaseCollision {
+  float distance;
+  float triangle_index;
+};

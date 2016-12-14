@@ -103,7 +103,7 @@ bool SceneIntersection(in Ray ray, inout Collision collision) {
   for (int i = 0; i < 1000; i++) {
     getObjectAtIndex(i, object);
 
-    float collision_distance = BoundingBoxCollision(object.bounding_bottom + object.position, object.bounding_top + object.position, ray);
+    float collision_distance = BoundingBoxCollision(object.bounding_bottom + object.position, object.bounding_top + object.position, ray, 0.0);
 
     if (collision_distance < closest_collision.distance) {
       traverseObjectTree(ray, closest_collision, object);

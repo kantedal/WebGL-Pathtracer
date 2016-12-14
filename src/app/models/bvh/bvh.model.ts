@@ -209,14 +209,14 @@ export class BVH {
     this.count += 6;
 
     if (!node.isLeaf()) {
-      let node_index_left = node_index.increment(12);
-      this.createBVHTexture(node.left, node_index, triangle_index, node.nodeIndex / 12);
-
       let node_index_right = node_index.increment(12);
       this.createBVHTexture(node.right, node_index, triangle_index, node.nodeIndex / 12);
 
-      this.setSibling(node.right, node_index_left / 12);
+      let node_index_left = node_index.increment(12);
+      this.createBVHTexture(node.left, node_index, triangle_index, node.nodeIndex / 12);
+
       this.setSibling(node.left, node_index_right / 12);
+      this.setSibling(node.right, node_index_left / 12);
 
       this._bvhTexture[node.nodeIndex + 6] = 0;
       this._bvhTexture[node.nodeIndex + 7] = node_index_left / 12;

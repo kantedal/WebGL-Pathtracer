@@ -9,18 +9,23 @@ struct Triangle {
   int material_index;
 };
 
+struct BaseTriangle {
+  vec3 v0;
+  vec3 edge1;
+  vec3 edge2;
+};
+
 Triangle GetTriangleFromIndex(int triangle_index) {
   // Fetch triangle from texture
-  vec2 sample_step = vec2(1.0,0) / vec2(2048, 2048);
-  vec2 start_sample = (vec2(1.0,0) / vec2(2048, 2048)) * float(triangle_index) * 8.0;
+  vec2 start_sample = SAMPLE_STEP_2048 * float(triangle_index) * 8.0;
 
-  vec2 sample1 = vec2(start_sample.x - floor(start_sample.x), floor(start_sample.x) / 2048.0);
-  vec2 sample2 = vec2((start_sample.x + 1.0*sample_step.x) - floor((start_sample.x + 1.0*sample_step.x)), floor((start_sample.x + 1.0*sample_step.x)) / 2048.0);
-  vec2 sample3 = vec2((start_sample.x + 2.0*sample_step.x) - floor((start_sample.x + 2.0*sample_step.x)), floor((start_sample.x + 2.0*sample_step.x)) / 2048.0);
-  vec2 sample4 = vec2((start_sample.x + 3.0*sample_step.x) - floor((start_sample.x + 3.0*sample_step.x)), floor((start_sample.x + 3.0*sample_step.x)) / 2048.0);
-  vec2 sample5 = vec2((start_sample.x + 4.0*sample_step.x) - floor((start_sample.x + 4.0*sample_step.x)), floor((start_sample.x + 4.0*sample_step.x)) / 2048.0);
-  vec2 sample6 = vec2((start_sample.x + 5.0*sample_step.x) - floor((start_sample.x + 5.0*sample_step.x)), floor((start_sample.x + 5.0*sample_step.x)) / 2048.0);
-  vec2 sample7 = vec2((start_sample.x + 6.0*sample_step.x) - floor((start_sample.x + 6.0*sample_step.x)), floor((start_sample.x + 6.0*sample_step.x)) / 2048.0);
+  vec2 sample1 = getSample(start_sample, SAMPLE_STEP_2048, 2048.0, 0.0);
+  vec2 sample2 = getSample(start_sample, SAMPLE_STEP_2048, 2048.0, 1.0);
+  vec2 sample3 = getSample(start_sample, SAMPLE_STEP_2048, 2048.0, 2.0);
+  vec2 sample4 = getSample(start_sample, SAMPLE_STEP_2048, 2048.0, 3.0);
+  vec2 sample5 = getSample(start_sample, SAMPLE_STEP_2048, 2048.0, 4.0);
+  vec2 sample6 = getSample(start_sample, SAMPLE_STEP_2048, 2048.0, 5.0);
+  vec2 sample7 = getSample(start_sample, SAMPLE_STEP_2048, 2048.0, 6.0);
 
   vec3 v0 = vec3(texture2D(u_triangle_texture, sample1));
   vec3 edge1 = vec3(texture2D(u_triangle_texture, sample2));
@@ -36,15 +41,26 @@ Triangle GetTriangleFromIndex(int triangle_index) {
   return Triangle(v0, edge1, edge2, n0, n1, n2, triangle_area, material_index);
 }
 
+BaseTriangle GetBaseTriangleFromIndex(int triangle_index) {
+  // Fetch triangle from texture
+  vec2 start_sample = SAMPLE_STEP_2048 * float(triangle_index) * 8.0;
+
+  vec2 sample1 = getSample(start_sample, SAMPLE_STEP_2048, 2048.0, 0.0);
+  vec2 sample2 = getSample(start_sample, SAMPLE_STEP_2048, 2048.0, 1.0);
+  vec2 sample3 = getSample(start_sample, SAMPLE_STEP_2048, 2048.0, 2.0);
+
+  vec3 v0 = vec3(texture2D(u_triangle_texture, sample1));
+  vec3 edge1 = vec3(texture2D(u_triangle_texture, sample2));
+  vec3 edge2 = vec3(texture2D(u_triangle_texture, sample3));
+
+  return BaseTriangle(v0, edge1, edge2);
+}
+
 int getTriangleIndex(int stackIdx) {
-  vec2 sample_step = vec2(1.0,0) / vec2(1024, 1024);
-  vec2 start_sample = (vec2(1.0,0) / vec2(1024, 1024)) * float(stackIdx);
+  vec2 start_sample = SAMPLE_STEP_1024 * float(stackIdx);
+  vec2 sample1 = getSample(start_sample, SAMPLE_STEP_1024, 1024.0, 0.0);
 
-  float row = floor(start_sample.x);
-  start_sample.x = start_sample.x - row;
-  start_sample.y = row / 1024.0;
-
-  vec3 triangle_index_slot = vec3(texture2D(u_triangle_index_texture, start_sample));
+  vec4 triangle_index_slot = texture2D(u_triangle_index_texture, sample1);
   return int(triangle_index_slot.x);
 }
 
@@ -53,13 +69,13 @@ Triangle GetLightTriangleFromIndex(int triangle_index) {
   vec2 sample_step = vec2(1.0,0) / vec2(128, 128);
   vec2 start_sample = (vec2(1.0,0) / vec2(128, 128)) * float(triangle_index) * 8.0;
 
-  vec2 sample1 = vec2(start_sample.x - floor(start_sample.x), floor(start_sample.x) / 2048.0);
-  vec2 sample2 = vec2((start_sample.x + 1.0*sample_step.x) - floor((start_sample.x + 1.0*sample_step.x)), floor((start_sample.x + 1.0*sample_step.x)) / 2048.0);
-  vec2 sample3 = vec2((start_sample.x + 2.0*sample_step.x) - floor((start_sample.x + 2.0*sample_step.x)), floor((start_sample.x + 2.0*sample_step.x)) / 2048.0);
-  vec2 sample4 = vec2((start_sample.x + 3.0*sample_step.x) - floor((start_sample.x + 3.0*sample_step.x)), floor((start_sample.x + 3.0*sample_step.x)) / 2048.0);
-  vec2 sample5 = vec2((start_sample.x + 4.0*sample_step.x) - floor((start_sample.x + 4.0*sample_step.x)), floor((start_sample.x + 4.0*sample_step.x)) / 2048.0);
-  vec2 sample6 = vec2((start_sample.x + 5.0*sample_step.x) - floor((start_sample.x + 5.0*sample_step.x)), floor((start_sample.x + 5.0*sample_step.x)) / 2048.0);
-  vec2 sample7 = vec2((start_sample.x + 6.0*sample_step.x) - floor((start_sample.x + 6.0*sample_step.x)), floor((start_sample.x + 6.0*sample_step.x)) / 2048.0);
+  vec2 sample1 = getSample(start_sample, sample_step, 128.0, 0.0);
+  vec2 sample2 = getSample(start_sample, sample_step, 128.0, 1.0);
+  vec2 sample3 = getSample(start_sample, sample_step, 128.0, 2.0);
+  vec2 sample4 = getSample(start_sample, sample_step, 128.0, 3.0);
+  vec2 sample5 = getSample(start_sample, sample_step, 128.0, 4.0);
+  vec2 sample6 = getSample(start_sample, sample_step, 128.0, 5.0);
+  vec2 sample7 = getSample(start_sample, sample_step, 128.0, 6.0);
 
   vec3 v0 = vec3(texture2D(u_light_texture, sample1));
   vec3 edge1 = vec3(texture2D(u_light_texture, sample2));
@@ -76,42 +92,48 @@ Triangle GetLightTriangleFromIndex(int triangle_index) {
 }
 
 float TriangleIntersection(Ray ray, Triangle triangle, inout Collision collision, float closest_collision_distance) {
-  if (dot(ray.direction, triangle.n0) > 0.0 && dot(ray.direction, triangle.n1) > 0.0 && dot(ray.direction, triangle.n2) > 0.0) return -1.0;
+  if (dot(ray.direction, triangle.n0) > 0.0) return -1.0;
 
   //Begin calculating determinant - also used to calculate u parameter
   vec3 P = cross(ray.direction, triangle.edge2);
   float det = dot(triangle.edge1, P);
-  float inv_det = 1.0 / det;
 
   if (det > -EPS && det < EPS) return -1.0;
 
   //Distance from vertex1 to ray origin
   vec3 T = ray.start_position - triangle.v0;
-  float u = dot(T, P) * inv_det;
-  if (u < 0.0 || u > 1.0) return -1.0;
+  float u = dot(T, P);
+  if (u < 0.0 || u > det) return -1.0;
 
   vec3 Q = cross(T, triangle.edge1);
 
-  float v = dot(ray.direction, Q) * inv_det;
-  if(v < 0.0 || u+v > 1.0) return -1.0;
+  float v = dot(ray.direction, Q);
+  if(v < 0.0 || u+v > det) return -1.0;
 
   float t = dot(triangle.edge2, Q);
 
   if(t < EPS) return -1.0;
 
+  float inv_det = 1.0 / det;
+
   collision.position = ray.start_position + inv_det * t * ray.direction;
-  collision.distance = distance(ray.start_position, collision.position);
+  collision.distance = distanceSquared(ray.start_position, collision.position);
 
   if (closest_collision_distance < collision.distance) return -1.0;
 
   collision.material_index = triangle.material_index;
 
   // Interpolate normal
-  collision.normal = mix(triangle.n0, (1.0 - u - v) * triangle.n0 + u * triangle.n1 + v * triangle.n2, clamp(length(triangle.n0 - triangle.n1 - triangle.n2), 0.0, 1.0));
+  if (triangle.n0 == triangle.n1) {
+    collision.normal = triangle.n0;
+  }
+  else {
+    u = u * inv_det;
+    v = v * inv_det;
+    collision.normal = (1.0 - u - v) * triangle.n0 + u * triangle.n1 + v * triangle.n2;
+  }
 
   return 1.0;
-
-
 }
 
 vec3 RandomizePointOnTriangle(Triangle triangle) {
