@@ -235,26 +235,26 @@ int nearChild(int current, inout BVHNode current_node, inout BVHNode sibling_nod
   }
 }
 
-int nearChil(int current, int start_index) {
-  vec2 start_sample = SAMPLE_STEP_2048 * float(current + start_index) * 4.0;
-  vec2 sample1 = getSample(start_sample, SAMPLE_STEP_2048, 2048.0, 2.0);
-
-  return int(vec3(texture2D(u_objects_bvh_texture, sample1)).y);
-}
-
-int farChild(int current, int start_index) {
-  vec2 start_sample = SAMPLE_STEP_2048 * float(current + start_index) * 4.0;
-  vec2 sample1 = getSample(start_sample, SAMPLE_STEP_2048, 2048.0, 2.0);
-
-  return int(vec3(texture2D(u_objects_bvh_texture, sample1)).z);
-}
-
-int sibling(int current, int start_index) {
-  vec2 start_sample = SAMPLE_STEP_2048 * float(current + start_index) * 4.0;
-  vec2 sample4 = getSample(start_sample, SAMPLE_STEP_2048, 2048.0, 3.0);
-
-  return int(texture2D(u_objects_bvh_texture, sample4).y);
-}
+//int nearChil(int current, int start_index) {
+//  vec2 start_sample = SAMPLE_STEP_2048 * float(current + start_index) * 4.0;
+//  vec2 sample1 = getSample(start_sample, SAMPLE_STEP_2048, 2048.0, 2.0);
+//
+//  return int(vec3(texture2D(u_objects_bvh_texture, sample1)).y);
+//}
+//
+//int farChild(int current, int start_index) {
+//  vec2 start_sample = SAMPLE_STEP_2048 * float(current + start_index) * 4.0;
+//  vec2 sample1 = getSample(start_sample, SAMPLE_STEP_2048, 2048.0, 2.0);
+//
+//  return int(vec3(texture2D(u_objects_bvh_texture, sample1)).z);
+//}
+//
+//int sibling(int current, int start_index) {
+//  vec2 start_sample = SAMPLE_STEP_2048 * float(current + start_index) * 4.0;
+//  vec2 sample4 = getSample(start_sample, SAMPLE_STEP_2048, 2048.0, 3.0);
+//
+//  return int(texture2D(u_objects_bvh_texture, sample4).y);
+//}
 
 //float boundingBoxDistance(int current, int start_index, Ray ray) {
 //   vec2 start_sample = SAMPLE_STEP_2048 * float(current + start_index) * 4.0;
@@ -265,94 +265,94 @@ int sibling(int current, int start_index) {
 //   node.top_bbox = vec3(texture2D(u_objects_bvh_texture, sample2));
 //}
 
-int parent(int current, int start_index) {
-  vec2 start_sample = SAMPLE_STEP_2048 * float(current + start_index) * 4.0;
-  vec2 sample4 = getSample(start_sample, SAMPLE_STEP_2048, 2048.0, 3.0);
+//int parent(int current, int start_index) {
+//  vec2 start_sample = SAMPLE_STEP_2048 * float(current + start_index) * 4.0;
+//  vec2 sample4 = getSample(start_sample, SAMPLE_STEP_2048, 2048.0, 3.0);
+//
+//  int parent_index = int(texture2D(u_objects_bvh_texture, sample4).x);
+//
+//  return parent_index;
+//}
 
-  int parent_index = int(texture2D(u_objects_bvh_texture, sample4).x);
-
-  return parent_index;
-}
-
-
-void traverseObjectTree(Ray ray, inout Collision closest_collision, Object object) {
-  int start_index = object.object_bvh_start_index;
-  int triangle_start_index = object.triangle_start_index;
-
-  BVHNode current_node;
-  BVHNode sibling_node;
-
-  getNodeData(0, start_index, ray, current_node);
-
-  int root = 0;
-
-  int parent_idx = 0;
-  BVHNode parent_sibling;
-  bool coming_from_near = false;
-
-  int current = nearChild(0, current_node, sibling_node, start_index, ray);
-  int state = fromParent;
-
-  for (int i = 0; i < 1000; i++) {
-    if (state == fromChild) {
-      //current = parent_idx; //parent_sibling.node_index;
-
-      if (current == root) return; // Finished
-
-      int parent_index = parent(current, start_index);
-      int near_parent_child = nearChild(parent_index, current_node, sibling_node, start_index, ray);
-
-      if (current == near_parent_child) {
-        current = sibling_node.node_index;
-        current_node = sibling_node;
-        state = fromSibling;
-      }
-      else {
-        current = parent_index;
-        state = fromChild;
-      }
-    }
-    else if (state == fromSibling) {
-      // HIT
-      if (current_node.distance < closest_collision.distance && current_node.is_leaf == 1.0) {
-        processLeaf(current_node, closest_collision, ray, triangle_start_index);
-        current = current_node.parent_index, start_index;
-        state = fromChild;
-      }
-      // MISSED
-      else if (current_node.distance > closest_collision.distance) {
-        current = current_node.parent_index, start_index;
-        state = fromChild;
-      }
-      else {
-        parent_idx = current;
-        current = nearChild(current, current_node, sibling_node, start_index, ray);
-        state = fromParent;
-      }
-
-    }
-    else if (state == fromParent) {
-      // HIT
-      if (current_node.distance < closest_collision.distance && current_node.is_leaf == 1.0) {
-        processLeaf(current_node, closest_collision, ray, triangle_start_index);
-        current = current_node.sibling_index;
-        current_node = sibling_node;
-        state = fromSibling;
-      }
-      // MISSED
-      else if (current_node.distance > closest_collision.distance) {
-        current = current_node.sibling_index;
-        current_node = sibling_node;
-        state = fromSibling;
-      }
-      else {
-        parent_idx = current;
-        current = nearChild(current, current_node, sibling_node, start_index, ray);
-        state = fromParent;
-      }
-    }
-  }
-}
+//
+//void traverseObjectTree(Ray ray, inout Collision closest_collision, Object object) {
+//  int start_index = object.object_bvh_start_index;
+//  int triangle_start_index = object.triangle_start_index;
+//
+//  BVHNode current_node;
+//  BVHNode sibling_node;
+//
+//  getNodeData(0, start_index, ray, current_node);
+//
+//  int root = 0;
+//
+//  int parent_idx = 0;
+//  BVHNode parent_sibling;
+//  bool coming_from_near = false;
+//
+//  int current = nearChild(0, current_node, sibling_node, start_index, ray);
+//  int state = fromParent;
+//
+//  for (int i = 0; i < 1000; i++) {
+//    if (state == fromChild) {
+//      //current = parent_idx; //parent_sibling.node_index;
+//
+//      if (current == root) return; // Finished
+//
+//      int parent_index = parent(current, start_index);
+//      int near_parent_child = nearChild(parent_index, current_node, sibling_node, start_index, ray);
+//
+//      if (current == near_parent_child) {
+//        current = sibling_node.node_index;
+//        current_node = sibling_node;
+//        state = fromSibling;
+//      }
+//      else {
+//        current = parent_index;
+//        state = fromChild;
+//      }
+//    }
+//    else if (state == fromSibling) {
+//      // HIT
+//      if (current_node.distance < closest_collision.distance && current_node.is_leaf == 1.0) {
+//        processLeaf(current_node, closest_collision, ray, triangle_start_index);
+//        current = current_node.parent_index, start_index;
+//        state = fromChild;
+//      }
+//      // MISSED
+//      else if (current_node.distance > closest_collision.distance) {
+//        current = current_node.parent_index, start_index;
+//        state = fromChild;
+//      }
+//      else {
+//        parent_idx = current;
+//        current = nearChild(current, current_node, sibling_node, start_index, ray);
+//        state = fromParent;
+//      }
+//
+//    }
+//    else if (state == fromParent) {
+//      // HIT
+//      if (current_node.distance < closest_collision.distance && current_node.is_leaf == 1.0) {
+//        processLeaf(current_node, closest_collision, ray, triangle_start_index);
+//        current = current_node.sibling_index;
+//        current_node = sibling_node;
+//        state = fromSibling;
+//      }
+//      // MISSED
+//      else if (current_node.distance > closest_collision.distance) {
+//        current = current_node.sibling_index;
+//        current_node = sibling_node;
+//        state = fromSibling;
+//      }
+//      else {
+//        parent_idx = current;
+//        current = nearChild(current, current_node, sibling_node, start_index, ray);
+//        state = fromParent;
+//      }
+//    }
+//  }
+//}
 
 //void traverseObjectTree(Ray ray, inout Collision closest_collision, Object object) {
 //  int start_index = object.object_bvh_start_index;
@@ -415,56 +415,56 @@ void traverseObjectTree(Ray ray, inout Collision closest_collision, Object objec
 //  }
 //}
 
-//void traverseObjectTree(Ray ray, inout Collision closest_collision, Object object) {
-//  int start_index = object.object_bvh_start_index;
-//  int triangle_start_index = object.triangle_start_index;
-//
-//  Collision collision;
-//  BVHNode node;
-//  BVHNode left_node;
-//  BVHNode right_node;
-//
-//  int stack[32];
-//  int stackIdx = 0;
-//  setStackIndex(stackIdx++, 0, stack);
-//
-//  for (int i = 0; i < 100; i++) {
-//    if (stackIdx < 1) break;
-//    int box_index = getStackValue(--stackIdx, stack);
-//
-//    // Fetch node data
-//    getNodeData(box_index, start_index, ray, node);
-//
-//    if (node.is_leaf == 0.0) {
-//      // Check collision with bounding box
-//      float collision_distance = 0.0;
-//
-//      getNodeData(node.extra_data1, start_index, ray, left_node);
-//      getNodeData(node.extra_data2, start_index, ray, right_node);
-//
-//      left_node.distance = BoundingBoxCollision(left_node.bottom_bbox, left_node.top_bbox, ray, left_node.is_leaf);
-//      right_node.distance = BoundingBoxCollision(right_node.bottom_bbox, right_node.top_bbox, ray, right_node.is_leaf);
-//
-//      float near_distance = min(left_node.distance, right_node.distance);
-//      float far_distance = max(left_node.distance, right_node.distance);
-//
-//      float mixer = clamp(step(right_node.distance, left_node.distance), 0.0, 1.0);
-//      int near_child = int(mix(float(node.extra_data1), float(node.extra_data2), mixer));
-//      int far_child = int(mix(float(node.extra_data2), float(node.extra_data1), mixer));
-//
-//      if (far_distance < closest_collision.distance) {
-//        setStackIndex(stackIdx++, far_child, stack); // Set left child index: extra_data1 = left index
-//        setStackIndex(stackIdx++, near_child , stack); // Set left child index: extra_data1 = left index
-//      }
-//      else if (near_distance < closest_collision.distance) {
-//        setStackIndex(stackIdx++, near_child , stack); // Set left child index: extra_data1 = left index
-//      }
-//
-//      // Return if stack index exceeds stack size
-//      if (stackIdx > 31) return;
-//    }
-//    else {
-//      processLeaf(node, closest_collision, ray, triangle_start_index);
-//    }
-//  }
-//}
+void traverseObjectTree(Ray ray, inout Collision closest_collision, Object object) {
+  int start_index = object.object_bvh_start_index;
+  int triangle_start_index = object.triangle_start_index;
+
+  Collision collision;
+  BVHNode node;
+  BVHNode left_node;
+  BVHNode right_node;
+
+  int stack[32];
+  int stackIdx = 0;
+  setStackIndex(stackIdx++, 0, stack);
+
+  for (int i = 0; i < 100; i++) {
+    if (stackIdx < 1) break;
+    int box_index = getStackValue(--stackIdx, stack);
+
+    // Fetch node data
+    getNodeData(box_index, start_index, ray, node);
+
+    if (node.is_leaf == 0.0) {
+      // Check collision with bounding box
+      float collision_distance = 0.0;
+
+      getNodeData(node.extra_data1, start_index, ray, left_node);
+      getNodeData(node.extra_data2, start_index, ray, right_node);
+
+      left_node.distance = BoundingBoxCollision(left_node.bottom_bbox, left_node.top_bbox, ray, left_node.is_leaf);
+      right_node.distance = BoundingBoxCollision(right_node.bottom_bbox, right_node.top_bbox, ray, right_node.is_leaf);
+
+      float near_distance = min(left_node.distance, right_node.distance);
+      float far_distance = max(left_node.distance, right_node.distance);
+
+      float mixer = clamp(step(right_node.distance, left_node.distance), 0.0, 1.0);
+      int near_child = int(mix(float(node.extra_data1), float(node.extra_data2), mixer));
+      int far_child = int(mix(float(node.extra_data2), float(node.extra_data1), mixer));
+
+      if (far_distance < closest_collision.distance) {
+        setStackIndex(stackIdx++, far_child, stack); // Set left child index: extra_data1 = left index
+        setStackIndex(stackIdx++, near_child , stack); // Set left child index: extra_data1 = left index
+      }
+      else if (near_distance < closest_collision.distance) {
+        setStackIndex(stackIdx++, near_child , stack); // Set left child index: extra_data1 = left index
+      }
+
+      // Return if stack index exceeds stack size
+      if (stackIdx > 31) return;
+    }
+    else {
+      processLeaf(node, closest_collision, ray, triangle_start_index);
+    }
+  }
+}

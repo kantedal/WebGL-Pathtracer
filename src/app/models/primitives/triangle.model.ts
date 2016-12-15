@@ -11,13 +11,18 @@ export class Triangle {
   private _n1: GLM.IArray;
   private _n2: GLM.IArray;
 
+  // UV points
+  private _uv0: GLM.IArray;
+  private _uv1: GLM.IArray;
+  private _uv2: GLM.IArray;
+
   private _edge1: GLM.IArray;
   private _edge2: GLM.IArray;
   private _triangleArea: number;
   private _objectIndex: number;
   private _triangleIndex: number;
 
-  constructor(v0, v1, v2, n0, n1, n2) {
+  constructor(v0: GLM.IArray, v1: GLM.IArray, v2: GLM.IArray, n0: GLM.IArray, n1: GLM.IArray, n2: GLM.IArray, uv0: GLM.IArray, uv1: GLM.IArray, uv2: GLM.IArray) {
     this._v0 = v0;
     this._v1 = v1;
     this._v2 = v2;
@@ -25,6 +30,10 @@ export class Triangle {
     this._n0 = n0;
     this._n1 = n1;
     this._n2 = n2;
+
+    this._uv0 = uv0;
+    this._uv1 = uv1;
+    this._uv2 = uv2;
 
     this._edge1 = vec3.create();
     vec3.subtract(this._edge1, v1, v0);
@@ -57,6 +66,9 @@ export class Triangle {
   get n2(): GLM.IArray { return this._n2;}
   get n1(): GLM.IArray { return this._n1; }
   get n0(): GLM.IArray { return this._n0; }
+  get uv2(): GLM.IArray { return this._uv2; }
+  get uv1(): GLM.IArray { return this._uv1; }
+  get uv0(): GLM.IArray { return this._uv0; }
   get edge1() { return this._edge1; }
   get edge2() { return this._edge2; }
   get objectIndex(): number { return this._objectIndex; }

@@ -37,22 +37,26 @@ export class Scene {
   }
 
   public sceneIntersection(ray: Ray): Object3d {
-    let colliding_objects = [];
-    let collision_positions = [];
+    let closest_colliding_object;
+    let closest_distance = 100000;
+
     for (let object of this._intersectables) {
       if(object.boundingBox.rayIntersection(ray)) {
-        if (object.rayIntersection(ray, vec3.create())) {
-          colliding_objects.push(object);
-          break;
+        let colliding_pos = vec3.create();
+        if (object.rayIntersection(ray, colliding_pos)) {
+
+          let distance = vec3.distance(ray.startPosition, colliding_pos);
+          if (distance < closest_distance) {
+            closest_colliding_object = object;
+          }
         }
       }
     }
 
-    return colliding_objects[0];
+    return closest_colliding_object;
   }
 
   buildScene() {
-    console.log("BUILD SCENE");
     for (let obj_idx = 0; obj_idx < this._intersectables.length; obj_idx++) {
       let object = this._intersectables[obj_idx];
       for (let triangle of object.triangles) {
@@ -65,7 +69,6 @@ export class Scene {
       this._triangles[tri_idx].triangleIndex = tri_idx;
     }
 
-    console.log(this._intersectables);
     for (let object of this._intersectables) {
       object.bvh.createBVH(object.triangles);
     }
@@ -145,10 +148,11 @@ export class Scene {
     // Load objects from .obj files
     LoadObjects([
         //{ fileName: './assets/models/cylinder.obj', material: glossy_blue_material, smooth_shading: true },
+        //{ fileName: './assets/models/box.obj', material: white_material, smooth_shading: false },
+        { fileName: './assets/models/bottom_disc.obj', material: white_material, smooth_shading: false },
         { fileName: './assets/models/teapot5.obj', material: silver_material, smooth_shading: true },
         { fileName: './assets/models/bunny.obj', material: gold_material, smooth_shading: true },
-        //{ fileName: './assets/models/dragon.obj', material: gold_material, smooth_shading: true },
-        { fileName: './assets/models/box.obj', material: white_material, smooth_shading: false },
+        //{ fileName: './assets/models/dragon2.obj', material: gold_material, smooth_shading: true },
         { fileName: './assets/models/light_plane4.obj', material: emission_material, smooth_shading: false },
         { fileName: './assets/models/light_plane5.obj', material: emission_red_material, smooth_shading: false },
       ], (objects) => {

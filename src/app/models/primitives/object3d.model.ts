@@ -55,6 +55,12 @@ export class Object3d extends Intersectable {
     this.recurseBBoxes(node, ray, colliding_positions);
 
     if (colliding_positions.length != 0) {
+      console.log(colliding_positions);
+
+      collision_pos[0] = colliding_positions[0][0];
+      collision_pos[1] = colliding_positions[0][1];
+      collision_pos[2] = colliding_positions[0][2];
+
       return true;
     }
     else {
@@ -83,6 +89,7 @@ export class Object3d extends Intersectable {
   static LoadObj(objData, material) {
     let vertices = [];
     let vertexNormals = [];
+    let vertexUVs = [];
     let triangles = [];
 
     let lines = objData.split('\n');
@@ -96,9 +103,11 @@ export class Object3d extends Intersectable {
           let indices2 = components[2].split('/');
           let indices3 = components[3].split('/');
 
+          //vertexUVs[parseInt(indices1[1]) - 1], vertexUVs[parseInt(indices2[1]) - 1], vertexUVs[parseInt(indices3[1]) - 1])
           triangles.push(new Triangle(
               vertices[parseInt(indices1[0]) - 1], vertices[parseInt(indices2[0]) - 1], vertices[parseInt(indices3[0]) - 1],
-              vertexNormals[parseInt(indices1[2]) - 1], vertexNormals[parseInt(indices2[2]) - 1], vertexNormals[parseInt(indices3[2]) - 1])
+              vertexNormals[parseInt(indices1[2]) - 1], vertexNormals[parseInt(indices2[2]) - 1], vertexNormals[parseInt(indices3[2]) - 1],
+              vertexUVs[parseInt(indices1[1]) - 1], vertexUVs[parseInt(indices2[1]) - 1], vertexUVs[parseInt(indices3[1]) - 1])
           );
           break;
 
@@ -108,6 +117,9 @@ export class Object3d extends Intersectable {
           break;
         case 'vn':
           vertexNormals.push(vec3.fromValues(components[1], components[2], components[3]));
+          break;
+        case 'vt':
+          vertexUVs.push(vec2.fromValues(components[1], components[2]));
           break;
       }
     }

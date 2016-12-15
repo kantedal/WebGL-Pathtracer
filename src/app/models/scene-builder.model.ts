@@ -129,6 +129,27 @@ export function buildScene(scene: Scene) {
       triangleData.push(triangle.n2[1]);
       triangleData.push(triangle.n2[2]);
 
+      // uv0
+      // triangleData.push(triangle.uv0[0]);
+      // triangleData.push(triangle.uv0[1]);
+      triangleData.push(0);
+      triangleData.push(0);
+      triangleData.push(0);
+
+      // uv1
+      // triangleData.push(triangle.uv1[0]);
+      // triangleData.push(triangle.uv1[1]);
+      triangleData.push(0);
+      triangleData.push(0);
+      triangleData.push(0);
+
+      // uv2
+      // triangleData.push(triangle.uv2[0]);
+      // triangleData.push(triangle.uv2[1]);
+      triangleData.push(0);
+      triangleData.push(0);
+      triangleData.push(0);
+
       // Extra data
       triangleData.push(material_index);
       triangleData.push(triangle.objectIndex);

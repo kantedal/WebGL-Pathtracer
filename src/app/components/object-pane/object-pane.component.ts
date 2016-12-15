@@ -22,12 +22,7 @@ export class ObjectPaneComponent implements OnChanges {
 
   public emissionRateChanged(event) {
     let new_emission_rate = parseFloat((<HTMLInputElement>event.target).value);
-    if (new_emission_rate >= 0 && new_emission_rate <= 100){
-      this.selectedObject.material.emission_rate = new_emission_rate;
-    }
-    else {
-      this.selectedObject.material.emission_rate = 0;
-    }
+    this.selectedObject.material.emission_rate = new_emission_rate;
 
     this._renderService.updateMaterialTexture(this.selectedObject.material);
   }
