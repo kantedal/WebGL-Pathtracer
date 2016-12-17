@@ -98,6 +98,7 @@ vec3 PathTrace(Ray ray) {
 
     vec3 next_dir = PDF(ray, collision_material, collision.normal, iteration, distribution);
     mask *= BRDF(ray, collision_material, collision.normal, next_dir) * distribution;
+    mask *= 2.0;
 
     accumulated_color += mask * collision_material.emission_rate;
 
