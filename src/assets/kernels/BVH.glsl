@@ -426,7 +426,8 @@ void traverseObjectTree(Ray ray, inout Collision closest_collision, Object objec
 
   int stack[32];
   int stackIdx = 0;
-  setStackIndex(stackIdx++, 0, stack);
+  stack[0] = 0;
+  stackIdx++;
 
   for (int i = 0; i < 100; i++) {
     if (stackIdx < 1) break;
