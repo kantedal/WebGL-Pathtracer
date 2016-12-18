@@ -11,7 +11,7 @@ export class DataTexture {
   public _location: WebGLUniformLocation;
 
   constructor(
-    gl: WebGLRenderingContext,
+    gl: any,
     width: number,
     height: number,
     data: Float32Array,
@@ -67,7 +67,7 @@ export class DataTexture {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 
-    gl.texImage2D(gl.TEXTURE_2D, 0, type, width, height, 0, type, gl.FLOAT, data);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB32F, width, height, 0, type, gl.FLOAT, data);
     this._location = gl.getUniformLocation(program, name);
   }
 

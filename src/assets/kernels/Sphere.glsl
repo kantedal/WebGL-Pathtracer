@@ -35,10 +35,10 @@ Sphere GetSphere(int sphere_index, vec3 bounding_bottom, vec3 bounding_top) {
   vec2 sample_step = vec2(1.0, 0.0) / vec2(512, 512);
   vec2 start_sample = (vec2(1.0, 0.0) / vec2(512, 512)) * float(sphere_index) * 2.0;
 
-  vec3 position = vec3(texture2D(u_sphere_texture, start_sample));
+  vec3 position = vec3(texture(u_sphere_texture, start_sample));
 
-  float radius = texture2D(u_sphere_texture, start_sample + sample_step).x;
-  int material_index = int(texture2D(u_sphere_texture, start_sample + sample_step).y);
+  float radius = texture(u_sphere_texture, start_sample + sample_step).x;
+  int material_index = int(texture(u_sphere_texture, start_sample + sample_step).y);
 
   return Sphere(bounding_bottom, bounding_top, position, radius, material_index);
 }

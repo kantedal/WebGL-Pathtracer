@@ -9,9 +9,9 @@ Material GetMaterial(int material_index) {
   vec2 sample_step = vec2(1.0, 0.0) / vec2(512, 512);
   vec2 start_sample = (vec2(1.0, 0.0) / vec2(512, 512)) * float(material_index) * 2.0 + 0.5 * sample_step;
 
-  vec3 color = vec3(texture2D(u_material_texture, start_sample));
-  int material_type = int(texture2D(u_material_texture, start_sample + sample_step).x);
-  float emission_rate = texture2D(u_material_texture, start_sample + sample_step).y;
+  vec3 color = vec3(texture(u_material_texture, start_sample));
+  int material_type = int(texture(u_material_texture, start_sample + sample_step).x);
+  float emission_rate = texture(u_material_texture, start_sample + sample_step).y;
 
   return Material(color, material_type, emission_rate);
 }

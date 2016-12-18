@@ -8,15 +8,15 @@ import { TracerProgram, TracerProgramInterface } from "./tracer-program.model";
 import { RenderProgram } from "./render-program.model";
 import { BloomProgram } from "./bloom-program.model";
 import { ThresholdProgram } from "./threshold-program.model";
-import {Material} from "../material.model";
-import {RenderService} from "../../services/render.service";
-import {DeveloperProgram} from "./developer-program.model";
-import {Scene} from "../scene.model";
+import { Material } from "../material.model";
+import { RenderService } from "../../services/render.service";
+import { DeveloperProgram } from "./developer-program.model";
+import { Scene } from "../scene.model";
 
 export class Renderer implements TracerProgramInterface {
   private _renderService: RenderService;
   private _camera: Camera;
-  private _gl: WebGLRenderingContext;
+  private _gl: any;
   private _canvas;
   private _buffer: WebGLBuffer;
   private _vertexBuffer: WebGLBuffer;
@@ -72,9 +72,9 @@ export class Renderer implements TracerProgramInterface {
         this._bloomTextures = [];
 
         // Initialise WebGL
-        this._gl = this._canvas.getContext('experimental-webgl');
-        //this._gl = this._canvas.getContext('webgl2');
-        this._gl.getExtension('OES_texture_float');
+        this._gl = this._canvas.getContext('webgl2');
+        // this._gl = this._canvas.getContext('webgl');
+        // this._gl.getExtension('OES_texture_float');
         this._gl.viewport( 0, 0, this._canvas.width, this._canvas.height );
 
         this._vertexBuffer = this._gl.createBuffer();
@@ -122,12 +122,12 @@ export class Renderer implements TracerProgramInterface {
         this._textures.reverse();
       }
 
-      // Run threshold and bloom shader if enabled
-      if (this._bloomEnabled) {
-        this._thresholdProgram.update(this._textures[0], this._bloomTextures[0], this._samples);
-        for (let bloomIteration = 0; bloomIteration < this._renderService.bloomIterations; bloomIteration++)
-          this._bloomProgram.update(this._bloomTextures[0], this._bloomTextures[1]);
-      }
+      // // Run threshold and bloom shader if enabled
+      // if (this._bloomEnabled) {
+      //   this._thresholdProgram.update(this._textures[0], this._bloomTextures[0], this._samples);
+      //   for (let bloomIteration = 0; bloomIteration < this._renderService.bloomIterations; bloomIteration++)
+      //     this._bloomProgram.update(this._bloomTextures[0], this._bloomTextures[1]);
+      // }
 
       this._renderProgram.update(this._textures[0], this._bloomTextures[0], this._samples, this._bloomEnabled, this._renderService.bloomAlpha);
 
@@ -165,7 +165,7 @@ export class Renderer implements TracerProgramInterface {
       this._gl.bindTexture(this._gl.TEXTURE_2D, this._textures[i]);
       this._gl.texParameteri(this._gl.TEXTURE_2D, this._gl.TEXTURE_MAG_FILTER, this._gl.NEAREST);
       this._gl.texParameteri(this._gl.TEXTURE_2D, this._gl.TEXTURE_MIN_FILTER, this._gl.NEAREST);
-      this._gl.texImage2D(this._gl.TEXTURE_2D, 0, this._gl.RGB, 512, 512, 0, this._gl.RGB, this._gl.FLOAT, null);
+      this._gl.texImage2D(this._gl.TEXTURE_2D, 0, this._gl.RGB32F, 512, 512, 0, this._gl.RGB, this._gl.FLOAT, null);
 
       let data = new Float32Array(512 * 512 * 3);
       for (let i = 0; i < 512 * 512 * 3; i++) {
@@ -178,14 +178,14 @@ export class Renderer implements TracerProgramInterface {
       this._gl.texParameteri(this._gl.TEXTURE_2D, this._gl.TEXTURE_MAG_FILTER, this._gl.NEAREST);
       this._gl.texParameteri(this._gl.TEXTURE_2D, this._gl.TEXTURE_WRAP_S, this._gl.CLAMP_TO_EDGE);
       this._gl.texParameteri(this._gl.TEXTURE_2D, this._gl.TEXTURE_WRAP_T, this._gl.CLAMP_TO_EDGE);
-      this._gl.texImage2D(this._gl.TEXTURE_2D, 0, this._gl.RGB, 512, 512, 0, this._gl.RGB, this._gl.FLOAT, data);
+      this._gl.texImage2D(this._gl.TEXTURE_2D, 0, this._gl.RGB32F, 512, 512, 0, this._gl.RGB, this._gl.FLOAT, data);
     }
 
     this._renderTexture = this._gl.createTexture();
     this._gl.bindTexture(this._gl.TEXTURE_2D, this._renderTexture);
     this._gl.texParameteri(this._gl.TEXTURE_2D, this._gl.TEXTURE_MAG_FILTER, this._gl.NEAREST);
     this._gl.texParameteri(this._gl.TEXTURE_2D, this._gl.TEXTURE_MIN_FILTER, this._gl.NEAREST);
-    this._gl.texImage2D(this._gl.TEXTURE_2D, 0, this._gl.RGB, 512, 512, 0, this._gl.RGB, this._gl.FLOAT, null);
+    this._gl.texImage2D(this._gl.TEXTURE_2D, 0, this._gl.RGB32F, 512, 512, 0, this._gl.RGB, this._gl.FLOAT, null);
 
     this._gl.bindTexture(this._gl.TEXTURE_2D, null);
     this._samples = 1;

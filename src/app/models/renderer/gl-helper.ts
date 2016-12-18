@@ -1,37 +1,38 @@
-/**
- * Created by fille on 02/11/16.
- */
+export function  getShaderSource(id) {
+  return document.getElementById(id).textContent.replace(/^\s+|\s+$/g, '');
+};
 
-
-export function createShader(gl, src, type) {
-  let shader = gl.createShader( type );
-
-  gl.shaderSource( shader, src );
-  gl.compileShader( shader );
-
-  if (!gl.getShaderParameter( shader, gl.COMPILE_STATUS)) {
-    return null;
-  }
+export function createShader(gl, source, type) {
+  var shader = gl.createShader(type);
+  gl.shaderSource(shader, source);
+  gl.compileShader(shader);
   return shader;
 }
 
-export function createProgram(gl, vertex, fragment) {
-  let program = gl.createProgram();
+export function createProgram(gl, vertexShaderSource, fragmentShaderSource) {
+  var program = gl.createProgram();
+  var vshader = createShader(gl, vertexShaderSource, gl.VERTEX_SHADER);
+  var fshader = createShader(gl, fragmentShaderSource, gl.FRAGMENT_SHADER);
+  gl.attachShader(program, vshader);
+  gl.deleteShader(vshader);
+  gl.attachShader(program, fshader);
+  gl.deleteShader(fshader);
+  gl.linkProgram(program);
 
-  let vs = createShader( gl, vertex, gl.VERTEX_SHADER );
-  let fs = createShader( gl, fragment, gl.FRAGMENT_SHADER );
+  var log = gl.getProgramInfoLog(program);
+  if (log) {
+    console.log(log);
+  }
 
-  gl.attachShader( program, vs );
-  gl.attachShader( program, fs );
+  log = gl.getShaderInfoLog(vshader);
+  if (log) {
+    console.log(log);
+  }
 
-  gl.deleteShader( vs );
-  gl.deleteShader( fs );
-
-  gl.linkProgram( program );
-
-  if ( !gl.getProgramParameter( program, gl.LINK_STATUS ) ) {
-    return null;
+  log = gl.getShaderInfoLog(fshader);
+  if (log) {
+    console.log(log);
   }
 
   return program;
-}
+};

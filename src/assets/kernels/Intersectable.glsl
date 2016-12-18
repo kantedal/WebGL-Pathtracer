@@ -17,9 +17,9 @@ void getObjectAtIndex(int index, inout Object object, inout int object_type) {
   vec2 sample2 = start_sample + sample_step;
   vec2 sample3 = start_sample + 2.0 * sample_step;
 
-  vec3 bottom_bbox = vec3(texture2D(u_objects_texture, sample1));
-  vec3 top_bbox = vec3(texture2D(u_objects_texture, sample2));
-  vec3 extra_data = vec3(texture2D(u_objects_texture, sample3));
+  vec3 bottom_bbox = vec3(texture(u_objects_texture, sample1));
+  vec3 top_bbox = vec3(texture(u_objects_texture, sample2));
+  vec3 extra_data = vec3(texture(u_objects_texture, sample3));
 
   // Triangle model
   int bvh_start_index = int(extra_data.x);

@@ -1,10 +1,10 @@
 import {Camera} from "../camera.model";
-import {createProgram} from "./gl-helper";
+import {createProgram, getShaderSource} from "./gl-helper";
 import {DataTexture} from "./data-texture.model";
 import {Material} from "../material.model";
 
 export class TracerProgram {
-  private _gl: WebGLRenderingContext;
+  private _gl: any;
   private _program: WebGLProgram;
   private _vertexBuffer;
   private _frameBuffer;
@@ -37,9 +37,21 @@ export class TracerProgram {
     this._callback = callback;
 
     // Create Program
-    this._program = createProgram( this._gl, document.getElementById('vs').textContent, kernelData);
-    this._vertexAttribute = this._gl.getAttribLocation(this._program, 'vertex');
-    this._gl.enableVertexAttribArray(this._vertexAttribute);
+    this._program = createProgram( this._gl, getShaderSource('vs'), kernelData);
+
+    let texCoords = new Float32Array([0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 1.0]);
+    let vertexTexBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, vertexTexBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, texCoords, gl.STATIC_DRAW);
+    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+    let vertexTexLocation = 1; // set with GLSL layout qualifier
+    gl.enableVertexAttribArray(vertexTexLocation);
+    gl.bindBuffer(gl.ARRAY_BUFFER, vertexTexBuffer);
+    gl.vertexAttribPointer(vertexTexLocation, 2, gl.FLOAT, false, 0, 0);
+
+    // this._vertexAttribute = this._gl.getAttribLocation(this._program, 'vertex');
+    // this._gl.enableVertexAttribArray(this._vertexAttribute);
 
     this.accumulatedBufferLocation = gl.getUniformLocation(this._program, "u_buffer_texture");
     this.timeLocation = gl.getUniformLocation( this._program, 'time' );
@@ -52,8 +64,10 @@ export class TracerProgram {
     this.updateCamera(camera);
     this._gl.bindBuffer(this._gl.ARRAY_BUFFER, this._vertexBuffer);
     this._gl.vertexAttribPointer(this._vertexAttribute, 2, this._gl.FLOAT, false, 0, 0);
+
     this._gl.bindFramebuffer(this._gl.FRAMEBUFFER, this._frameBuffer);
     this._gl.framebufferTexture2D(this._gl.FRAMEBUFFER, this._gl.COLOR_ATTACHMENT0, this._gl.TEXTURE_2D, bufferTextures[1], 0);
+    this._gl.bindFramebuffer(this._gl.FRAMEBUFFER, null);
 
     this._gl.activeTexture(this._gl.TEXTURE0);
     this._gl.bindTexture(this._gl.TEXTURE_2D, bufferTextures[0]);
@@ -86,7 +100,9 @@ export class TracerProgram {
     this._gl.bindTexture(this._gl.TEXTURE_2D, this._objectsTexture.texture);
 
     this._gl.drawArrays(this._gl.TRIANGLE_STRIP, 0, 4);
-    this._gl.bindFramebuffer(this._gl.FRAMEBUFFER, null);
+
+    this._gl.bindFramebuffer(this._gl.DRAW_FRAMEBUFFER, this._frameBuffer);
+    //this._gl.bindFramebuffer(this._gl.FRAMEBUFFER, null);
 
     this._gl.uniform1f( this.timeLocation, time );
     this._gl.uniform2f( this.resolutionLocation, width, height );
@@ -117,7 +133,7 @@ export class TracerProgram {
     this._materialTexture.textureData[material_index * 6 + 5] = 0;
 
     this._gl.bindTexture(this._gl.TEXTURE_2D, this._materialTexture.texture);
-    this._gl.texImage2D(this._gl.TEXTURE_2D, 0, this._gl.RGB, this._materialTexture.width, this._materialTexture.height, 0, this._gl.RGB, this._gl.FLOAT, this._materialTexture.textureData);
+    this._gl.texImage2D(this._gl.TEXTURE_2D, 0, this._gl.RGB32F, this._materialTexture.width, this._materialTexture.height, 0, this._gl.RGB, this._gl.FLOAT, this._materialTexture.textureData);
   }
 
   public addSceneTextures(textureData) {
