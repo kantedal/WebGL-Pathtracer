@@ -1,9 +1,11 @@
 import 'hammerjs';
-import {Component, AfterViewInit} from '@angular/core';
+import {Component, AfterViewInit, ViewContainerRef} from '@angular/core';
 import {RenderService} from "./services/render.service";
 import {NavigatorService} from "./services/navigator.service";
 import {Object3d} from "./models/primitives/object3d.model";
 import {SceneLoaderService} from "./services/scene-loader.service";
+import {MdDialog, MdDialogRef, MdDialogConfig} from "@angular/material";
+import {LoaderDialog} from "./components/loader.component";
 
 declare var ProgressBar: any;
 
@@ -22,11 +24,14 @@ export class AppComponent implements AfterViewInit {
 
   private selectedObject: Object3d = null;
   private progressBar: any;
+  private dialogRef: MdDialogRef<LoaderDialog>;
 
   constructor(
+    private viewContainerRef: ViewContainerRef,
     private renderService: RenderService,
     private navigatorService: NavigatorService,
-    private sceneLoaderService: SceneLoaderService
+    private sceneLoaderService: SceneLoaderService,
+    private loaderDialog: MdDialog
   ) {}
 
   public changePane(paneId: number) {
@@ -67,6 +72,16 @@ export class AppComponent implements AfterViewInit {
     setInterval(() => {
       this.progressBar.animate(this.renderService.renderCompletion)
     }, 100);
+
+    setTimeout(() => {
+      let config = new MdDialogConfig();
+      config.viewContainerRef = this.viewContainerRef;
+      this.dialogRef = this.loaderDialog.open(LoaderDialog, config);
+    }, 200);
+
+    setTimeout(() => {
+      this.dialogRef.close();
+    }, 5000);
 
     this.setupListeners();
   }

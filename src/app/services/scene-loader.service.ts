@@ -4,7 +4,7 @@
 import { Injectable } from '@angular/core';
 import { Object3d } from "../models/primitives/object3d.model";
 import { Scene } from "../models/scene.model";
-import { Material } from "../models/material.model";
+import { Material } from "../models/materials/material.model";
 import { Triangle } from "../models/primitives/triangle.model";
 
 @Injectable()

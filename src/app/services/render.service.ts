@@ -7,8 +7,9 @@ import { Camera } from "../models/camera.model";
 import {Scene, SceneListener} from "../models/scene.model";
 import { Renderer } from "../models/renderer/renderer.model";
 import { NavigatorService } from "./navigator.service";
-import { Material } from "../models/material.model";
+import { Material } from "../models/materials/material.model";
 import {SceneLoaderService} from "./scene-loader.service";
+import {Object3d} from "../models/primitives/object3d.model";
 
 @Injectable()
 export class RenderService implements SceneListener {
@@ -18,6 +19,7 @@ export class RenderService implements SceneListener {
   public renderSamples = 0;
   public samplesPerSecond = 0;
   public BVHModeEnabled = false;
+  public globalLightningEnabled: boolean = false;
 
   public bloomIterations = 20;
   public bloomAlpha = 0.7;
@@ -80,6 +82,10 @@ export class RenderService implements SceneListener {
   public sceneUpdated() {
     this._scene.buildScene();
     this._renderer.addSceneTextures(this._scene.buildSceneTextures(), this._scene);
+  }
+
+  public updateObjectTexture(object: Object3d) {
+    this._renderer.tracerProgram.updateObjectTexture(object);
   }
 
   get bloomEnabled() { return this._renderer.bloomEnabled; }

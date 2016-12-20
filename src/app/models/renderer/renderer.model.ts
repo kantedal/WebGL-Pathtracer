@@ -8,7 +8,7 @@ import { TracerProgram, TracerProgramInterface } from "./tracer-program.model";
 import { RenderProgram } from "./render-program.model";
 import { BloomProgram } from "./bloom-program.model";
 import { ThresholdProgram } from "./threshold-program.model";
-import { Material } from "../material.model";
+import { Material } from "../materials/material.model";
 import { RenderService } from "../../services/render.service";
 import { DeveloperProgram } from "./developer-program.model";
 import { Scene} from "../scene.model";
@@ -42,7 +42,21 @@ export class Renderer implements TracerProgramInterface {
     this._camera = camera;
   }
 
+  public generate(splitter: number, size: number) {
+    console.log(splitter);
+    console.log("----");
+    if (splitter % 2 == 0) {
+      return 'mix(' + this.generate(splitter - size / 2, size / 2) + ', ' + this.generate(splitter + size / 2, size / 2) + ', step(' + (splitter - 0.1) + ', index))'
+    }
+    else {
+      return 'mix(stack[' + (splitter - 1) + '],' + 'stack[' + splitter + '], step(' + (splitter - 0.1) + ', index))';
+    }
+    //this.generate(splitter / 2);
+    //
+  }
+
   public init(callback: any) {
+    //console.log('int(' + this.generate(16, 16) + ');');
     LoadShaders([
         './assets/kernels/header.glsl',
         './assets/kernels/Ray.glsl',
@@ -199,5 +213,9 @@ export class Renderer implements TracerProgramInterface {
 
   set bloomEnabled(value: boolean) {
     this._bloomEnabled = value;
+  }
+
+  get tracerProgram(): TracerProgram {
+    return this._tracerProgram;
   }
 }

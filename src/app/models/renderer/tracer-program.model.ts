@@ -1,8 +1,11 @@
 import {Camera} from "../camera.model";
 import {createProgram} from "./gl-helper";
 import {DataTexture} from "./data-texture.model";
-import {Material} from "../material.model";
+import {Material, MATERIAL_TYPES} from "../materials/material.model";
 import {RenderService} from "../../services/render.service";
+import {Object3d} from "../primitives/object3d.model";
+import {GlossyMaterial} from "../materials/glossy-material.model";
+import {DiffuseMaterial} from "../materials/diffuse-material.model";
 
 export class TracerProgram {
   private _renderService: RenderService;
@@ -24,6 +27,7 @@ export class TracerProgram {
   private _lightSphereLocation: WebGLUniformLocation;
   private _objectCountLocation: WebGLUniformLocation;
   private _traceDepthLocation: WebGLUniformLocation;
+  private _globalLightningLocation: WebGLUniformLocation;
   private timeLocation: WebGLUniformLocation;
   private resolutionLocation: WebGLUniformLocation;
 
@@ -47,6 +51,7 @@ export class TracerProgram {
     this.timeLocation = gl.getUniformLocation( this._program, 'time' );
     this.resolutionLocation = gl.getUniformLocation( this._program, 'resolution' );
     this._traceDepthLocation = gl.getUniformLocation( this._program, 'trace_depth' );
+    this._globalLightningLocation = gl.getUniformLocation( this._program, 'global_lightning_enabled' );
   }
 
   public update(time, width, height, bufferTextures: Array<any>, camera: Camera) {
@@ -88,6 +93,7 @@ export class TracerProgram {
     this._gl.uniform1f( this.timeLocation, time );
     this._gl.uniform2f( this.resolutionLocation, width, height );
     this._gl.uniform1i( this._traceDepthLocation, this._renderService.traceDepth );
+    this._gl.uniform1f( this._globalLightningLocation, (this._renderService.globalLightningEnabled ? 1.0 : 0.0));
   }
 
   private updateCamera(camera: Camera) {
@@ -107,15 +113,39 @@ export class TracerProgram {
   public updateMaterialTexture(material: Material) {
     let material_index = material.material_index;
 
-    this._materialTexture.textureData[material_index * 6 + 0] = material.color[0];
-    this._materialTexture.textureData[material_index * 6 + 1] = material.color[1];
-    this._materialTexture.textureData[material_index * 6 + 2] = material.color[2];
-    this._materialTexture.textureData[material_index * 6 + 3] = material.material_type;
-    this._materialTexture.textureData[material_index * 6 + 4] = material.emission_rate;
-    this._materialTexture.textureData[material_index * 6 + 5] = 0;
+    this._materialTexture.textureData[material_index * 9 + 0] = material.color[0];
+    this._materialTexture.textureData[material_index * 9 + 1] = material.color[1];
+    this._materialTexture.textureData[material_index * 9 + 2] = material.color[2];
+    this._materialTexture.textureData[material_index * 9 + 3] = material.material_type;
+    this._materialTexture.textureData[material_index * 9 + 4] = material.emission_rate;
+    this._materialTexture.textureData[material_index * 9 + 5] = 0;
+
+    // Extra data 2
+    if (material.material_type == MATERIAL_TYPES.diffuse) {
+      let diffuse_material = <DiffuseMaterial> material;
+      this._materialTexture.textureData[material_index * 9 + 6] = diffuse_material.albedo;
+      this._materialTexture.textureData[material_index * 9 + 7] = diffuse_material.roughness;
+    }
+    else if (material.material_type == MATERIAL_TYPES.glossy) {
+      let diffuse_material = <GlossyMaterial> material;
+      this._materialTexture.textureData[material_index * 9 + 6] = diffuse_material.shininess
+    }
 
     this._gl.bindTexture(this._gl.TEXTURE_2D, this._materialTexture.texture);
     this._gl.texImage2D(this._gl.TEXTURE_2D, 0, this._gl.RGB, this._materialTexture.width, this._materialTexture.height, 0, this._gl.RGB, this._gl.FLOAT, this._materialTexture.textureData);
+  }
+
+  public updateObjectTexture(object: Object3d) {
+    this._objectsTexture.textureData[object.textureIndex * 15 + 6] = object.position[0];
+    this._objectsTexture.textureData[object.textureIndex * 15 + 7] = object.position[1];
+    this._objectsTexture.textureData[object.textureIndex * 15 + 8] = object.position[2];
+
+    this._objectsTexture.textureData[object.textureIndex * 15 + 9] = object.scale[0];
+    this._objectsTexture.textureData[object.textureIndex * 15 + 10] = object.scale[1];
+    this._objectsTexture.textureData[object.textureIndex * 15 + 11] = object.scale[2];
+
+    this._gl.bindTexture(this._gl.TEXTURE_2D, this._objectsTexture.texture);
+    this._gl.texImage2D(this._gl.TEXTURE_2D, 0, this._gl.RGB, this._objectsTexture.width, this._objectsTexture.height, 0, this._gl.RGB, this._gl.FLOAT, this._objectsTexture.textureData);
   }
 
   public addSceneTextures(textureData) {

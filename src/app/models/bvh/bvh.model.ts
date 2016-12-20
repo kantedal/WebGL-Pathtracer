@@ -1,6 +1,17 @@
 import {BVHNode, BVHLeaf, BVHInner} from "./bvh-node.model";
 import {Triangle} from "../primitives/triangle.model";
 
+class BVHSplit {
+  public min_cost;
+  public best_split;
+  public best_axis;
+
+  constructor(_min_cost: number, _best_split: number, _best_axis: number) {
+    this.min_cost = _min_cost;
+    this.best_split = _best_split;
+    this.best_axis = _best_axis;
+  }
+}
 export class BVH {
   public static MAX_SIZE = 100;
 
@@ -59,6 +70,56 @@ export class BVH {
     this.createBVHTexture(this._root, new NodeCounter(0), new NodeCounter(0), 0);
   }
 
+  private findBestSplitPlane(bvh_split: BVHSplit, axis: number, test_split: number, workBoxes: Array<WorkBoundingBox>): any {
+    // Left and right bounding box
+    let left_bottom = vec3.fromValues(BVH.MAX_SIZE, BVH.MAX_SIZE, BVH.MAX_SIZE);
+    let left_top = vec3.fromValues(-BVH.MAX_SIZE, -BVH.MAX_SIZE, -BVH.MAX_SIZE);
+    let right_bottom = vec3.fromValues(BVH.MAX_SIZE, BVH.MAX_SIZE, BVH.MAX_SIZE);
+    let right_top = vec3.fromValues(-BVH.MAX_SIZE, -BVH.MAX_SIZE, -BVH.MAX_SIZE);
+
+    let count_left = 0;
+    let count_right = 0;
+
+    for (let box of workBoxes) {
+      let value = box.center[axis];
+
+      if (value < test_split) {
+        vec3.min(left_bottom, left_bottom, box.bottom);
+        vec3.max(left_top, left_top, box.top);
+        count_left++;
+      }
+      else {
+        vec3.min(right_bottom, right_bottom, box.bottom);
+        vec3.max(right_top, right_top, box.top);
+        count_right++;
+      }
+    }
+
+    // Bins with less than 1 elements not accepted
+    if (count_left <= 1 || count_right <= 1) return;
+
+    // Calculate surface areas
+    let left_side1 = left_top[0] - left_bottom[0];
+    let left_side2 = left_top[1] - left_bottom[1];
+    let left_side3 = left_top[2] - left_bottom[2];
+
+    let right_side1 = right_top[0] - right_bottom[0];
+    let right_side2 = right_top[1] - right_bottom[1];
+    let right_side3 = right_top[2] - right_bottom[2];
+
+    let surface_left = left_side1*left_side2 + left_side2*left_side3 + left_side3*left_side1;
+    let surface_right = right_side1*right_side2 + right_side2*right_side3 + right_side3*right_side1;
+
+    // Calculate total cost
+    let total_cost = surface_left*count_left + surface_right*count_right;
+
+    if (total_cost < bvh_split.min_cost) {
+      bvh_split.min_cost = total_cost;
+      bvh_split.best_split = test_split;
+      bvh_split.best_axis = axis;
+    }
+  }
+
   private recurse(workBoxes: Array<WorkBoundingBox>, depth): BVHNode {
     // Terminate if work boxes has less than 4 triangles
     if (workBoxes.length < 4) {
@@ -84,9 +145,7 @@ export class BVH {
     let side2 = top[1] - bottom[1]; // y
     let side3 = top[2] - bottom[2]; // z
 
-    let min_cost = workBoxes.length * (side1*side2 + side2*side3 + side3*side1);
-    let best_split = 10000;
-    let best_axis = -1;
+    let bvh_split = new BVHSplit(workBoxes.length * (side1*side2 + side2*side3 + side3*side1), 10000, -1);
 
     // Try all axis
     for (let axis = 0; axis < 3; axis++) {
@@ -96,61 +155,15 @@ export class BVH {
       if (Math.abs(stop - start) < 0.0001)
         continue;
 
-      let step = (stop - start) / (32.0 / (depth + 1.0));
-
+      let step = (stop - start) / (128.0 / (depth + 1.0));
       for (let test_split = start + step; test_split < stop - step; test_split += step) {
-        // Left and right bounding box
-        let left_bottom = vec3.fromValues(BVH.MAX_SIZE, BVH.MAX_SIZE, BVH.MAX_SIZE);
-        let left_top = vec3.fromValues(-BVH.MAX_SIZE, -BVH.MAX_SIZE, -BVH.MAX_SIZE);
-        let right_bottom = vec3.fromValues(BVH.MAX_SIZE, BVH.MAX_SIZE, BVH.MAX_SIZE);
-        let right_top = vec3.fromValues(-BVH.MAX_SIZE, -BVH.MAX_SIZE, -BVH.MAX_SIZE);
-
-        let count_left = 0;
-        let count_right = 0;
-
-        for (let box of workBoxes) {
-          let value = box.center[axis];
-
-          if (value < test_split) {
-            vec3.min(left_bottom, left_bottom, box.bottom);
-            vec3.max(left_top, left_top, box.top);
-            count_left++;
-          }
-          else {
-            vec3.min(right_bottom, right_bottom, box.bottom);
-            vec3.max(right_top, right_top, box.top);
-            count_right++;
-          }
-        }
-
-        // Bins with less than 1 elements not accepted
-        if (count_left <= 1 || count_right <= 1) continue;
-
-        // Calculate surface areas
-        let left_side1 = left_top[0] - left_bottom[0];
-        let left_side2 = left_top[1] - left_bottom[1];
-        let left_side3 = left_top[2] - left_bottom[2];
-
-        let right_side1 = right_top[0] - right_bottom[0];
-        let right_side2 = right_top[1] - right_bottom[1];
-        let right_side3 = right_top[2] - right_bottom[2];
-
-        let surface_left = left_side1*left_side2 + left_side2*left_side3 + left_side3*left_side1;
-        let surface_right = right_side1*right_side2 + right_side2*right_side3 + right_side3*right_side1;
-
-        // Calculate total cost
-        let total_cost = surface_left*count_left + surface_right*count_right;
-
-        if (total_cost < min_cost) {
-          min_cost = total_cost;
-          best_split = test_split;
-          best_axis = axis;
-        }
+        this.findBestSplitPlane(bvh_split, axis, test_split, workBoxes);
       }
+
     }
 
     // No best axis found, create leaf node
-    if (best_axis == -1) {
+    if (bvh_split.best_axis == -1) {
       let leaf = new BVHLeaf();
       for (let box of workBoxes) {
         leaf.triangles.push(box.triangle);
@@ -167,9 +180,9 @@ export class BVH {
     let right_top = vec3.fromValues(-BVH.MAX_SIZE, -BVH.MAX_SIZE, -BVH.MAX_SIZE);
 
     for (let box of workBoxes) {
-      let value = box.center[best_axis];
+      let value = box.center[bvh_split.best_axis];
 
-      if (value < best_split) {
+      if (value < bvh_split.best_split) {
         left.push(box);
         vec3.min(left_bottom, left_bottom, box.bottom);
         vec3.max(left_top, left_top, box.top);

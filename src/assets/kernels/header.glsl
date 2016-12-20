@@ -1,7 +1,8 @@
-precision lowp float;
+precision highp float;
 
 uniform float time;
 uniform int trace_depth;
+uniform float global_lightning_enabled;
 uniform int triangle_count;
 uniform int object_count;
 uniform vec2 resolution;

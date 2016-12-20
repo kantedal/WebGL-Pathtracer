@@ -12,6 +12,7 @@ import { PostEffectsPaneComponent } from "./components/post-effects-pane/post-ef
 import { RenderSettingsComponent } from "./components/render-settings/render-settings.component";
 import { SceneLoaderService } from "./services/scene-loader.service";
 import { LightningSettingsComponent } from "./components/lightning-settings/lightning-settings.component";
+import { LoaderDialog } from "./components/loader.component";
 
 @NgModule({
   declarations: [
@@ -19,7 +20,8 @@ import { LightningSettingsComponent } from "./components/lightning-settings/ligh
     ObjectPaneComponent,
     PostEffectsPaneComponent,
     RenderSettingsComponent,
-    LightningSettingsComponent
+    LightningSettingsComponent,
+    LoaderDialog
   ],
   imports: [
     BrowserModule,
@@ -30,7 +32,10 @@ import { LightningSettingsComponent } from "./components/lightning-settings/ligh
   providers: [
     NavigatorService,
     RenderService,
-    SceneLoaderService
+    SceneLoaderService,
+  ],
+  entryComponents: [
+    LoaderDialog
   ],
   bootstrap: [AppComponent]
 })

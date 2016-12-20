@@ -1,5 +1,5 @@
 import {BoundingBox} from "../bvh/bounding-box.model";
-import {Material} from "../material.model";
+import {Material} from "../materials/material.model";
 
 export class Intersectable {
   private _material: Material;
@@ -8,6 +8,7 @@ export class Intersectable {
   private _position: GLM.IArray;
   private _rotation: GLM.IArray;
   private _scale: GLM.IArray;
+  private _textureIndex: number;
 
   private _triangleStartIndex: number = -1;
   private _triangleEndIndex: number = -1;
@@ -33,4 +34,6 @@ export class Intersectable {
   set position(value: GLM.IArray) { this._position = value; }
   get material(): Material { return this._material; }
   set material(value: Material) { this._material = value; }
+  get textureIndex(): number { return this._textureIndex; }
+  set textureIndex(value: number) { this._textureIndex = value; }
 }

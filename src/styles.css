@@ -10,6 +10,9 @@ app-root {
 md-divider {
   color: #ddd;
 }
+md-spinner path {
+  path: #000 !important;
+}
 
 .md-input-element {
   color: #555555 !important;

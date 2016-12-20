@@ -8,41 +8,41 @@
   <md-list-item style="margin-top: 10px;">
     <table style="width: 100%" cellspacing="0" style="padding-top: 10px;">
       <tr>
-        <td><md-input placeholder="X" style="width: 100%" dividerColor="accent" color="accent" value="{{selectedObject && selectedObject?.position[0].toFixed(2)}}"></md-input></td>
-        <td><md-input placeholder="Y" style="width: 100%" dividerColor="accent" color="accent" value="{{selectedObject && selectedObject?.position[1].toFixed(2)}}"></md-input></td>
-        <td><md-input placeholder="Z" style="width: 100%" dividerColor="accent" color="accent" value="{{selectedObject && selectedObject?.position[2].toFixed(2)}}"></md-input></td>
+        <td><md-input (input)="positionXChanged($event)" placeholder="X" style="width: 100%" dividerColor="accent" color="accent" value="{{this._position.x}}"></md-input></td>
+        <td><md-input (input)="positionYChanged($event)"  placeholder="Y" style="width: 100%" dividerColor="accent" color="accent" value="{{this._position.y}}"></md-input></td>
+        <td><md-input (input)="positionZChanged($event)"  placeholder="Z" style="width: 100%" dividerColor="accent" color="accent" value="{{this._position.z}}"></md-input></td>
       </tr>
     </table>
   </md-list-item>
 
-  <div class="list-header" style="">
-    Scale
-  </div>
-  <md-list-item style="margin-top: 10px;">
-    <table style="width: 100%" cellspacing="0" style="padding-top: 10px;">
-      <tr>
-        <td><md-input placeholder="X" style="width: 100%" dividerColor="accent" color="accent" value="0"></md-input></td>
-        <td><md-input placeholder="Y" style="width: 100%" dividerColor="accent" color="accent" value="0"></md-input></td>
-        <td><md-input placeholder="Z" style="width: 100%" dividerColor="accent" color="accent" value="0"></md-input></td>
-      </tr>
-    </table>
-  </md-list-item>
+  <!--<div class="list-header" style="">-->
+    <!--Scale-->
+  <!--</div>-->
+  <!--<md-list-item style="margin-top: 10px;">-->
+    <!--<table style="width: 100%" cellspacing="0" style="padding-top: 10px;">-->
+      <!--<tr>-->
+        <!--<td><md-input (input)="scaleXChanged($event)" placeholder="X" style="width: 100%" dividerColor="accent" color="accent" value="{{this._scale.x}}"></md-input></td>-->
+        <!--<td><md-input (input)="scaleYChanged($event)" placeholder="Y" style="width: 100%" dividerColor="accent" color="accent" value="{{this._scale.y}}"></md-input></td>-->
+        <!--<td><md-input (input)="scaleZChanged($event)" placeholder="Z" style="width: 100%" dividerColor="accent" color="accent" value="{{this._scale.z}}"></md-input></td>-->
+      <!--</tr>-->
+    <!--</table>-->
+  <!--</md-list-item>-->
 
-  <div class="list-header" style="">
-    Rotation
-  </div>
-  <md-list-item style="margin-top: 10px;">
-    <table style="width: 100%" cellspacing="0" style="padding-top: 10px;">
-      <tr>
-        <td><md-input placeholder="X" style="width: 100%" dividerColor="accent" color="accent" value="0"></md-input></td>
-        <td><md-input placeholder="Y" style="width: 100%" dividerColor="accent" color="accent" value="0"></md-input></td>
-        <td><md-input placeholder="Z" style="width: 100%" dividerColor="accent" color="accent" value="0"></md-input></td>
-      </tr>
-    </table>
-  </md-list-item>
+  <!--<div class="list-header" style="">-->
+    <!--Rotation-->
+  <!--</div>-->
+  <!--<md-list-item style="margin-top: 10px;">-->
+    <!--<table style="width: 100%" cellspacing="0" style="padding-top: 10px;">-->
+      <!--<tr>-->
+        <!--<td><md-input placeholder="X" style="width: 100%" dividerColor="accent" color="accent" value="0"></md-input></td>-->
+        <!--<td><md-input placeholder="Y" style="width: 100%" dividerColor="accent" color="accent" value="0"></md-input></td>-->
+        <!--<td><md-input placeholder="Z" style="width: 100%" dividerColor="accent" color="accent" value="0"></md-input></td>-->
+      <!--</tr>-->
+    <!--</table>-->
+  <!--</md-list-item>-->
 
   <div class="main-list-header" style="margin-top: 20px">
-    Selected material
+    {{_materialTitle}}
   </div>
   <div class="list-header" style="">
     Color
@@ -50,12 +50,40 @@
   <md-list-item style="margin-top: 10px;">
     <table style="width: 100%" cellspacing="0" style="padding-top: 10px;">
       <tr>
-        <td><md-input (input)="redChannelChanged($event)" placeholder="R" style="width: 100%" dividerColor="accent" color="red" value="{{selectedObject && selectedObject?.material?.color[0].toFixed(2)}}"></md-input></td>
-        <td><md-input (input)="greenChannelChanged($event)" placeholder="G" style="width: 100%" dividerColor="accent" color="green" value="{{selectedObject && selectedObject?.material?.color[1].toFixed(2)}}"></md-input></td>
-        <td><md-input (input)="blueChannelChanged($event)" placeholder="B" style="width: 100%" dividerColor="accent" color="blue" value="{{selectedObject && selectedObject?.material?.color[2].toFixed(2)}}"></md-input></td>
+        <td><md-input (input)="redChannelChanged($event)" placeholder="R" style="width: 100%" dividerColor="accent" color="red" value="{{this._color.red}}"></md-input></td>
+        <td><md-input (input)="greenChannelChanged($event)" placeholder="G" style="width: 100%" dividerColor="accent" color="green" value="{{this._color.green}}"></md-input></td>
+        <td><md-input (input)="blueChannelChanged($event)" placeholder="B" style="width: 100%" dividerColor="accent" color="blue" value="{{this._color.blue}}"></md-input></td>
       </tr>
     </table>
   </md-list-item>
+
+  <div [hidden]="_materialType != 0">
+    <div class="list-header" style="">
+      Roughness
+    </div>
+    <md-list-item style="margin-top: 10px;">
+      <md-input (input)="roughnessChanged($event)" style="width:50px;" dividerColor="accent" value="{{_materialProperties.roughness}}"></md-input>
+      <input type="range" name="points" min="0" max="100" value="{{_materialProperties.roughness}}" (input)="roughnessChanged($event)">
+    </md-list-item>
+    <div class="list-header" style="">
+      Albedo
+    </div>
+    <md-list-item style="margin-top: 10px;">
+      <md-input (input)="albedoChanged($event)" style="width:50px;" dividerColor="accent" value="{{_materialProperties.albedo}}"></md-input>
+      <input type="range" name="points" min="0" max="100" value="{{_materialProperties.albedo}}" (input)="albedoChanged($event)">
+    </md-list-item>
+  </div>
+
+  <div [hidden]="_materialType != 5">
+    <div class="list-header" style="">
+      Shininess
+    </div>
+    <md-list-item style="margin-top: 10px;">
+      <md-input (input)="shininessChanged($event)" style="width:50px;" dividerColor="accent" value="{{_materialProperties.shininess}}"></md-input>
+      <input type="range" name="points" min="0" max="100" value="{{_materialProperties.shininess}}" (input)="shininessChanged($event)">
+    </md-list-item>
+  </div>
+
   <div class="list-header" style="">
     Emission rate
   </div>

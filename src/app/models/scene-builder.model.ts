@@ -1,6 +1,8 @@
 import { Scene } from "./scene.model";
 import { Object3d } from "./primitives/object3d.model";
-import {MATERIAL_TYPES} from "./material.model";
+import {MATERIAL_TYPES} from "./materials/material.model";
+import {DiffuseMaterial} from "./materials/diffuse-material.model";
+import {GlossyMaterial} from "./materials/glossy-material.model";
 
 export function buildScene(scene: Scene) {
   let textureData = {
@@ -22,6 +24,7 @@ export function buildScene(scene: Scene) {
   let triangleCount = 0;
   for (let obj_idx = 0; obj_idx < scene.intersectables.length; obj_idx++) {
     let object = scene.intersectables[obj_idx] as Object3d;
+    object.textureIndex = obj_idx;
 
     let bvh_start_index = bvhCount;
     for (let obj_bvh_idx = 0; obj_bvh_idx < object.bvh.count; obj_bvh_idx++) {
@@ -50,6 +53,11 @@ export function buildScene(scene: Scene) {
     objectData.push(object.position[1]);
     objectData.push(object.position[2]);
 
+    // Object scale
+    objectData.push(object.scale[0]);
+    objectData.push(object.scale[1]);
+    objectData.push(object.scale[2]);
+
     // Set indices for bvh texture
     objectData.push(bvh_start_index / 12); // BVH start index
     objectData.push(triangle_start_index / 3);
@@ -73,10 +81,29 @@ export function buildScene(scene: Scene) {
     materialData.push(material.color[1]);
     materialData.push(material.color[2]);
 
-    // Extra data
+    // Extra data 1
     materialData.push(material.material_type);
     materialData.push(material.emission_rate);
     materialData.push(0);
+
+    // Extra data 2
+    if (material.material_type == MATERIAL_TYPES.diffuse) {
+      let diffuse_material = <DiffuseMaterial> material;
+      materialData.push(diffuse_material.albedo);
+      materialData.push(diffuse_material.roughness);
+      materialData.push(0);
+    }
+    else if (material.material_type == MATERIAL_TYPES.glossy) {
+      let diffuse_material = <GlossyMaterial> material;
+      materialData.push(diffuse_material.shininess);
+      materialData.push(0);
+      materialData.push(0);
+    }
+    else {
+      materialData.push(0);
+      materialData.push(0);
+      materialData.push(0);
+    }
   }
 
   textureData.material_count = scene.materials.length;

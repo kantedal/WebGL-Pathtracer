@@ -86,11 +86,13 @@ vec3 PathTrace(Ray ray) {
     //break;
 
     if (!SceneIntersection(ray, collision)) {
-      vec3 lightSphereContribution = LightSphereContributions(ray);
-      if (iteration == 0) {
-        return lightSphereContribution * 5.0;
+      if (global_lightning_enabled == 1.0) {
+        vec3 lightSphereContribution = LightSphereContributions(ray);
+        if (iteration == 0) {
+          return lightSphereContribution * 5.0;
+        }
+        accumulated_color += (mask * lightSphereContribution);
       }
-      accumulated_color += (mask * lightSphereContribution);
       break;
     }
 
@@ -98,13 +100,11 @@ vec3 PathTrace(Ray ray) {
 
     vec3 next_dir = PDF(ray, collision_material, collision.normal, iteration, distribution);
     mask *= BRDF(ray, collision_material, collision.normal, next_dir) * distribution;
-    mask *= 2.0;
+    //mask *= 2.0;
 
     accumulated_color += mask * collision_material.emission_rate;
 
     if (collision_material.emission_rate != 0.0) break;
-
-    ray = Ray(collision.position + next_dir * EPS, next_dir);
 
     if (iteration == trace_depth - 1) {
 //      // Cast shadow ray to end point of ray chain if it has not hit any light source
@@ -113,6 +113,9 @@ vec3 PathTrace(Ray ray) {
 //      }
 
       break;
+    }
+    else {
+      ray = Ray(collision.position + next_dir * EPS, next_dir);
     }
   }
 

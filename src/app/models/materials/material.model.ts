@@ -8,7 +8,7 @@ export const MATERIAL_TYPES = {
   emission: 2,
   transmission: 3,
   glossy: 5
-}
+};
 
 export class Material {
   private _material_type: number;

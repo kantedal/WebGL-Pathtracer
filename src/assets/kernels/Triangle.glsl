@@ -18,9 +18,9 @@ struct BaseTriangle {
   vec3 edge2;
 };
 
-Triangle GetTriangleFromIndex(int triangle_index) {
+Triangle GetTriangleFromIndex(float triangle_index) {
   // Fetch triangle from texture
-  vec2 start_sample = SAMPLE_STEP_2048 * float(triangle_index) * 11.0;
+  vec2 start_sample = SAMPLE_STEP_2048 * triangle_index * 11.0;
 
   vec2 sample1 = getSample(start_sample, SAMPLE_STEP_2048, 2048.0, 0.0);
   vec2 sample2 = getSample(start_sample, SAMPLE_STEP_2048, 2048.0, 1.0);
@@ -66,12 +66,12 @@ BaseTriangle GetBaseTriangleFromIndex(int triangle_index) {
   return BaseTriangle(v0, edge1, edge2);
 }
 
-int getTriangleIndex(int stackIdx) {
-  vec2 start_sample = SAMPLE_STEP_1024 * float(stackIdx);
+float getTriangleIndex(float stackIdx) {
+  vec2 start_sample = SAMPLE_STEP_1024 * stackIdx;
   vec2 sample1 = getSample(start_sample, SAMPLE_STEP_1024, 1024.0, 0.0);
 
   vec4 triangle_index_slot = texture2D(u_triangle_index_texture, sample1);
-  return int(triangle_index_slot.x);
+  return triangle_index_slot.x;
 }
 
 Triangle GetLightTriangleFromIndex(int triangle_index) {
@@ -108,26 +108,30 @@ Triangle GetLightTriangleFromIndex(int triangle_index) {
   return Triangle(v0, edge1, edge2, n0, n1, n2, uv0, uv1, uv2, triangle_area, material_index);
 }
 
-float TriangleIntersection(Ray ray, Triangle triangle, inout Collision collision, float closest_collision_distance) {
-  if (dot(ray.direction, triangle.n0) > 0.0) return -1.0;
+float TriangleIntersection(Ray ray, Triangle triangle, bool backface_culling, vec3 object_position, inout Collision collision, float closest_collision_distance) {
+  if (dot(ray.direction, triangle.n0) > 0.0 && !backface_culling) return -1.0;
+
+  vec3 v0 = object_position + triangle.v0;
+  vec3 edge1 = triangle.edge1;
+  vec3 edge2 = triangle.edge2;
 
   //Begin calculating determinant - also used to calculate u parameter
-  vec3 P = cross(ray.direction, triangle.edge2);
-  float det = dot(triangle.edge1, P);
+  vec3 P = cross(ray.direction, edge2);
+  float det = dot(edge1, P);
 
   if (det > -EPS && det < EPS) return -1.0;
 
   //Distance from vertex1 to ray origin
-  vec3 T = ray.start_position - triangle.v0;
+  vec3 T = ray.start_position - v0;
   float u = dot(T, P);
   if (u < 0.0 || u > det) return -1.0;
 
-  vec3 Q = cross(T, triangle.edge1);
+  vec3 Q = cross(T, edge1);
 
   float v = dot(ray.direction, Q);
   if(v < 0.0 || u+v > det) return -1.0;
 
-  float t = dot(triangle.edge2, Q);
+  float t = dot(edge2, Q);
 
   if(t < EPS) return -1.0;
 
