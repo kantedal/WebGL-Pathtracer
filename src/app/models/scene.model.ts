@@ -154,9 +154,9 @@ export class Scene {
         //{ fileName: './assets/models/cylinder.obj', material: glossy_blue_material, smooth_shading: true },
         { fileName: './assets/models/box.obj', material: white_material, smooth_shading: false },
         //{ fileName: './assets/models/bottom_disc.obj', material: white_material, smooth_shading: false },
-        //{ fileName: './assets/models/teapot5.obj', material: gold_material, smooth_shading: true },
-        //{ fileName: './assets/models/bunny.obj', material: green_glass, smooth_shading: true },
-        { fileName: './assets/models/dragon2.obj', material: green_glass, smooth_shading: true },
+        { fileName: './assets/models/teapot5.obj', material: gold_material, smooth_shading: true },
+        { fileName: './assets/models/bunny.obj', material: green_glass, smooth_shading: true },
+        //{ fileName: './assets/models/dragon2.obj', material: green_glass, smooth_shading: true },
         { fileName: './assets/models/light_plane4.obj', material: emission_material, smooth_shading: false },
         { fileName: './assets/models/light_plane5.obj', material: emission_red_material, smooth_shading: false },
       ], (objects) => {
