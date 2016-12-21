@@ -68,7 +68,7 @@ export class DeveloperProgram {
     this._mvMatrix = [];
     mat4.identity(this._mvMatrix);
     mat4.perspective(this._mvMatrix, 45, 1.0, 0.1, 100);
-    mat4.translate(this._mvMatrix, this._mvMatrix, [0, 0, -1.5]);
+    mat4.translate(this._mvMatrix, this._mvMatrix, [-0.3, 0.0, -1.0]);
     mat4.rotate(this._mvMatrix, this._mvMatrix, 0.3, [1,0,0]);
 
     this._mvLocation = this._gl.getUniformLocation(this._program, 'uMVMatrix');

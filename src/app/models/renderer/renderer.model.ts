@@ -122,7 +122,7 @@ export class Renderer implements TracerProgramInterface {
   }
 
   private animate = () => {
-    if (this._renderService.BVHModeEnabled) {
+    if (false) {
       this._developerProgram.update();
     }
     else {

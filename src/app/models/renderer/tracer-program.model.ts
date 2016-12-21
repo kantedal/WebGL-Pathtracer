@@ -168,15 +168,15 @@ export class TracerProgram {
       this._gl.useProgram(this._program);
       this._gl.activeTexture(this._gl.TEXTURE10);
       this._gl.bindTexture(this._gl.TEXTURE_2D, this._lightSphereTexture);
-      this._gl.texParameteri(this._gl.TEXTURE_2D, this._gl.TEXTURE_WRAP_S, this._gl.REPEAT);
-      this._gl.texParameteri(this._gl.TEXTURE_2D, this._gl.TEXTURE_WRAP_T, this._gl.REPEAT);
+      this._gl.texParameteri(this._gl.TEXTURE_2D, this._gl.TEXTURE_WRAP_S, this._gl.CLAMP_TO_EDGE);
+      this._gl.texParameteri(this._gl.TEXTURE_2D, this._gl.TEXTURE_WRAP_T, this._gl.CLAMP_TO_EDGE);
       this._gl.texParameteri(this._gl.TEXTURE_2D, this._gl.TEXTURE_MIN_FILTER, this._gl.LINEAR);
       this._gl.texParameteri(this._gl.TEXTURE_2D, this._gl.TEXTURE_MAG_FILTER, this._gl.LINEAR);
       this._gl.texImage2D(this._gl.TEXTURE_2D, 0, this._gl.RGBA, this._gl.RGBA, this._gl.UNSIGNED_BYTE, lightSphereImage);
       this._gl.uniform1i(this._lightSphereLocation, 10);
       this._gl.bindTexture(this._gl.TEXTURE_2D, null);
     };
-    lightSphereImage.src = "./assets/brick.jpg";
+    lightSphereImage.src = "./assets/dome.jpg";
 
     this._gl.useProgram(this._program);
     this._gl.uniform1i(this.accumulatedBufferLocation, 0);

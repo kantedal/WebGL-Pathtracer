@@ -15,7 +15,16 @@ vec3 LightSphereContributions(Ray ray) {
   if (t < 0.01)
     return vec3(0,0,0);
 
+
+
   vec3 collision_position = (ray.start_position + ray.direction * t) / 100.0;
+  vec3 normal = normalize(collision_position);
+  float u = 0.5 - atan(normal.z, normal.x) / 6.28;
+  float v = 0.5 - 2.0 * asin(normal.y) / 6.28;
+
+  vec3 clr = texture2D(u_light_sphere_texture, vec2(u,v)).rgb;
+  return clr;
+
   float sun_distance = distance(collision_position, sun_position);
 
   if (sun_distance < 0.1) {

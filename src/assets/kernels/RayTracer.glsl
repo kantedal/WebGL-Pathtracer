@@ -86,13 +86,17 @@ vec3 PathTrace(Ray ray) {
     //break;
 
     if (!SceneIntersection(ray, collision)) {
-      if (global_lightning_enabled == 1.0) {
+      //if (global_lightning_enabled == 1.0) {
         vec3 lightSphereContribution = LightSphereContributions(ray);
         if (iteration == 0) {
-          return lightSphereContribution * 5.0;
+          return vec3(0,0,0); //(lightSphereContribution - 0.5) * 1.5 + 0.5;
         }
-        accumulated_color += (mask * lightSphereContribution);
-      }
+        else {
+          lightSphereContribution = ((lightSphereContribution - 0.5) * 2.5 + 0.5) * 0.8;
+          accumulated_color += (mask * lightSphereContribution);
+        }
+
+      //}
       break;
     }
 
