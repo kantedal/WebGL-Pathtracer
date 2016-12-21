@@ -122,29 +122,26 @@ export class Renderer implements TracerProgramInterface {
   }
 
   private animate = () => {
-    if (false) {
-      this._developerProgram.update();
+    //this._developerProgram.update();
+    
+    if (this._shouldRender && this._samples < this._renderService.maxSamples) {
+      this._tracerProgram.update(this._time, this._canvas.width, this._canvas.height, this._textures, this._camera);
+      this._textures.reverse();
     }
-    else {
-      if (this._shouldRender && this._samples < this._renderService.maxSamples) {
-        this._tracerProgram.update(this._time, this._canvas.width, this._canvas.height, this._textures, this._camera);
-        this._textures.reverse();
-      }
 
-      // Run threshold and bloom shader if enabled
-      if (this._bloomEnabled) {
-        this._thresholdProgram.update(this._textures[0], this._bloomTextures[0], this._samples);
-        for (let bloomIteration = 0; bloomIteration < this._renderService.bloomIterations; bloomIteration++)
-          this._bloomProgram.update(this._bloomTextures[0], this._bloomTextures[1]);
-      }
+    // Run threshold and bloom shader if enabled
+    if (this._bloomEnabled) {
+      this._thresholdProgram.update(this._textures[0], this._bloomTextures[0], this._samples);
+      for (let bloomIteration = 0; bloomIteration < this._renderService.bloomIterations; bloomIteration++)
+        this._bloomProgram.update(this._bloomTextures[0], this._bloomTextures[1]);
+    }
 
-      this._renderProgram.update(this._textures[0], this._bloomTextures[0], this._samples, this._bloomEnabled, this._renderService.bloomAlpha);
+    this._renderProgram.update(this._textures[0], this._bloomTextures[0], this._samples, this._bloomEnabled, this._renderService.bloomAlpha);
 
-      if (this._shouldRender && this._samples < this._renderService.maxSamples) {
-        this._time = (new Date().getTime() - this._startTime) / 10000;
-        this._samples += 1;
-        this.calculateSPS();
-      }
+    if (this._shouldRender && this._samples < this._renderService.maxSamples) {
+      this._time = (new Date().getTime() - this._startTime) / 10000;
+      this._samples += 1;
+      this.calculateSPS();
     }
 
     requestAnimationFrame( this.animate );
