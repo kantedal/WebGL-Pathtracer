@@ -18,33 +18,31 @@ vec3 CosineDistributeDirection(vec3 normal) {
     return v1 + v2 + v3;
 }
 
-vec3 ShadowRay(vec3 collision_pos, vec3 collision_normal) {
-  int light_index = int(random(vec3(15.326, 24.4236, 812.23), time + 12421.362) * 2.0);
+vec3 ShadowRay(Material collision_material, vec3 collision_pos, vec3 collision_normal) {
+  int light_index = int(random(vec3(15.326, 24.4236, 812.23), sin(time) * 30245.42 + 12421.362) * 2.0);
 
   // Fetch triangle and material
   Triangle light_triangle = GetLightTriangleFromIndex(light_index);
-  Material light_material = GetMaterial(light_triangle.material_index);
-  vec3 light_normal = cross(light_triangle.edge1, light_triangle.edge2);
+  vec3 light_normal = light_triangle.n0;
 
   // Generate emission position and direction
   vec3 light_emission_pos = RandomizePointOnTriangle(light_triangle);
-  vec3 light_emission_direction = normalize(collision_pos - light_emission_pos);
-  Ray shadow_ray = newRay(light_emission_pos, light_emission_direction);
+  vec3 light_emission_direction = normalize(light_emission_pos - collision_pos);
 
-  // Test ray visibility
-  Collision collision;
-  if (SceneIntersection(shadow_ray, collision)) {
-    if (distance(collision.position, collision_pos) < 0.1) {
+  if (dot(collision_normal, light_emission_direction) > 0.0) {
+    // Test ray visibility
+    Collision collision;
+    Ray shadow_ray = newRay(collision_pos, light_emission_direction);
+    if (SceneIntersection(shadow_ray, collision)) {
+      if (distance(collision.position, light_emission_pos) < EPS) {
 
-      // Point is visible
-      vec3 distance_vector = light_emission_pos - collision_pos;
-      vec3 L = normalize(distance_vector);
-      float cosine_term = clamp(dot(collision_normal, L), 0.0, 1.0);
-      float light_area = (length(light_triangle.edge1) * length(light_triangle.edge2)) / 2.0;
-      float projected_light_area = clamp(dot(light_normal, -1.0 * L), 0.0, 1.0);
-
-
-      return light_material.emission_rate * light_material.color * cosine_term * projected_light_area * 1.0 / pow(length(distance_vector), 2.0);
+        // Point is visible
+        vec3 distance_vector = light_emission_pos - collision_pos;
+        float alpha = dot(collision_normal, light_emission_direction);
+        float beta = clamp(dot(light_normal, -light_emission_direction), 0.0, 1.0);
+        Material light_material = GetMaterial(light_triangle.material_index);
+        return 0.5 * dot(collision_normal, light_emission_direction) * light_material.emission_rate * light_material.color * alpha * beta * light_triangle.triangle_area * 1.0 / pow(length(distance_vector), 2.0);
+     }
     }
   }
 
@@ -82,30 +80,50 @@ vec3 PathTrace(Ray ray) {
   Material collision_material;
 
   for (int iteration = 0; iteration < 10; iteration++) {
-    if (iteration == trace_depth) break;
     float distribution = 1.0;
 
+    //accumulated_color += mask * ShadowRay(collision_material, collision.position, collision.normal);
+    //break;
+
     if (!SceneIntersection(ray, collision)) {
-//      vec3 lightSphereContribution = LightSphereContributions(ray);
-//      if (iteration == 0) {
-//        return lightSphereContribution * 5.0;
-//      }
-//
-//      accumulated_color += (mask * lightSphereContribution);
+      //if (global_lightning_enabled == 1.0) {
+        vec3 lightSphereContribution = LightSphereContributions(ray);
+        if (iteration == 0) {
+          return vec3(0,0,0); //(lightSphereContribution - 0.5) * 1.5 + 0.5;
+        }
+        else {
+          lightSphereContribution = ((lightSphereContribution - 0.5) * 2.5 + 0.5) * 0.8;
+          accumulated_color += (mask * lightSphereContribution);
+        }
+
+      //}
       break;
     }
 
     collision_material = GetMaterial(collision.material_index);
 
     vec3 next_dir = PDF(ray, collision_material, collision.normal, iteration, distribution);
-    mask *= BRDF(ray, collision_material, collision.normal, next_dir) * distribution;
+    mask *= BRDF(ray, collision_material, collision.uv, collision.normal, next_dir) * distribution;
+    //mask *= 2.0;
 
-    accumulated_color += mask * collision_material.color * collision_material.emission_rate;
+    accumulated_color += mask * collision_material.emission_rate;
 
-    if (length(next_dir) == 0.0) break;
-    ray = Ray(collision.position + next_dir * 0.01, next_dir);
+    if (collision_material.emission_rate != 0.0) break;
+
+    if (iteration == trace_depth - 1) {
+//      // Cast shadow ray to end point of ray chain if it has not hit any light source
+//      if (collision_material.material_type == DIFFUSE_MATERIAL) {
+//        accumulated_color += mask * ShadowRay(collision_material, collision.position, collision.normal);
+//      }
+
+      break;
+    }
+    else {
+      ray = Ray(collision.position + next_dir * EPS, next_dir);
+    }
   }
 
+  //return vec3(clamp(accumulated_color.x, 0.0, 1.0), clamp(accumulated_color.y, 0.0, 1.0), clamp(accumulated_color.z, 0.0, 1.0));
   return accumulated_color;
 }
 
