@@ -7,6 +7,7 @@ import { buildScene } from './scene-builder.model';
 import {DiffuseMaterial} from "./materials/diffuse-material.model";
 import {GlossyMaterial} from "./materials/glossy-material.model";
 import {EmissionMaterial} from "./materials/emission-material.model";
+import {TransmissionMaterial} from "./materials/transmission-material.model";
 
 export class Scene {
   private _sceneListener: SceneListener;
@@ -123,14 +124,14 @@ export class Scene {
     let green_material = new DiffuseMaterial(vec3.fromValues(0,1,0));
     let blue_material = new DiffuseMaterial(vec3.fromValues(0,0,1));
     let white_material = new DiffuseMaterial(vec3.fromValues(1,1,1));
-    let green_glass = new Material(vec3.fromValues(0.5,1,0.5), MATERIAL_TYPES.transmission);
+    let green_glass = new TransmissionMaterial(vec3.fromValues(0.5,1,0.5));
     let glossy_red_material = new GlossyMaterial(vec3.fromValues(1,0.5,0.5));
     let glossy_blue_material = new GlossyMaterial(vec3.fromValues(0.5,0.5,1.0));
     let gold_material = new GlossyMaterial(vec3.fromValues(1.0,0.8,0.3));
     let silver_material = new GlossyMaterial(vec3.fromValues(0.8,0.8,0.8));
 
     let emission_material = new EmissionMaterial(vec3.fromValues(1,1,1));
-    emission_material.emission_rate = 5.0;
+    emission_material.emission_rate = 20.0;
     let emission_red_material = new EmissionMaterial(vec3.fromValues(1,0.7,0.7));
     emission_red_material.emission_rate = 5.0;
     let light_emission_material = new EmissionMaterial(vec3.fromValues(0,1,1));
@@ -153,9 +154,9 @@ export class Scene {
         //{ fileName: './assets/models/cylinder.obj', material: glossy_blue_material, smooth_shading: true },
         { fileName: './assets/models/box.obj', material: white_material, smooth_shading: false },
         //{ fileName: './assets/models/bottom_disc.obj', material: white_material, smooth_shading: false },
-        { fileName: './assets/models/teapot5.obj', material: silver_material, smooth_shading: true },
-        { fileName: './assets/models/bunny.obj', material: gold_material, smooth_shading: true },
-        //{ fileName: './assets/models/dragon2.obj', material: gold_material, smooth_shading: true },
+        //{ fileName: './assets/models/teapot5.obj', material: gold_material, smooth_shading: true },
+        //{ fileName: './assets/models/bunny.obj', material: green_glass, smooth_shading: true },
+        { fileName: './assets/models/dragon2.obj', material: green_glass, smooth_shading: true },
         { fileName: './assets/models/light_plane4.obj', material: emission_material, smooth_shading: false },
         { fileName: './assets/models/light_plane5.obj', material: emission_red_material, smooth_shading: false },
       ], (objects) => {

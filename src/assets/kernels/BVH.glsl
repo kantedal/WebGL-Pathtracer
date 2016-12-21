@@ -46,7 +46,7 @@ void processLeaf(BVHNode node, inout Collision closest_collision, Ray ray, float
   for (int idx = 0; idx < 1000; idx++) {
     Triangle triangle = GetTriangleFromIndex(getTriangleIndex(current_index));
 
-    if (TriangleIntersection(ray, triangle, true, object.position, collision, closest_collision.distance) == 1.0) {
+    if (TriangleIntersection(ray, triangle, object.position, collision, closest_collision.distance) == 1.0) {
       closest_collision = collision;
     }
 

@@ -87,6 +87,9 @@ export class TracerProgram {
     this._gl.activeTexture(this._gl.TEXTURE7);
     this._gl.bindTexture(this._gl.TEXTURE_2D, this._objectsTexture.texture);
 
+    this._gl.activeTexture(this._gl.TEXTURE10);
+    this._gl.bindTexture(this._gl.TEXTURE_2D, this._lightSphereTexture);
+
     this._gl.drawArrays(this._gl.TRIANGLE_STRIP, 0, 4);
     this._gl.bindFramebuffer(this._gl.FRAMEBUFFER, null);
 
@@ -157,22 +160,23 @@ export class TracerProgram {
     this._objectsBVHTexture = new DataTexture(this._gl, 2048, 2048, textureData.objects_bvh, "u_objects_bvh_texture", this._program, 6, this._gl.RGB);
     this._objectsTexture = new DataTexture(this._gl, 512, 512, textureData.objects, "u_objects_texture", this._program, 7, this._gl.RGB);
 
-    // this._lightSphereTexture = this._gl.createTexture();
-    // this._lightSphereLocation = this._gl.getUniformLocation(this._program, "u_light_sphere_texture");
-    // this._gl.uniform1i(this._lightSphereLocation, 7);
+    this._lightSphereTexture = this._gl.createTexture();
+    this._lightSphereLocation = this._gl.getUniformLocation(this._program, "u_light_sphere_texture");
 
-    // let lightSphereImage = new Image();
-    // lightSphereImage.onload = () => {
-    //   this._gl.bindTexture(this._gl.TEXTURE_2D, this._lightSphereTexture);
-    //   this._gl.texImage2D(this._gl.TEXTURE_2D, 0, this._gl.RGBA, this._gl.RGBA, this._gl.UNSIGNED_BYTE, lightSphereImage);
-    //   this._gl.texParameteri(this._gl.TEXTURE_2D, this._gl.TEXTURE_WRAP_S, this._gl.CLAMP_TO_EDGE);
-    //   this._gl.texParameteri(this._gl.TEXTURE_2D, this._gl.TEXTURE_WRAP_T, this._gl.CLAMP_TO_EDGE);
-    //   this._gl.texParameteri(this._gl.TEXTURE_2D, this._gl.TEXTURE_MIN_FILTER, this._gl.LINEAR);
-    //   this._gl.texParameteri(this._gl.TEXTURE_2D, this._gl.TEXTURE_MAG_FILTER, this._gl.LINEAR);
-    //   this._gl.bindTexture(this._gl.TEXTURE_2D, null);
-    //
-    // };
-    // lightSphereImage.src = "./assets/sky.jpg";
+    let lightSphereImage = new Image();
+    lightSphereImage.onload = () => {
+      this._gl.useProgram(this._program);
+      this._gl.activeTexture(this._gl.TEXTURE10);
+      this._gl.bindTexture(this._gl.TEXTURE_2D, this._lightSphereTexture);
+      this._gl.texParameteri(this._gl.TEXTURE_2D, this._gl.TEXTURE_WRAP_S, this._gl.REPEAT);
+      this._gl.texParameteri(this._gl.TEXTURE_2D, this._gl.TEXTURE_WRAP_T, this._gl.REPEAT);
+      this._gl.texParameteri(this._gl.TEXTURE_2D, this._gl.TEXTURE_MIN_FILTER, this._gl.LINEAR);
+      this._gl.texParameteri(this._gl.TEXTURE_2D, this._gl.TEXTURE_MAG_FILTER, this._gl.LINEAR);
+      this._gl.texImage2D(this._gl.TEXTURE_2D, 0, this._gl.RGBA, this._gl.RGBA, this._gl.UNSIGNED_BYTE, lightSphereImage);
+      this._gl.uniform1i(this._lightSphereLocation, 10);
+      this._gl.bindTexture(this._gl.TEXTURE_2D, null);
+    };
+    lightSphereImage.src = "./assets/brick.jpg";
 
     this._gl.useProgram(this._program);
     this._gl.uniform1i(this.accumulatedBufferLocation, 0);

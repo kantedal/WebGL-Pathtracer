@@ -32,7 +32,7 @@ Material GetMaterial(int material_index) {
   return Material(color, material_type, emission_rate, material_parameter1, material_parameter2);
 }
 
-vec3 BRDF(Ray ray, Material material, vec3 collision_normal, vec3 next_dir) {
+vec3 BRDF(Ray ray, Material material, vec2 uv, vec3 collision_normal, vec3 next_dir) {
   // Lambertian diffuse material
   if (material.material_type == DIFFUSE_MATERIAL) {
     float albedo = material.material_parameter1; // material parameter 1 is albedo
@@ -61,6 +61,7 @@ vec3 BRDF(Ray ray, Material material, vec3 collision_normal, vec3 next_dir) {
     float L1 = max(0.0, NdotL) * (A + B * max(0.0, gamma) * C);
 
     // get the final color
+    //vec3 texture_color = texture2D(u_light_sphere_texture, uv * 5.0).rgb;
     return material.color * L1;
   }
 
@@ -132,7 +133,7 @@ vec3 PDF(Ray ray, Material material, vec3 collision_normal, int iteration, inout
   else if (material.material_type == TRANSMISSION_MATERIAL) {
     bool into = dot(collision_normal, real_normal) > 0.0; // is ray entering or leaving refractive material?
     float nc = 1.0;  // Index of Refraction air
-    float nt = 1.3;  // Index of Refraction glass/water
+    float nt = 1.5;  // Index of Refraction glass/water
     float nnt = into ? nc / nt : nt / nc;  // IOR ratio of refractive materials
     float ddn = dot(ray.direction, real_normal);
     float cos2t = 1.0 - nnt*nnt * (1.0 - ddn*ddn);
