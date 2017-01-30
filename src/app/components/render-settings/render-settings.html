@@ -25,4 +25,28 @@
   <md-list-item>
     <button md-raised-button (click)="_renderService.scene.saveSceneToFile()" style="margin-top: 30px; background-color: #FF4081; width: 100%; color:#fff;">Save scene</button>
   </md-list-item>
+
+  <div class="list-header" style="padding-top: 10px;">
+    Load default scene
+  </div>
+  <md-list-item>
+    <button md-raised-button (click)="createDefaultScene1()" style="margin-top: 5px; background-color: #aaa; width: 100%; color:#fff;">
+      HDR teapot, bunny
+    </button>
+  </md-list-item>
+  <md-list-item>
+    <button md-raised-button (click)="createDefaultScene2()" style="margin-top: 5px; background-color: #aaa; width: 100%; color:#fff;">
+      HDR stanford dragon
+    </button>
+  </md-list-item>
+  <md-list-item>
+    <button md-raised-button (click)="createDefaultScene3()" style="margin-top: 5px; background-color: #aaa; width: 100%; color:#fff;">
+      Room teapot, bunny
+    </button>
+  </md-list-item>
+  <md-list-item>
+    <button md-raised-button (click)="createDefaultScene4()" style="margin-top: 5px; background-color: #aaa; width: 100%; color:#fff;">
+      Room stanford dragon
+    </button>
+  </md-list-item>
 </md-list>

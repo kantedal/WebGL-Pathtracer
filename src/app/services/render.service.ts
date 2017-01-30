@@ -10,6 +10,7 @@ import { NavigatorService } from "./navigator.service";
 import { Material } from "../models/materials/material.model";
 import {SceneLoaderService} from "./scene-loader.service";
 import {Object3d} from "../models/primitives/object3d.model";
+import {createDefaultScene1, createDefaultScene2, createDefaultScene4} from "../models/default-scenes/default-scenes";
 
 @Injectable()
 export class RenderService implements SceneListener {
@@ -40,7 +41,7 @@ export class RenderService implements SceneListener {
 
     this._renderer = new Renderer(this._camera, this);
     this._renderer.init(() => {
-      this._scene.createDefaultScene(() => {
+      createDefaultScene1(this._scene, () => {
         this._scene.sceneListener = this;
         this.sceneUpdated();
         setInterval(() => this.update(), 50);
@@ -73,7 +74,7 @@ export class RenderService implements SceneListener {
     this._renderer.bloomEnabled = enabled;
   }
 
-  private update() {
+  public update() {
     this.renderSamples = this._renderer.samples;
     this.renderCompletion = this._renderer.samples / this.maxSamples;
     this.samplesPerSecond = this._renderer.fps;

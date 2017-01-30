@@ -34,30 +34,32 @@ export class ObjectPaneComponent implements OnChanges {
 
     this._navigatorService.on(NavigatorService.OBJECT_SELECTED).subscribe(object => {
       this.selectedObject = object;
-      this._position = {x: this.selectedObject.position[0].toFixed(2), y: this.selectedObject.position[1].toFixed(2), z: this.selectedObject.position[2].toFixed(2)};
-      //this._scale = {x: this.selectedObject.scale[0].toFixed(2), y: this.selectedObject.scale[1].toFixed(2), z: this.selectedObject.scale[2].toFixed(2)};
-      this._color = {red: this.selectedObject.material.color[0].toFixed(2), green: this.selectedObject.material.color[1].toFixed(2), blue: this.selectedObject.material.color[2].toFixed(2)};
-      this._materialType = this.selectedObject.material.material_type;
+      if (this.selectedObject != null) {
+        this._position = {x: this.selectedObject.position[0].toFixed(2), y: this.selectedObject.position[1].toFixed(2), z: this.selectedObject.position[2].toFixed(2)};
+        //this._scale = {x: this.selectedObject.scale[0].toFixed(2), y: this.selectedObject.scale[1].toFixed(2), z: this.selectedObject.scale[2].toFixed(2)};
+        this._color = {red: this.selectedObject.material.color[0].toFixed(2), green: this.selectedObject.material.color[1].toFixed(2), blue: this.selectedObject.material.color[2].toFixed(2)};
+        this._materialType = this.selectedObject.material.material_type;
 
-      if (this._materialType == MATERIAL_TYPES.diffuse) {
-        this._materialTitle = 'Diffuse material';
-        let material = <DiffuseMaterial> this.selectedObject.material;
-        this._materialProperties.albedo = material.albedo;
-        this._materialProperties.roughness = material.roughness;
-      }
-      else if (this._materialType == MATERIAL_TYPES.emission) {
-        this._materialTitle = 'Emission material';
-      }
-      else if (this._materialType == MATERIAL_TYPES.glossy) {
-        this._materialTitle = 'Glossy material';
-        let material = <GlossyMaterial> this.selectedObject.material;
-        this._materialProperties.shininess = material.shininess;
-      }
-      else if (this._materialType == MATERIAL_TYPES.transmission) {
-        this._materialTitle = 'Transmission material';
-      }
-      else if (this._materialType == MATERIAL_TYPES.specular) {
-        this._materialTitle = 'Specular material';
+        if (this._materialType == MATERIAL_TYPES.diffuse) {
+          this._materialTitle = 'Diffuse material';
+          let material = <DiffuseMaterial> this.selectedObject.material;
+          this._materialProperties.albedo = material.albedo;
+          this._materialProperties.roughness = material.roughness;
+        }
+        else if (this._materialType == MATERIAL_TYPES.emission) {
+          this._materialTitle = 'Emission material';
+        }
+        else if (this._materialType == MATERIAL_TYPES.glossy) {
+          this._materialTitle = 'Glossy material';
+          let material = <GlossyMaterial> this.selectedObject.material;
+          this._materialProperties.shininess = material.shininess;
+        }
+        else if (this._materialType == MATERIAL_TYPES.transmission) {
+          this._materialTitle = 'Transmission material';
+        }
+        else if (this._materialType == MATERIAL_TYPES.specular) {
+          this._materialTitle = 'Specular material';
+        }
       }
     });
   }
